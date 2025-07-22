@@ -1,14 +1,22 @@
 <script setup lang="ts">
-import { Head, router } from '@inertiajs/vue3';
+import { Head, useForm, usePage } from '@inertiajs/vue3';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import TextLink from '@/components/TextLink.vue';
 import { Button } from '@/components/ui/button';
-import { LoaderCircle } from 'lucide-vue-next';
+import TextLink from '@/components/TextLink.vue';
 
-const goToDashboard = () => {
-  router.visit('/dashboard');
-};
+const form = useForm({
+  code: '',
+});
+
+const page = usePage();
+const email = (page.props.flash as { email?: string })?.email ?? '';
+
+function submit() {
+  form.post(route('verify.code'), {
+    preserveScroll: true,
+  })
+}
 </script>
 
 <template>
@@ -62,13 +70,14 @@ const goToDashboard = () => {
 
     <!-- Email Verification Form -->
     <div class="flex-grow flex items-center justify-center bg-[#F8FAFC]">
-      <form
-        @submit.prevent="goToDashboard"
+            <form
+        @submit.prevent="submit"
         class="flex flex-col gap-4 w-full max-w-sm mx-auto bg-white p-8 rounded-lg shadow-md"
       >
         <h2 class="text-2xl font-bold text-center text-[#182235]">Verify Your Email</h2>
         <p class="text-center text-gray-500 mb-4">
-          Please enter the verification code we sent to your email.
+          Please enter the verification code we sent to
+          <span class="font-semibold text-[#002B5C]">{{ email }}</span>.
         </p>
 
         <div class="grid gap-3 w-full">
@@ -78,10 +87,14 @@ const goToDashboard = () => {
             <Input
               id="email_code"
               type="text"
+              v-model="form.code"
               required
               placeholder="Enter your code"
               class="w-full text-black"
             />
+            <div v-if="form.errors.code" class="text-red-600 text-sm mt-1">
+              {{ form.errors.code }}
+            </div>
           </div>
 
           <!-- Submit Button -->
@@ -90,7 +103,6 @@ const goToDashboard = () => {
             class="mt-2 w-full"
             style="background:#FF2D2D; color:#fff; font-weight:600; padding-top:0.5rem; padding-bottom:0.5rem; border-radius:0.5rem;"
           >
-            <LoaderCircle v-if="false" class="h-4 w-4 animate-spin" />
             <span>Verify Email</span>
           </Button>
         </div>
