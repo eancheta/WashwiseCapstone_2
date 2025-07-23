@@ -9,29 +9,29 @@ Route::get('/', function () {
     return Inertia::render('Welcome');
 })->name('home');
 
-// 🛡 Dashboard - Requires authentication and verified email
+
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-// ✉ Email Verification Code Page (Vue Component)
+
 Route::get('/emailvcode', function () {
     return Inertia::render('EmailVerificationCode');
 })->middleware(['auth'])->name('emailvcode');
 
-// 🔐 Login Page
+
 Route::get('/login', function () {
     return Inertia::render('auth/Login');
 })->name('login');
 
-// 📝 Register Page
+
 Route::get('/register', function () {
     return Inertia::render('auth/Register');
 })->name('register');
 
-// ✅ Submit email verification code (POST)
+
 Route::post('/verify-code', [EmailVerificationController::class, 'verify'])
-    ->middleware(['auth']) // Secure the route
+    ->middleware(['auth'])
     ->name('verify.code');
 
 require __DIR__.'/settings.php';
