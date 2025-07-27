@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Inertia\Inertia;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
