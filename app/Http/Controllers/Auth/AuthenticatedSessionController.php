@@ -18,6 +18,7 @@ class AuthenticatedSessionController extends Controller
      */
     public function create(Request $request): Response
     {
+        /** @var \Illuminate\Http\Request $request */ // ✅ Fix for Intelephense
         return Inertia::render('auth/Login', [
             'canResetPassword' => Route::has('password.request'),
             'status' => $request->session()->get('status'),
@@ -31,6 +32,7 @@ class AuthenticatedSessionController extends Controller
     {
         $request->authenticate();
 
+        /** @var \Illuminate\Http\Request $request */ // ✅ Fix for Intelephense
         $request->session()->regenerate();
 
         return redirect()->intended(route('dashboard', absolute: false));
@@ -43,6 +45,7 @@ class AuthenticatedSessionController extends Controller
     {
         Auth::guard('web')->logout();
 
+        /** @var \Illuminate\Http\Request $request */ // ✅ Fix for Intelephense
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
