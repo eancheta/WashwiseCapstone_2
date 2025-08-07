@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Session;
 use Inertia\Inertia;
 use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\Auth\StaticLoginController;
+use App\Http\Controllers\AdminController;
 
 
 Route::get('/', fn() => Inertia::render('Welcome'))->name('home');
@@ -36,12 +37,8 @@ Route::post('/loginAdmin', [StaticLoginController::class,'login']);
 Route::post('/logout',     [StaticLoginController::class,'logout'])
     ->name('logout');
 
-Route::get('/admindashboard', function(){
-    if( ! Session::get('authenticated') ){
-        return redirect()->route('loginAdmin');
-    }
-    return Inertia::render('settings/AdminDashboard');
-})->name('admindashboard');
+
+Route::get('/admindashboard', [AdminController::class, 'index'])->name('admindashboard');
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';
