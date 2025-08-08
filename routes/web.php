@@ -7,6 +7,9 @@ use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\Auth\StaticLoginController;
 use App\Http\Controllers\AdminController;
 
+Route::get('/about', function () {
+    return Inertia::render('AboutUs');
+});
 
 Route::get('/', fn() => Inertia::render('Welcome'))->name('home');
 
