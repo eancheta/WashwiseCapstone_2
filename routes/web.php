@@ -43,5 +43,9 @@ Route::post('/logout',     [StaticLoginController::class,'logout'])
 
 Route::get('/admindashboard', [AdminController::class, 'index'])->name('admindashboard');
 
+Route::get('/about-us', function () {
+    return Inertia::render('AboutUs');
+})->name('about');
+
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';

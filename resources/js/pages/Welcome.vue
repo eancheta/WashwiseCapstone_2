@@ -33,7 +33,7 @@ import { Head, Link } from '@inertiajs/vue3';
   <nav class="w-full bg-[#182235] flex items-center px-8 py-2 text-white font-semibold shadow z-10">
     <ul class="flex gap-8 items-center flex-1">
       <li><Link :href="'#'" class="text-[#FF2D2D]">Home</Link></li>
-      <li><Link :href="'#'">About</Link></li>
+      <li><Link href="/about-us">About</Link></li>
       <li><Link :href="'#'">Service</Link></li>
     </ul>
 
