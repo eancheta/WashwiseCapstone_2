@@ -40,7 +40,14 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+
+            'carwashowner' => [
+        'driver' => 'session',
+        'provider' => 'carwashowners',
     ],
+    ],
+
+
 
     /*
     |--------------------------------------------------------------------------
@@ -64,6 +71,12 @@ return [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', App\Models\User::class),
         ],
+
+
+    'carwashowners' => [
+        'driver' => 'eloquent',
+        'model' => App\Models\CarwashOwner::class,
+    ],
 
         // 'users' => [
         //     'driver' => 'database',
