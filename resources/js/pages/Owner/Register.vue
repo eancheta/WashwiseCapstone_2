@@ -132,75 +132,74 @@ function submit() {
       <!-- Name -->
       <div>
         <Label for="name" class="text-gray-700 font-medium">Name</Label>
-        <input 
-        id="name"
-        type="text"
-        required
-              autofocus
-              autocomplete="name"
-              v-model="form.name"
-              placeholder="Full name"
-        class="w-full text-black border border-gray-200 px-4 py-2 rounded-lg bg-gray-300" />
+        <input
+          id="name"
+          type="text"
+          required
+          autofocus
+          autocomplete="name"
+          v-model="form.name"
+          placeholder="Full name"
+          class="w-full text-black border border-gray-200 px-4 py-2 rounded-lg bg-gray-300"
+        />
         <InputError :message="form.errors.name" />
-        
       </div>
 
       <!-- Email -->
       <div>
         <Label for="email" class="text-gray-700 font-medium">Email</Label>
-        <input 
-        id="email"
-              type="email"
-              required
-              autocomplete="email"
-              v-model="form.email"
-              placeholder="email@example.com" 
-        class="w-full text-black border border-gray-200 px-4 py-2 rounded-lg bg-gray-300"
-
- />
+        <input
+          id="email"
+          type="email"
+          required
+          autocomplete="email"
+          v-model="form.email"
+          placeholder="email@example.com"
+          class="w-full text-black border border-gray-200 px-4 py-2 rounded-lg bg-gray-300"
+        />
         <InputError :message="form.errors.email" />
       </div>
 
       <!-- Password -->
       <div class="grid gap-1 w-full">
         <Label for="password" class="text-gray-700 font-medium">Password</Label>
-        <input 
-         id="password"
-  type="password"
-  required
-  autocomplete="new-password"
-  v-model.trim="form.password"
-  name="password"
-  placeholder="Password"
-        class="w-full text-black border border-gray-200 px-4 py-2 rounded-lg bg-gray-300" />
-        <InputError :message="form.errors.password" />
+        <input
+          id="password"
+          type="password"
+          required
+          autocomplete="new-password"
+          v-model.trim="form.password"
+          name="password"
+          placeholder="Password"
+          class="w-full text-black border border-gray-200 px-4 py-2 rounded-lg bg-gray-300"
+        />
+        <div v-if="form.errors.password" class="text-red-600 text-sm mt-1">{{ form.errors.password }}</div>
       </div>
 
       <!-- Confirm Password -->
       <div class="grid gap-1 w-full">
-                  <Label for="password_confirmation" class="text-gray-700 font-medium">Confirm password</Label>
-                  <Input
-        id="password_confirmation"
-  name="password_confirmation"
-  type="password"
-  required
-  autocomplete="new-password"
-  v-model="form.password_confirmation"
-  placeholder="Confirm password"
-        class="w-full text-black border border-gray-200 px-4 py-2 rounded-lg bg-gray-300" />
-        <InputError :message="form.errors.password_confirmation" />
+        <Label for="password_confirmation" class="text-gray-700 font-medium">Confirm password</Label>
+        <input
+          id="password_confirmation"
+          name="password_confirmation"
+          type="password"
+          required
+          autocomplete="new-password"
+          v-model="form.password_confirmation"
+          placeholder="Confirm password"
+          class="w-full text-black border border-gray-200 px-4 py-2 rounded-lg bg-gray-300"
+        />
+        <div v-if="form.errors.password_confirmation" class="text-red-600 text-sm mt-1">{{ form.errors.password_confirmation }}</div>
       </div>
-
       <!-- District -->
       <div>
         <Label for="district" class="text-gray-700 font-medium">District</Label>
-        <select 
-        v-model="form.district" 
-        id="district" 
-         required
-         autofocus
-        
-        class="w-full text-black border border-gray-200 px-4 py-2 rounded-lg bg-gray-300">
+        <select
+          v-model="form.district"
+          id="district"
+          required
+          class="w-full text-black border border-gray-200 px-4 py-2 rounded-lg bg-gray-300"
+        >
           <option value="">Select District</option>
           <option v-for="n in 6" :key="n" :value="n">{{ n }}</option>
         </select>
@@ -211,41 +210,64 @@ function submit() {
       <div>
         <Label for="address" class="text-gray-700 font-medium">Address</Label>
         <input
-         placeholder="Enter address" 
-        v-model="form.address" 
-        id="address" 
-        type="Address" 
-        class="w-full text-black border border-gray-200 px-4 py-2 rounded-lg bg-gray-300"/>
+          placeholder="Enter address"
+          v-model="form.address"
+          id="address"
+          type="text"
+          class="w-full text-black border border-gray-200 px-4 py-2 rounded-lg bg-gray-300"
+        />
         <InputError :message="form.errors.address" />
       </div>
 
       <!-- Photo Uploads -->
       <div>
         <Label for="photo1" class="text-gray-700 font-medium">Photo 1</Label>
-        <input 
-        type="file" 
-        id="photo1" 
-        @change="handlePhoto1Change" 
-        class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4" />
-        <img v-if="preview1" 
-        :src="preview1" 
-        alt="Photo 1 preview" 
-        class="mt-2 w-32 h-32 object-cover border rounded"
+        <input
+          type="file"
+          id="photo1"
+          @change="handlePhoto1Change"
+          class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4"
+        />
+        <img
+          v-if="preview1"
+          :src="preview1"
+          alt="Photo 1 preview"
+          class="mt-2 w-32 h-32 object-cover border rounded"
         />
         <InputError :message="form.errors.photo1" />
       </div>
 
       <div>
         <Label for="photo2" class="text-gray-700 font-medium">Photo 2</Label>
-        <input type="file" id="photo2" @change="handlePhoto2Change" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4" />
-        <img v-if="preview2" :src="preview2" alt="Photo 2 preview" class="mt-2 w-32 h-32 object-cover border rounded" />
+        <input
+          type="file"
+          id="photo2"
+          @change="handlePhoto2Change"
+          class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4"
+        />
+        <img
+          v-if="preview2"
+          :src="preview2"
+          alt="Photo 2 preview"
+          class="mt-2 w-32 h-32 object-cover border rounded"
+        />
         <InputError :message="form.errors.photo2" />
       </div>
 
       <div>
         <Label for="photo3" class="text-gray-700 font-medium">Photo 3</Label>
-        <input type="file" id="photo3" @change="handlePhoto3Change" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4" />
-        <img v-if="preview3" :src="preview3" alt="Photo 3 preview" class="mt-2 w-32 h-32 object-cover border rounded" />
+        <input
+          type="file"
+          id="photo3"
+          @change="handlePhoto3Change"
+          class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4"
+        />
+        <img
+          v-if="preview3"
+          :src="preview3"
+          alt="Photo 3 preview"
+          class="mt-2 w-32 h-32 object-cover border rounded"
+        />
         <InputError :message="form.errors.photo3" />
       </div>
 
