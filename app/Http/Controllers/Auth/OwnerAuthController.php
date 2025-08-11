@@ -71,15 +71,26 @@ public function login(Request $request)
         'password' => 'required',
     ]);
 
+    // Find owner by email
+    $owner = CarWashOwner::where('email', $request->email)->first();
+
+    if (!$owner) {
+        return back()->withErrors(['email' => 'Account not found.']);
+    }
+
+    // Block login if account is not approved
+    if ($owner->status !== 'approved') {
+        return back()->withErrors(['email' => 'Your account is pending approval by the admin.']);
+    }
+
+    // Attempt login
     if (Auth::guard('carwashowner')->attempt($credentials)) {
 
-        $owner = Auth::guard('carwashowner')->user();
-
-        if (! $owner->email_verified_at) {
+        // If email is not verified yet, redirect to verification page
+        if (!$owner->email_verified_at) {
             Auth::guard('carwashowner')->logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
-
 
             session(['owner_verification_email' => $owner->email]);
 

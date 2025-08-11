@@ -9,6 +9,12 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Auth\OwnerAuthController;
 use App\Http\Controllers\Auth\OwnerVerificationController;
 use App\Http\Controllers\Auth\OwnerDashboardController;
+use App\Http\Controllers\AdminOwnerTable;
+
+
+Route::get('/admindashboard', [AdminController::class, 'index'])->name('admindashboard');
+Route::post('/admin/owners/{id}/approve', [AdminController::class, 'approve']);
+Route::post('/admin/owners/{id}/decline', [AdminController::class, 'decline']);
 
 Route::get('/owner/register', [OwnerAuthController::class, 'create'])->name('owner.register.show');
 Route::post('/owner/register', [OwnerAuthController::class, 'store'])->name('owner.register');
@@ -59,11 +65,14 @@ Route::post('/logout',     [StaticLoginController::class,'logout'])
     ->name('logout');
 
 
-Route::get('/admindashboard', [AdminController::class, 'index'])->name('admindashboard');
+
 
 Route::get('/about-us', function () {
     return Inertia::render('AboutUs');
 })->name('about');
+
+Route::post('/owners/{id}/approve', [AdminController::class, 'approve'])->name('owners.approve');
+Route::post('/owners/{id}/decline', [AdminController::class, 'decline'])->name('owners.decline');
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';

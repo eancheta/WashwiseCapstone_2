@@ -108,6 +108,9 @@ function submit() {
             placeholder="owner@email.com"
             class="w-full text-black border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF2D2D] transition"
           />
+          <div v-if="form.errors.email" class="text-red-500 text-sm mt-1">
+                {{ form.errors.email }}
+            </div>
         </div>
 
         <div class="grid gap-1 w-full">

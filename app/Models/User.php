@@ -45,7 +45,7 @@ protected function casts(): array
     return [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
-        'verification_code' => 'string', // ✅ Add this
+        'verification_code' => 'string',
     ];
 }
 }

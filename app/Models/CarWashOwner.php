@@ -21,6 +21,7 @@ class CarWashOwner extends Authenticatable
         'photo2',
         'photo3',
         'verification_code',
+        'status', // added from second version
     ];
 
     protected $hidden = [
