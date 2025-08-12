@@ -20,7 +20,7 @@
           :class="activeTab === 'owners' ? 'bg-[#FF2D2D] text-white' : 'text-[#182235] hover:bg-[#f8fafc]'"
           @click="activeTab = 'owners'"
         >
-          <span>🏢</span> Owners
+          <span>🏢</span> Owners    
         </button>
       </nav>
       <form @submit.prevent="logout" class="mt-auto pt-10">
@@ -69,79 +69,6 @@
           </tbody>
         </table>
       </div>
-
-      <div v-if="activeTab === 'owners'" class="overflow-x-auto">
-            <h1 class="text-2xl font-bold mb-4">Car Wash Owners</h1>
-
-    <table class="min-w-full border border-gray-300">
-      <thead class="bg-gray-100">
-        <tr>
-          <th class="border px-4 py-2">ID</th>
-          <th class="border px-4 py-2">Name</th>
-          <th class="border px-4 py-2">Email</th>
-          <th class="border px-4 py-2">Verified At</th>
-          <th class="border px-4 py-2">Password</th>
-          <th class="border px-4 py-2">District</th>
-          <th class="border px-4 py-2">Address</th>
-          <th class="border px-4 py-2">Photo1</th>
-          <th class="border px-4 py-2">Photo2</th>
-          <th class="border px-4 py-2">Photo3</th>
-          <th class="border px-4 py-2">Status</th>
-          <th class="border px-4 py-2">Remember Token</th>
-          <th class="border px-4 py-2">Created At</th>
-          <th class="border px-4 py-2">Updated At</th>
-          <th class="border px-4 py-2">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="owner in owners" :key="owner.id">
-          <td class="py-2 px-4 border-b border-[#182235] text-[#182235]">{{ owner.id }}</td>
-          <td class="py-2 px-4 border-b border-[#182235] text-[#182235]">{{ owner.name }}</td>
-          <td class="py-2 px-4 border-b border-[#182235] text-[#182235]">{{ owner.email }}</td>
-          <td class="py-2 px-4 border-b border-[#182235] text-[#182235]">{{ owner.email_verified_at }}</td>
-          <td class="py-2 px-4 border-b border-[#182235] text-[#182235]">{{ owner.password }}</td>
-          <td class="py-2 px-4 border-b border-[#182235] text-[#182235]">{{ owner.district }}</td>
-          <td class="py-2 px-4 border-b border-[#182235] text-[#182235]">{{ owner.address }}</td>
-<td class="py-2 px-4 border-b border-[#182235] text-[#182235]">
-  <img
-    v-if="owner.photo1"
-    :src="`/storage/${owner.photo1}`"
-    alt="Photo 1"
-    class="h-16 w-16 object-cover rounded"
-  />
-  <span v-else>No photo</span>
-</td>
-<td class="py-2 px-4 border-b border-[#182235] text-[#182235]">
-  <img
-    v-if="owner.photo2"
-    :src="`/storage/${owner.photo2}`"
-    alt="Photo 2"
-    class="h-16 w-16 object-cover rounded"
-  />
-  <span v-else>No photo</span>
-</td>
-<td class="py-2 px-4 border-b border-[#182235] text-[#182235]">
-  <img
-    v-if="owner.photo3"
-    :src="`/storage/${owner.photo3}`"
-    alt="Photo 3"
-    class="h-16 w-16 object-cover rounded"
-  />
-  <span v-else>No photo</span>
-</td>
-          <td class="py-2 px-4 border-b border-[#182235] text-[#182235]">{{ owner.status }}</td>
-          <td class="py-2 px-4 border-b border-[#182235] text-[#182235]">{{ owner.remember_token }}</td>
-          <td class="py-2 px-4 border-b border-[#182235] text-[#182235]">{{ owner.created_at }}</td>
-          <td class="py-2 px-4 border-b border-[#182235] text-[#182235]">{{ owner.updated_at }}</td>
-          <td class="py-2 px-4 border-b border-[#182235] text-[#182235]">
-            <button @click="approve(owner.id)" class="bg-green-500 text-white px-2 py-1 rounded">Approve</button>
-            <button @click="decline(owner.id)" class="bg-red-500 text-white px-2 py-1 rounded ml-2">Decline</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-      </div>
-
     </main>
   </div>
 </template>
@@ -150,49 +77,21 @@
 import { ref } from 'vue'
 import { router } from '@inertiajs/vue3'
 
-interface Owner {
-  id: number;
-  name: string;
-  email: string;
-  email_verified_at: string | null;
-  password: string;
-  district: string;
-  address: string;
-  photo1: string | null;
-  photo2: string | null;
-  photo3: string | null;
-  status: string;
-  remember_token: string | null;
-  created_at: string;
-  updated_at: string;
-}
+const { users } = defineProps<{
+  users: Array<{
+    id: number
+    name: string
+    email: string
+    email_verified_at: string | null
+    verification_code: string | null
+    created_at: string
+    updated_at: string
+  }>
+}>()
 
-interface User {
-  id: number;
-  name: string;
-  email: string;
-  email_verified_at: string | null;
-  verification_code: string | null;
-  created_at: string;
-  updated_at: string;
-}
-
-const { owners, users } = defineProps<{
-  owners: Owner[];
-  users: User[];
-}>();
-
-const activeTab = ref('users');
-
-const approve = (id: number) => {
-  router.post(`/admin/owners/${id}/approve`);
-};
-
-const decline = (id: number) => {
-  router.post(`/admin/owners/${id}/decline`);
-};
+const activeTab = ref('users')
 
 const logout = () => {
-  router.post('/logout');
-};
+  router.post('/logout')
+}
 </script>
