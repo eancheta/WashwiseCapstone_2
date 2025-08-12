@@ -11,12 +11,11 @@ use App\Mail\OwnerVerificationCodeMail;
 
 class OwnerVerificationController extends Controller
 {
-
     public function show()
     {
         $email = session('owner_verification_email') ?? session('flash.email') ?? request()->query('email');
         return inertia('Owner/VerifyCode', [
-            'email' => $email
+            'email' => $email,
         ]);
     }
 
@@ -36,7 +35,6 @@ class OwnerVerificationController extends Controller
         return back()->with('success', 'Verification code resent.')->with('email', $owner->email);
     }
 
-
     public function verify(Request $request)
     {
         $request->validate([
@@ -46,21 +44,21 @@ class OwnerVerificationController extends Controller
 
         $owner = CarWashOwner::where('email', $request->email)->first();
 
-        if (! $owner) {
-            return back()->withErrors(['email' => 'Owner not found']);
+        if (!$owner) {
+            return back()->withErrors(['email' => 'Owner not found'])->with('email', $request->email);
         }
 
         if ($owner->verification_code !== $request->code) {
             return back()->withErrors(['code' => 'Invalid verification code'])->with('email', $owner->email);
         }
 
-
         $owner->email_verified_at = now();
         $owner->verification_code = null;
         $owner->save();
 
-        Auth::login($owner);
+        session()->forget('owner_verification_email');
 
-        return redirect()->route('carwashownerdashboard')->with('success', 'Email verified.');
+        return redirect()->route('owner.login.show')
+            ->with('success', 'Email verified successfully. Please login.');
     }
 }

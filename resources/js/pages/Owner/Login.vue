@@ -109,7 +109,9 @@ function submit() {
             class="w-full text-black border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF2D2D] transition"
           />
         </div>
-
+          <div v-if="form.errors.email" class="text-red-500 text-sm mt-1">
+                {{ form.errors.email }}
+            </div>
         <div class="grid gap-1 w-full">
           <label for="password" class="text-gray-700 font-medium">Password</label>
           <input

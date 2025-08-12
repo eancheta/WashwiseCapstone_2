@@ -1,8 +1,8 @@
-<<<<<<< HEAD
-<!-- resources/js/Pages/UserDashboard.vue -->
+
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
 import { ref } from 'vue';
+
 
 const sidebarOpen = ref(false);
 const profileMenuOpen = ref(false);
@@ -150,21 +150,3 @@ function toggleProfileMenu() {
   animation: fadeIn 0.15s ease-out;
 }
 </style>
-=======
-<script setup lang="ts">
-import { Head } from '@inertiajs/vue3';
-</script>
-
-<template>
-  <Head title="Car Wash Owner Dashboard" />
-
-  <div class="min-h-screen p-6 bg-gray-100">
-    <h1 class="text-3xl font-bold mb-4">Hello</h1>
-
-    <p>
-      hi
-    </p>
-
-  </div>
-</template>
->>>>>>> parent of 1b912a2 (BusinessOwnerDashboard)

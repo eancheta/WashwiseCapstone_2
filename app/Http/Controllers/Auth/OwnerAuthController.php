@@ -1,19 +1,17 @@
 <?php
 
-namespace app\Http\Controllers\Auth;
+namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\CarWashOwner;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Auth;
-use App\Mail\OwnerVerificationCodeMail;
 use Illuminate\Support\Facades\Mail;
+use App\Mail\OwnerVerificationCodeMail;
 
 class OwnerAuthController extends Controller
 {
-
     public function create()
     {
         return inertia('Owner/Register');
@@ -38,6 +36,7 @@ class OwnerAuthController extends Controller
 
         $data['password'] = Hash::make($data['password']);
 
+        // Generate 6-digit verification code
         $code = (string) rand(100000, 999999);
         $data['verification_code'] = $code;
 
@@ -46,50 +45,47 @@ class OwnerAuthController extends Controller
         try {
             Mail::to($owner->email)->send(new OwnerVerificationCodeMail($code, $owner->name));
         } catch (\Exception $e) {
-            Log::error('Registration error: ' . $e->getMessage());
+            Log::error('Registration email sending failed: ' . $e->getMessage());
         }
 
-
+        // Store email in session to use on verify page
         session(['owner_verification_email' => $owner->email]);
 
-
-        Auth::login($owner);
+        // Redirect to verify code page
         return redirect()->route('owner.verify.show')->with('email', $owner->email);
     }
-
 
     public function showLogin()
     {
         return inertia('Owner/Login');
     }
 
+    public function login(Request $request)
+    {
+        $credentials = $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
 
-public function login(Request $request)
-{
-    $credentials = $request->validate([
-        'email' => 'required|email',
-        'password' => 'required',
-    ]);
+        $owner = CarWashOwner::where('email', $request->email)->first();
 
-    if (Auth::guard('carwashowner')->attempt($credentials)) {
-
-        $owner = Auth::guard('carwashowner')->user();
-
-        if (! $owner->email_verified_at) {
-            Auth::guard('carwashowner')->logout();
-            $request->session()->invalidate();
-            $request->session()->regenerateToken();
-
-
-            session(['owner_verification_email' => $owner->email]);
-
-            return redirect()->route('owner.verify.show')->with('email', $owner->email);
+        if (!$owner) {
+            return back()->withErrors(['email' => 'Account not found.'])->withInput();
         }
 
-        $request->session()->regenerate();
-        return redirect()->intended(route('carwashownerdashboard'));
-    }
+        if ($owner->status !== 'approved') {
+            return back()->withErrors(['email' => 'Your account is pending approval by the admin.'])->withInput();
+        }
 
-    return back()->withErrors(['email' => 'Invalid credentials'])->withInput($request->only('email'));
-}
+        if (! $owner->email_verified_at) {
+            return back()->withErrors(['email' => 'Please verify your email before logging in.'])->withInput();
+        }
+
+        if (auth()->guard('carwashowner')->attempt($credentials)) {
+            $request->session()->regenerate();
+            return redirect()->intended(route('carwashownerdashboard'));
+        }
+
+        return back()->withErrors(['email' => 'Invalid credentials'])->withInput();
+    }
 }
