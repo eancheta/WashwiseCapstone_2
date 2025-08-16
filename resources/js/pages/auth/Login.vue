@@ -17,15 +17,16 @@ const form = useForm({
     password: '',
     remember: false,
 });
+
 const submit = () => {
     form.post(route('login'), {
         onFinish: () => form.reset('password'),
+        onError: (errors) => console.error('Login errors:', errors),
     });
 };
 </script>
 
 <template>
-
   <Head title="Login" />
 
   <div class="min-h-screen flex flex-col bg-[#F8FAFC]">
@@ -77,6 +78,14 @@ const submit = () => {
       >
         <h2 class="text-2xl font-bold text-center text-[#182235]">Log in to your account</h2>
         <p class="text-center text-gray-500 mb-4">Enter your credentials below to log in</p>
+
+        <!-- Flash Message -->
+        <div v-if="$page.props.flash.error" class="alert alert-danger mb-4">
+          {{ $page.props.flash.error }}
+        </div>
+        <div v-if="$page.props.flash.success" class="alert alert-success mb-4">
+          {{ $page.props.flash.success }}
+        </div>
 
         <div class="grid gap-3 w-full">
           <!-- Email -->
@@ -144,20 +153,33 @@ const submit = () => {
             Register
           </TextLink>
         </div>
-        <!-- Forgot Password Link -->
-<div class="text-center text-sm mt-1">
-  <TextLink
-    :href="route('password.request')"
-    class="text-sm font-medium transition-colors duration-200 [text-decoration:none] hover:text-[#004080]"
-    style="color: #002B5C;"
-  >
-    Forgot your password?
-  </TextLink>
-</div>
 
+        <!-- Forgot Password Link -->
+        <div v-if="canResetPassword" class="text-center text-sm mt-1">
+          <TextLink
+            :href="route('password.request')"
+            class="text-sm font-medium transition-colors duration-200 [text-decoration:none] hover:text-[#004080]"
+            style="color: #002B5C;"
+          >
+            Forgot your password?
+          </TextLink>
+        </div>
       </form>
     </div>
   </div>
-
-
 </template>
+
+<style>
+.alert-success {
+  background-color: #d4edda;
+  color: #155724;
+  padding: 1rem;
+  border-radius: 0.25rem;
+}
+.alert-danger {
+  background-color: #f8d7da;
+  color: #721c24;
+  padding: 1rem;
+  border-radius: 0.25rem;
+}
+</style>

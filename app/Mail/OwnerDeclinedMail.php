@@ -27,7 +27,7 @@ class OwnerDeclinedMail extends Mailable
     public function build()
     {
         return $this->subject('Account Declined - WashWise')
-                    ->markdown('emails.owners.declined')
+                    ->markdown('emails.declined')
                     ->with([
                         'name' => $this->owner->name,
                     ]);

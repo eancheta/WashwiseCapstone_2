@@ -77,12 +77,18 @@ class OwnerAuthController extends Controller
             return back()->withErrors(['email' => 'Your account is pending approval by the admin.'])->withInput();
         }
 
-        if (! $owner->email_verified_at) {
+        if (!$owner->email_verified_at) {
             return back()->withErrors(['email' => 'Please verify your email before logging in.'])->withInput();
         }
 
         if (auth()->guard('carwashowner')->attempt($credentials)) {
             $request->session()->regenerate();
+
+            // Redirect to shop setup only if no shop exists yet
+            if (!$owner->shop) {
+                return redirect()->route('owner.shop.create');
+            }
+
             return redirect()->intended(route('carwashownerdashboard'));
         }
 

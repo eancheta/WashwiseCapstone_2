@@ -33,4 +33,10 @@ class CarWashOwner extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    // Relation to the owner's shop
+    public function shop()
+    {
+        return $this->hasOne(\App\Models\CarWashShop::class, 'owner_id');
+    }
 }
