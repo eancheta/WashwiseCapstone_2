@@ -28,18 +28,18 @@ class StaticLoginController extends Controller
             $credentials['username'] === $validUsername &&
             $credentials['password'] === $validPassword
         ) {
-            Session::put('admin_authenticated', true);
+            Session::put('authenticated', true);
             return redirect()->route('admindashboard');
         }
 
         return back()->withErrors([
             'username' => 'Invalid username or password.',
-        ])->withInput();
+        ]);
     }
 
     public function logout(Request $request)
     {
-        Session::forget('admin_authenticated');
+        Session::forget('authenticated');
         return redirect()->route('loginAdmin');
     }
 }
