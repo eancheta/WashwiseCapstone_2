@@ -1,25 +1,34 @@
 <template>
-  <div class="container py-5">
-    <div v-if="shop">
-      <h1>Book at {{ shop.name }}</h1>
+  <div class="min-h-screen bg-gray-50 py-10 px-4 flex justify-center">
+    <div v-if="shop" class="w-full max-w-2xl bg-white rounded-2xl shadow-lg p-8">
+      <!-- Title -->
+      <h1 class="text-2xl font-bold text-center text-[#002B5C] mb-6">
+        Book at {{ shop.name }}
+      </h1>
 
-      <div v-if="$page.props.flash.success" class="alert alert-success mb-4">
+      <!-- Success & Error Alerts -->
+      <div v-if="$page.props.flash.success" class="bg-green-100 text-green-800 p-3 rounded-lg mb-4 text-sm">
         {{ $page.props.flash.success }}
       </div>
-      <div v-if="$page.props.flash.error" class="alert alert-danger mb-4">
+      <div v-if="$page.props.flash.error" class="bg-red-100 text-red-800 p-3 rounded-lg mb-4 text-sm">
         {{ $page.props.flash.error }}
       </div>
 
-      <form @submit.prevent="submit">
-        <div class="mb-3">
-          <label>Your Name</label>
-          <input type="text" v-model="form.name" class="form-control" required />
-          <div v-if="form.errors.name" class="text-danger">{{ form.errors.name }}</div>
+      <!-- Form -->
+      <form @submit.prevent="submit" class="space-y-5">
+        <!-- Name -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700">Your Name</label>
+          <input type="text" v-model="form.name"
+            class="w-full mt-1 p-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-[#002B5C] focus:outline-none"
+            required />
+          <div v-if="form.errors.name" class="text-red-600 text-sm mt-1">{{ form.errors.name }}</div>
         </div>
 
-        <div class="mb-3">
-          <label>Size of the Car</label>
+        <div class="mb-3 block text-sm font-semibold text-gray-700">
+          <label>Size of the Car: </label>
           <select v-model="form.size_of_the_car" class="form-control" required>
+
             <option value="">Select</option>
             <option value="HatchBack">HatchBack</option>
             <option value="Sedan">Sedan</option>
@@ -29,44 +38,60 @@
             <option value="Van">Van</option>
             <option value="Motorcycle">Motorcycle</option>
           </select>
-          <div v-if="form.errors.size_of_the_car" class="text-danger">{{ form.errors.size_of_the_car }}</div>
+          <div v-if="form.errors.size_of_the_car" class="text-red-600 text-sm mt-1">{{ form.errors.size_of_the_car }}</div>
         </div>
 
-        <div class="mb-3">
-          <label>Contact Number</label>
-          <input type="text" v-model="form.contact_no" class="form-control" required />
-          <div v-if="form.errors.contact_no" class="text-danger">{{ form.errors.contact_no }}</div>
+        <!-- Contact -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700">Contact Number</label>
+          <input type="text" v-model="form.contact_no"
+            class="w-full mt-1 p-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-[#002B5C] focus:outline-none"
+            required />
+          <div v-if="form.errors.contact_no" class="text-red-600 text-sm mt-1">{{ form.errors.contact_no }}</div>
         </div>
 
-        <div class="mb-3">
-          <label>Time of Booking</label>
-          <input type="time" v-model="form.time_of_booking" class="form-control" required />
-          <div v-if="form.errors.time_of_booking" class="text-danger">{{ form.errors.time_of_booking }}</div>
+        <!-- Time -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700">Time of Booking</label>
+          <input type="time" v-model="form.time_of_booking"
+            class="w-full mt-1 p-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-[#002B5C] focus:outline-none"
+            required />
+          <div v-if="form.errors.time_of_booking" class="text-red-600 text-sm mt-1">{{ form.errors.time_of_booking }}</div>
         </div>
 
-        <div class="mb-3">
-          <label>Date of Booking</label>
-          <input type="date" v-model="form.date_of_booking" class="form-control" required />
-          <div v-if="form.errors.date_of_booking" class="text-danger">{{ form.errors.date_of_booking }}</div>
+        <!-- Date -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700">Date of Booking</label>
+          <input type="date" v-model="form.date_of_booking"
+            class="w-full mt-1 p-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-[#002B5C] focus:outline-none"
+            required />
+          <div v-if="form.errors.date_of_booking" class="text-red-600 text-sm mt-1">{{ form.errors.date_of_booking }}</div>
         </div>
 
-        <div class="mb-3">
-          <label>Slot Number</label>
-          <input type="number" v-model.number="form.slot_number" min="1" class="form-control" required />
-          <div v-if="form.errors.slot_number" class="text-danger">{{ form.errors.slot_number }}</div>
+        <!-- Slot -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700">Slot Number</label>
+          <input type="number" v-model.number="form.slot_number" min="1"
+            class="w-full mt-1 p-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-[#002B5C] focus:outline-none"
+            required />
+          <div v-if="form.errors.slot_number" class="text-red-600 text-sm mt-1">{{ form.errors.slot_number }}</div>
         </div>
 
-        <button type="submit" class="btn btn-primary" :disabled="form.processing">
+        <!-- Button -->
+        <button type="submit"
+          class="w-full bg-[#FF2D2D] text-white py-2 rounded-lg font-semibold hover:bg-red-700 transition disabled:opacity-50"
+          :disabled="form.processing">
           <span v-if="form.processing">Booking...</span>
           <span v-else>Book Now</span>
         </button>
       </form>
     </div>
-    <div v-else class="text-danger">
-      Shop not found. Please select a valid shop.
-    </div>
+
+    <!-- If shop not found -->
+    <div v-else class="text-red-600 font-medium">Shop not found. Please select a valid shop.</div>
   </div>
 </template>
+
 
 <script setup lang="ts">
 import { useForm } from '@inertiajs/vue3'
@@ -98,33 +123,3 @@ const submit = () => {
   })
 }
 </script>
-
-<style>
-.alert-success {
-  background-color: #d4edda;
-  color: #155724;
-  padding: 1rem;
-  border-radius: 0.25rem;
-}
-.alert-danger {
-  background-color: #f8d7da;
-  color: #721c24;
-  padding: 1rem;
-  border-radius: 0.25rem;
-}
-.text-danger {
-  color: #721c24;
-}
-.form-control {
-  width: 100%;
-  padding: 0.5rem;
-  border: 1px solid #ced4da;
-  border-radius: 0.25rem;
-}
-.btn-primary {
-  background-color: #FF2D2D;
-  color: #fff;
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
-}
-</style>
