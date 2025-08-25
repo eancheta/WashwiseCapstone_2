@@ -26,10 +26,21 @@ interface Props {
 
 const props = defineProps<Props>()
 
+// Define backend base URL from environment variable or fallback
+const backendBaseUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost/Washwise'
+
 // Profile menu toggle
 const profileMenuOpen = ref(false)
 function toggleProfileMenu() {
   profileMenuOpen.value = !profileMenuOpen.value
+}
+
+// Function to handle image error and set fallback
+const handleImageError = (event: Event, fallbackSrc: string) => {
+  const target = event.target as HTMLImageElement | null
+  if (target) {
+    target.src = fallbackSrc
+  }
 }
 
 // Navigate to Booking
@@ -44,6 +55,24 @@ const goToBooking = (shopId: number) => {
   }
   Inertia.get(`/customer/book/${shopId}`)
 }
+
+// Logout function
+const logout = () => {
+  Inertia.post('/logout', {}, {
+    onSuccess: () => {
+      Inertia.get('/login')
+    },
+    onError: (errors) => {
+      console.error('Logout error:', errors)
+      alert('Failed to log out. Please try again.')
+    }
+  })
+}
+
+// Debug shop logos
+props.shops.forEach((shop) => {
+  console.log(`Shop ${shop.id} Logo:`, shop.logo)
+})
 </script>
 
 <template>
@@ -56,9 +85,10 @@ const goToBooking = (shopId: number) => {
     <!-- Left: Logo -->
     <div class="flex items-center">
       <img
-        src="/images/washwiselogo2.png"
+        :src="`${backendBaseUrl}/images/washwiselogo2.png`"
         alt="WashWise Logo"
         class="h-10 w-auto"
+        @error="handleImageError($event, `${backendBaseUrl}/images/washwiselogo2.png`)"
         draggable="false"
       />
     </div>
@@ -70,9 +100,10 @@ const goToBooking = (shopId: number) => {
         class="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition"
       >
         <img
-          src="/images/default-avatar.png"
+          :src="`${backendBaseUrl}/images/default-avatar.png`"
           alt="Profile"
           class="w-8 h-8 rounded-full border border-gray-300"
+          @error="handleImageError($event, `${backendBaseUrl}/images/default-avatar.png`)"
         />
         <span class="text-gray-700 font-medium">
           {{ props.auth.user?.email || 'Guest' }}
@@ -118,6 +149,7 @@ const goToBooking = (shopId: number) => {
             Transaction History
           </button>
           <button
+            @click="logout"
             class="flex items-center gap-2 px-4 py-2 w-full text-left text-red-600 hover:bg-red-50 hover:text-red-700 transition rounded-lg"
           >
             <span>🚪</span>
@@ -128,7 +160,7 @@ const goToBooking = (shopId: number) => {
     </div>
   </div>
 
-  <!-- ✅ Flash Messages (Backend-driven) -->
+  <!-- Flash Messages (Backend-driven) -->
   <transition name="fade">
     <div
       v-if="$page.props.flash.success"
@@ -165,9 +197,10 @@ const goToBooking = (shopId: number) => {
         class="bg-white shadow-md rounded-xl p-6 flex flex-col items-center text-center border border-gray-200 hover:shadow-xl hover:-translate-y-1 transition"
       >
         <img
-          :src="shop.logo || '/images/default-carwash.png'"
+          :src="shop.logo ? `${backendBaseUrl}/storage/${shop.logo}` : `${backendBaseUrl}/images/default-carwash.png`"
           alt="Car Wash Logo"
           class="h-20 w-20 object-contain mb-4"
+          @error="handleImageError($event, `${backendBaseUrl}/images/default-carwash.png`)"
         />
         <h3 class="text-lg font-semibold text-gray-800">{{ shop.name }}</h3>
         <p class="text-sm text-gray-500 mb-5">{{ shop.address }}</p>
@@ -209,7 +242,7 @@ const goToBooking = (shopId: number) => {
   animation: fadeIn 0.3s ease-out;
 }
 
-/* ✅ Smooth fade transition */
+/* Smooth fade transition */
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 1.0s;

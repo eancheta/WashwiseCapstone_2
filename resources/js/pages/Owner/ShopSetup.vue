@@ -50,8 +50,14 @@
         <!-- Logo -->
         <div>
           <label class="block text-sm font-semibold text-gray-700">Logo</label>
-          <input type="file" @change="handleLogoChange" accept="image/*"
-            class="w-full text-gray-700 mt-1" />
+          <div class="mt-1 flex items-center">
+            <input type="file" @change="handleLogoChange" accept="image/*"
+              class="w-full p-3 border border-gray-300 rounded-xl text-gray-900 focus:ring-2 focus:ring-[#002B5C] focus:outline-none shadow-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#002B5C] file:text-white hover:file:bg-[#003b7a] cursor-pointer" />
+          </div>
+          <!-- Logo Preview -->
+          <div v-if="logoPreview" class="mt-3">
+            <img :src="logoPreview" alt="Logo Preview" class="h-24 w-24 object-contain rounded-lg border border-gray-300 shadow-sm" />
+          </div>
           <div v-if="form.errors.logo" class="text-red-600 text-sm mt-1">{{ form.errors.logo }}</div>
         </div>
 
@@ -95,6 +101,7 @@
 
 <script setup lang="ts">
 import { useForm } from '@inertiajs/vue3'
+import { ref } from 'vue'
 
 defineProps<{ pageTitle: string }>()
 
@@ -108,10 +115,18 @@ const form = useForm({
   qr_code: null as File | null,
 })
 
+// Add ref for logo preview
+const logoPreview = ref<string | null>(null)
+
 const handleLogoChange = (event: Event) => {
   const target = event.target as HTMLInputElement
   if (target.files && target.files.length > 0) {
     form.logo = target.files[0]
+    // Generate preview URL
+    logoPreview.value = URL.createObjectURL(target.files[0])
+  } else {
+    form.logo = null
+    logoPreview.value = null
   }
 }
 
@@ -124,7 +139,11 @@ const handleQrCodeChange = (event: Event) => {
 
 const submit = () => {
   form.post(route('owner.shop.store'), {
-    onSuccess: () => console.log('Shop created successfully'),
+    onSuccess: () => {
+      console.log('Shop created successfully')
+      // Reset logo preview after successful submission
+      logoPreview.value = null
+    },
     onError: (errors) => console.error('Shop creation error:', errors),
   })
 }

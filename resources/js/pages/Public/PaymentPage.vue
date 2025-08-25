@@ -1,0 +1,162 @@
+<!-- resources/js/Pages/Public/PaymentPage.vue -->
+<template>
+  <div class="min-h-screen py-10 px-4 flex justify-center">
+    <div class="w-full max-w-xl bg-white rounded-2xl shadow-lg p-6">
+      <h1 class="text-2xl font-bold text-center text-[#002B5C] mb-6">Confirm & Pay for {{ shop.name }}</h1>
+
+      <!-- Success & Error Alerts -->
+      <div v-if="$page.props.flash.success" class="bg-green-100 text-green-800 p-3 rounded-lg mb-4 text-sm">
+        {{ $page.props.flash.success }}
+      </div>
+      <div v-if="$page.props.flash.error" class="bg-red-100 text-red-800 p-3 rounded-lg mb-4 text-sm">
+        {{ $page.props.flash.error }}
+      </div>
+
+      <!-- Error for Null Booking -->
+      <div v-if="error || !booking" class="bg-red-100 text-red-800 p-3 rounded-lg mb-4 text-sm">
+        {{ error || 'Please submit booking details to proceed with payment.' }}
+        <div class="mt-2">
+          <a :href="`/shop/${shop.id}/book`" class="text-[#002B5C] underline">Go to Booking Form</a>
+        </div>
+      </div>
+
+      <!-- Booking Details -->
+      <div v-if="booking" class="space-y-4 mb-6">
+        <div class="mb-6 text-center">
+          <h2 class="text-sm font-semibold text-gray-700 mb-2">Scan to Pay (QR)</h2>
+          <img
+            :src="qrSrc"
+            @error="handleImageError"
+            alt="Shop QR Code"
+            class="mx-auto h-40 w-40 object-contain rounded-lg border border-gray-200 bg-white"
+          />
+          <p class="text-xs text-gray-500 mt-2">Scan this QR with your payment app, then upload a screenshot as proof.</p>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-semibold text-gray-700">Name</h3>
+          <p class="text-gray-900">{{ booking.name }}</p>
+        </div>
+        <div>
+          <h3 class="text-sm font-semibold text-gray-700">Email</h3>
+          <p class="text-gray-900">{{ booking.email }}</p>
+        </div>
+        <div>
+          <h3 class="text-sm font-semibold text-gray-700">Size</h3>
+          <p class="text-gray-900">{{ booking.size_of_the_car }}</p>
+        </div>
+        <div>
+          <h3 class="text-sm font-semibold text-gray-700">Contact</h3>
+          <p class="text-gray-900">{{ booking.contact_no }}</p>
+        </div>
+        <div class="flex gap-4">
+          <div>
+            <h3 class="text-sm font-semibold text-gray-700">Date</h3>
+            <p class="text-gray-900">{{ booking.date_of_booking }}</p>
+          </div>
+          <div>
+            <h3 class="text-sm font-semibold text-gray-700">Time</h3>
+            <p class="text-gray-900">{{ booking.time_of_booking }}</p>
+          </div>
+        </div>
+        <div>
+          <h3 class="text-sm font-semibold text-gray-700">Slot Number</h3>
+          <p class="text-gray-900">{{ booking.slot_number }}</p>
+        </div>
+        <div>
+          <h3 class="text-sm font-semibold text-gray-700">Payment Amount</h3>
+          <p class="text-gray-900">PHP 50.00</p>
+        </div>
+      </div>
+
+      <!-- Payment Form -->
+      <form v-if="booking" @submit.prevent="confirm" class="space-y-4" enctype="multipart/form-data">
+        <div>
+          <label class="block text-sm font-semibold text-gray-700">Upload proof (screenshot of receipt)</label>
+          <input @change="handleFile" type="file" accept="image/jpeg,image/png"
+            class="w-full mt-1 p-2 border border-gray-300 rounded-lg" required />
+          <div v-if="form.errors.payment_proof" class="text-red-600 text-sm mt-1">{{ form.errors.payment_proof }}</div>
+        </div>
+
+        <button type="submit"
+          class="w-full bg-[#002B5C] text-white py-2 rounded-lg font-semibold hover:opacity-90 transition disabled:opacity-50"
+          :disabled="form.processing">
+          <span v-if="form.processing">Booking...</span>
+          <span v-else>Confirm Booking</span>
+        </button>
+      </form>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { useForm } from '@inertiajs/vue3'
+import { ref } from 'vue'
+
+interface Shop {
+  id: number
+  name: string
+  qr_code?: string | null
+}
+
+interface Booking {
+  name: string
+  email: string
+  size_of_the_car: string
+  contact_no: string
+  date_of_booking: string
+  time_of_booking: string
+  slot_number: number
+}
+
+interface Props {
+  shop: Shop
+  booking: Booking | null
+  pageTitle: string
+  error?: string
+}
+
+const props = defineProps<Props>()
+
+const backendBaseUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost/Washwise'
+const qrSrc = ref(props.shop.qr_code ? `${backendBaseUrl}/storage/${props.shop.qr_code}` : `${backendBaseUrl}/images/default-qr.png`)
+
+const form = useForm({
+  name: props.booking?.name ?? '',
+  email: props.booking?.email ?? '',
+  size_of_the_car: props.booking?.size_of_the_car ?? '',
+  contact_no: props.booking?.contact_no ?? '',
+  date_of_booking: props.booking?.date_of_booking ?? '',
+  time_of_booking: props.booking?.time_of_booking ?? '',
+  slot_number: props.booking?.slot_number ?? 1,
+  payment_amount: 50,
+  payment_proof: null as File | null,
+})
+
+const handleImageError = (e: Event) => {
+  const target = e.target as HTMLImageElement | null
+  if (target) {
+    target.src = `${backendBaseUrl}/images/default-qr.png`
+  }
+}
+
+const handleFile = (e: Event) => {
+  const input = e.target as HTMLInputElement | null
+  if (input?.files?.[0]) {
+    form.payment_proof = input.files[0]
+  }
+}
+
+const confirm = () => {
+  if (!form.payment_proof) {
+    form.errors.payment_proof = 'Please upload payment proof (screenshot).'
+    return
+  }
+
+  form.post(`/customer/book/${props.shop.id}/confirm`, {
+    forceFormData: true, // Required for file uploads
+    onSuccess: () => console.log('Payment confirmed successfully'),
+    onError: (errors) => console.error('Payment submission error:', errors),
+  })
+}
+</script>

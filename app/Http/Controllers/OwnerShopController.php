@@ -5,13 +5,41 @@ namespace App\Http\Controllers;
 use App\Models\CarWashShop;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Inertia\Inertia;
 
 class OwnerShopController extends Controller
 {
-    // Show the create shop page
+    /**
+     * Ensure the bookings table for a specific shop exists.
+     */
+    public static function ensureBookingTableExists($shopId)
+    {
+        $tableName = "bookings_shop_{$shopId}";
+
+        if (!Schema::hasTable($tableName)) {
+            Schema::create($tableName, function (Blueprint $table) {
+                $table->id();
+                $table->string('name');
+                $table->string('size_of_the_car');
+                $table->string('contact_no');
+                $table->string('email')->nullable(); // Added email
+                $table->time('time_of_booking');
+                $table->date('date_of_booking');
+                $table->integer('slot_number');
+                $table->string('payment_proof')->nullable();
+                $table->decimal('payment_amount', 8, 2)->nullable();
+                $table->string('status')->default('pending');
+                $table->timestamps();
+            });
+        }
+    }
+
+    /**
+     * Display the form to create a new shop.
+     */
     public function create()
     {
         return Inertia::render('Owner/ShopSetup', [
@@ -19,77 +47,67 @@ class OwnerShopController extends Controller
         ]);
     }
 
-    // Store new shop
+    /**
+     * Store a new shop for the authenticated owner.
+     */
     public function store(Request $request)
     {
-        $data = $request->validate([
+        $ownerId = Auth::guard('carwashowner')->id();
+        if (!$ownerId) {
+            return redirect()->route('owner.login.show');
+        }
+
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
             'address' => 'required|string|max:255',
-            'district' => 'required|integer|min:1|max:6',
-            'logo' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
+            'district' => 'nullable|string|max:100',
             'description' => 'nullable|string',
             'services_offered' => 'nullable|string',
+            'logo' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
             'qr_code' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
         ]);
 
+        $shopData = [
+            'owner_id' => $ownerId,
+            'name' => $validated['name'],
+            'address' => $validated['address'],
+            'district' => $validated['district'],
+            'description' => $validated['description'],
+            'services_offered' => $validated['services_offered'],
+        ];
+
         if ($request->hasFile('logo')) {
-            $data['logo'] = $request->file('logo')->store('carwash_logos', 'public');
+            $shopData['logo'] = $request->file('logo')->store('logos', 'public');
         }
 
         if ($request->hasFile('qr_code')) {
-            $data['qr_code'] = $request->file('qr_code')->store('carwash_qrcodes', 'public');
+            $shopData['qr_code'] = $request->file('qr_code')->store('qr_codes', 'public');
         }
 
-        $data['owner_id'] = Auth::guard('carwashowner')->id();
+        $shop = CarWashShop::create($shopData);
 
-        $shop = CarWashShop::create($data);
-
+        // Create bookings table for the new shop
         self::ensureBookingTableExists($shop->id);
 
-        return redirect()->route('carwashownerdashboard')
+                return redirect()->route('carwashownerdashboard')
             ->with('success', 'Shop created successfully!');
     }
 
-    // Show shop details
-    public function show(int $id)
+    /**
+     * Display the owner's shop details.
+     */
+    public function index()
     {
-        $shop = CarWashShop::findOrFail($id);
-        return Inertia::render('Public/ShopView', [
-            'shop' => $shop,
-            'pageTitle' => $shop->name,
-        ]);
-    }
+        $ownerId = Auth::guard('carwashowner')->id();
+        if (!$ownerId) {
+            return redirect()->route('owner.login.show');
+        }
 
-    // Show booking page
-    public function bookPage(int $id)
-    {
-        $shop = CarWashShop::findOrFail($id);
+        $shop = CarWashShop::where('owner_id', $ownerId)->first();
+
         return Inertia::render('Public/ShopBooking', [
             'shop' => $shop,
             'pageTitle' => "Book at {$shop->name}",
         ]);
-    }
-
-    // Ensure each shop has its own booking table
-    public static function ensureBookingTableExists(int $shopId): void
-    {
-        $table = "bookings_shop_{$shopId}";
-        if (!Schema::hasTable($table)) {
-            Schema::create($table, function (Blueprint $t) {
-                $t->bigIncrements('id');
-                $t->unsignedBigInteger('customer_id')->nullable();
-                $t->string('name');
-                $t->enum('size_of_the_car', [
-                    'HatchBack', 'Sedan', 'MPV', 'SUV', 'Pickup', 'Van', 'Motorcycle'
-                ]);
-                $t->string('contact_no', 20);
-                $t->time('time_of_booking');
-                $t->date('date_of_booking');
-                $t->unsignedTinyInteger('slot_number');
-                $t->timestamp('created_at')->useCurrent();
-                $t->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
-                $t->foreign('customer_id')->references('id')->on('users')->onDelete('set null');
-            });
-        }
     }
 }

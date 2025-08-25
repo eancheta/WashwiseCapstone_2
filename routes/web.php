@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\Auth\StaticLoginController;
 use App\Http\Controllers\Auth\CustomerAuthController;
@@ -16,110 +18,112 @@ use App\Http\Controllers\ShopBookingController;
 use App\Http\Controllers\CustomerBookingController;
 use App\Http\Controllers\CustomerDashboardController;
 use App\Http\Controllers\PublicBookingController;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-
-// Test route for debugging authentication and shop data
-Route::get('/test-auth', function () {
-    return response()->json([
-        'user' => Auth::user() ? Auth::user()->toArray() : null,
-        'shops' => DB::table('car_wash_shops')->get()->toArray(),
-        'owners' => DB::table('car_wash_owners')->where('status', 'approved')->get()->toArray(),
-    ]);
-})->middleware('auth');
-
-Route::post('/shop/{shop}/book', [PublicBookingController::class, 'store'])
-    ->name('public.customer.book');
-// Booking page for a shop
-Route::middleware(['auth'])->group(function () {
-    // Inertia page for booking
-    Route::get('/customer/book/{shop}', [CustomerBookingController::class, 'create'])
-        ->name('customer.book.create');
-
-    // POST form submission handled by Inertia
-    Route::post('/customer/book/{shop}', [CustomerBookingController::class, 'store'])
-        ->name('customer.book.store');
-});
-Route::prefix('owner')->group(function () {
-    // Show the shop setup form
-    Route::get('/shop/create', [OwnerShopController::class, 'create'])->name('owner.shop.create');
-
-    // Store the new shop
-    Route::post('/shop', [OwnerShopController::class, 'store'])->name('owner.shop.store');
-});
-
-// Public viewing routes
-Route::get('/shop/{id}', [OwnerShopController::class, 'show'])->name('shop.show');
-Route::get('/shop/{id}/book', [OwnerShopController::class, 'bookPage'])->name('shop.book');
-
-// Availability + booking actions (public endpoints – add rate limits/captcha if needed)
-Route::get('/shops/{shop}/availability', [ShopBookingController::class, 'availability'])->name('shops.bookings.availability');
-Route::post('/shops/{shop}/book', [ShopBookingController::class, 'store'])->name('shops.bookings.store');
+use App\Http\Controllers\OwnerAppointmentController;
 
 /*
 |--------------------------------------------------------------------------
-| Added routes to match controller calls
+| PUBLIC + CUSTOMER BOOKING
 |--------------------------------------------------------------------------
 */
+Route::get('/shops/{shop}/availability', [ShopBookingController::class, 'availability'])->name('shops.bookings.availability');
+Route::post('/shops/{shop}/book', [ShopBookingController::class, 'store'])->name('shops.bookings.store');
+Route::get('/customer/book/{shop}/payment', [ShopBookingController::class, 'showPaymentPage'])->name('customer.book.payment.show');
+Route::post('/customer/book/{shop}/payment', [ShopBookingController::class, 'paymentPage'])->name('customer.book.payment');
+Route::post('/customer/book/{shop}/confirm', [ShopBookingController::class, 'confirmBooking'])->name('customer.book.confirm');
+
+Route::post('/shop/{shop}/book', [PublicBookingController::class, 'store'])->name('public.customer.book');
+Route::get('/shop/{id}', [OwnerShopController::class, 'show'])->name('shop.show');
+Route::get('/shop/{id}/book', [OwnerShopController::class, 'bookPage'])->name('shop.book');
 Route::get('/public/shop/{id}/booking', [OwnerShopController::class, 'bookPage'])->name('public.shop.booking');
 Route::post('/public/shop/{id}/submit-booking', [OwnerShopController::class, 'submitBooking'])->name('public.shop.submitBooking');
 
-Route::get('/owner/register', [OwnerAuthController::class, 'create'])->name('owner.register.show');
-Route::post('/owner/register', [OwnerAuthController::class, 'store'])->name('owner.register');
+Route::middleware(['auth'])->group(function () {
+    Route::get('/customer/book/{shop}', [CustomerBookingController::class, 'create'])->name('customer.book.create');
+    Route::post('/customer/book/{shop}', [CustomerBookingController::class, 'store'])->name('customer.book.store');
+});
 
-Route::get('/owner/verify', [OwnerVerificationController::class, 'show'])->name('owner.verify.show');
-Route::post('/owner/verify', [OwnerVerificationController::class, 'verify'])->name('owner.verify.submit');
-Route::post('/owner/verify/resend', [OwnerVerificationController::class, 'resend'])->name('owner.verify.resend');
+/*
+|--------------------------------------------------------------------------
+| OWNER ROUTES
+|--------------------------------------------------------------------------
+*/
+Route::prefix('owner')->group(function () {
+    Route::get('/register', [OwnerAuthController::class, 'create'])->name('owner.register.show');
+    Route::post('/register', [OwnerAuthController::class, 'store'])->name('owner.register');
+    Route::get('/login', [OwnerAuthController::class, 'showLogin'])->name('owner.login.show');
+    Route::post('/login', [OwnerAuthController::class, 'login'])->name('owner.login');
+    Route::get('/verify', [OwnerVerificationController::class, 'show'])->name('owner.verify.show');
+    Route::post('/verify', [OwnerVerificationController::class, 'verify'])->name('owner.verify.submit');
+    Route::post('/verify/resend', [OwnerVerificationController::class, 'resend'])->name('owner.verify.resend');
 
-Route::get('/owner/login', [OwnerAuthController::class, 'showLogin'])->name('owner.login.show');
-Route::post('/owner/login', [OwnerAuthController::class, 'login'])->name('owner.login');
+    Route::middleware(['auth:carwashowner'])->group(function () {
+        Route::get('/dashboard', [OwnerDashboardController::class, 'index'])->name('carwashownerdashboard');
+        Route::get('/appointments', [OwnerAppointmentController::class, 'index'])->name('owner.appointments');
+        Route::post('/appointments/{id}/approve', [OwnerAppointmentController::class, 'approve'])->name('owner.appointments.approve');
+        Route::post('/appointments/{id}/decline', [OwnerAppointmentController::class, 'decline'])->name('owner.appointments.decline');
+        Route::get('/shop/create', [OwnerShopController::class, 'create'])->name('owner.shop.create');
+        Route::post('/shop', [OwnerShopController::class, 'store'])->name('owner.shop.store');
+    });
+});
 
+/*
+|--------------------------------------------------------------------------
+| CUSTOMER AUTH
+|--------------------------------------------------------------------------
+*/
+Route::get('/login', [CustomerAuthController::class, 'showLogin'])->name('login');
+Route::post('/login', [CustomerAuthController::class, 'login'])->name('login.submit');
+Route::post('/logout', [CustomerAuthController::class, 'logout'])->name('logout');
+Route::get('/register', fn () => Inertia::render('auth/Register'))->name('register');
+Route::get('/emailvcode', fn () => Inertia::render('EmailVerificationCode'))->middleware('auth')->name('emailvcode');
+Route::post('/verify-code', [EmailVerificationController::class, 'verify'])->middleware('auth')->name('verify.code');
+
+/*
+|--------------------------------------------------------------------------
+| ADMIN AUTH
+|--------------------------------------------------------------------------
+*/
+Route::get('/loginAdmin', [StaticLoginController::class, 'showLogin'])->name('loginAdmin');
+Route::post('/loginAdmin', [StaticLoginController::class, 'login']);
 Route::get('/admindashboard', [AdminController::class, 'index'])->name('admindashboard');
-Route::post('/admin/owners/{id}/approve', [AdminController::class, 'approve']);
-Route::post('/admin/owners/{id}/decline', [AdminController::class, 'decline']);
+Route::post('/admin/owners/{id}/approve', [AdminController::class, 'approve'])->name('owners.approve');
+Route::post('/admin/owners/{id}/decline', [AdminController::class, 'decline'])->name('owners.decline');
 
-Route::middleware(['auth:carwashowner'])->group(function () {
-    Route::get('/carwashowner/dashboard', [OwnerDashboardController::class, 'index'])->name('carwashownerdashboard');
-});
+/*
+|--------------------------------------------------------------------------
+| STATIC PAGES
+|--------------------------------------------------------------------------
+*/
+Route::get('/about', fn () => Inertia::render('AboutUs'));
+Route::get('/about-us', fn () => Inertia::render('AboutUs'))->name('about');
+Route::get('/', fn () => Inertia::render('Welcome'))->name('home');
 
-Route::get('/about', function () {
-    return Inertia::render('AboutUs');
-});
-
-Route::get('/', fn() => Inertia::render('Welcome'))->name('home');
-
+/*
+|--------------------------------------------------------------------------
+| DASHBOARD
+|--------------------------------------------------------------------------
+*/
 Route::get('/dashboard', [CustomerDashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
-Route::get('/login', [CustomerAuthController::class, 'showLogin'])->name('login');
-Route::post('/login', [CustomerAuthController::class, 'login'])->name('login.submit');
+/*
+|--------------------------------------------------------------------------
+| DEBUG
+|--------------------------------------------------------------------------
+*/
+Route::get('/test-auth', function () {
+    return response()->json([
+        'user' => Auth::user() ? Auth::user()->toArray() : null,
+        'shops' => DB::table('car_wash_shops')->get()->toArray(),
+        'owners' => DB::table('car_wash_owners')->where('status', 'approved')->toArray(),
+    ]);
+})->middleware('auth');
 
-Route::get('/register', function () {
-    return Inertia::render('auth/Register');
-})->name('register');
-
-Route::get('/emailvcode', fn() => Inertia::render('EmailVerificationCode'))
-    ->middleware('auth')
-    ->name('emailvcode');
-
-Route::post('/verify-code', [EmailVerificationController::class, 'verify'])
-    ->middleware('auth')
-    ->name('verify.code');
-
-Route::get('/loginAdmin', [StaticLoginController::class, 'showLogin'])
-    ->name('loginAdmin');
-
-Route::post('/loginAdmin', [StaticLoginController::class, 'login']);
-Route::post('/logout', [CustomerAuthController::class, 'logout'])
-    ->name('logout');
-
-Route::get('/about-us', function () {
-    return Inertia::render('AboutUs');
-})->name('about');
-
-Route::post('/owners/{id}/approve', [AdminController::class, 'approve'])->name('owners.approve');
-Route::post('/owners/{id}/decline', [AdminController::class, 'decline'])->name('owners.decline');
-
-require __DIR__.'/settings.php';
-require __DIR__.'/auth.php';
+/*
+|--------------------------------------------------------------------------
+| Include Other Route Files
+|--------------------------------------------------------------------------
+*/
+require __DIR__ . '/settings.php';
+require __DIR__ . '/auth.php';

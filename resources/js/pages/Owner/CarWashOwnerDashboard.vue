@@ -1,8 +1,6 @@
-
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
 import { ref } from 'vue';
-
 
 const sidebarOpen = ref(false);
 const profileMenuOpen = ref(false);
@@ -45,7 +43,6 @@ function toggleProfileMenu() {
       />
     </div>
 
-
     <!-- Right: Styled Profile Dropdown -->
     <div class="relative">
       <button @click="toggleProfileMenu" class="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition">
@@ -87,12 +84,12 @@ function toggleProfileMenu() {
 
     <!-- Menu -->
     <nav class="flex-1 space-y-2 px-3 mt-4">
-      <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-gradient-to-r from-[#1F3A5F] to-[#162B4A] hover:from-[#E74C3C] hover:to-[#C0392B] text-white font-semibold shadow-md transition-all duration-300">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#E74C3C]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2v-7H3v7a2 2 0 002 2z" />
-        </svg>
-        Appointments
-      </a>
+<Link :href="route('owner.appointments')" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-gradient-to-r from-[#1F3A5F] to-[#162B4A] hover:from-[#E74C3C] hover:to-[#C0392B] text-white font-semibold shadow-md transition-all duration-300">
+  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#E74C3C]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2v-7H3v7a2 2 0 002 2z" />
+  </svg>
+  Appointments
+</Link>
 
       <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-gradient-to-r from-[#1F3A5F] to-[#162B4A] hover:from-[#E74C3C] hover:to-[#C0392B] text-white font-semibold shadow-md transition-all duration-300">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#E74C3C]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -105,7 +102,7 @@ function toggleProfileMenu() {
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#E74C3C]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-5m0 0l-5 5m5-5H3" />
         </svg>
-        Customers
+        Customers data
       </a>
 
       <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-gradient-to-r from-[#1F3A5F] to-[#162B4A] hover:from-[#E74C3C] hover:to-[#C0392B] text-white font-semibold shadow-md transition-all duration-300">
