@@ -70,77 +70,76 @@
         </table>
       </div>
 
-
+      <!-- Owners Table -->
       <div v-if="activeTab === 'owners'" class="overflow-x-auto">
-            <h1 class="text-2xl font-bold mb-4">Car Wash Owners</h1>
-
-    <table class="min-w-full border border-gray-300">
-      <thead class="bg-gray-100">
-        <tr>
-          <th class="border px-4 py-2">ID</th>
-          <th class="border px-4 py-2">Name</th>
-          <th class="border px-4 py-2">Email</th>
-          <th class="border px-4 py-2">Verified At</th>
-          <th class="border px-4 py-2">Password</th>
-          <th class="border px-4 py-2">District</th>
-          <th class="border px-4 py-2">Address</th>
-          <th class="border px-4 py-2">Photo1</th>
-          <th class="border px-4 py-2">Photo2</th>
-          <th class="border px-4 py-2">Photo3</th>
-          <th class="border px-4 py-2">Status</th>
-          <th class="border px-4 py-2">Remember Token</th>
-          <th class="border px-4 py-2">Created At</th>
-          <th class="border px-4 py-2">Updated At</th>
-          <th class="border px-4 py-2">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="owner in owners" :key="owner.id">
-          <td class="py-2 px-4 border-b border-[#182235] text-[#182235]">{{ owner.id }}</td>
-          <td class="py-2 px-4 border-b border-[#182235] text-[#182235]">{{ owner.name }}</td>
-          <td class="py-2 px-4 border-b border-[#182235] text-[#182235]">{{ owner.email }}</td>
-          <td class="py-2 px-4 border-b border-[#182235] text-[#182235]">{{ owner.email_verified_at }}</td>
-          <td class="py-2 px-4 border-b border-[#182235] text-[#182235]">{{ owner.password }}</td>
-          <td class="py-2 px-4 border-b border-[#182235] text-[#182235]">{{ owner.district }}</td>
-          <td class="py-2 px-4 border-b border-[#182235] text-[#182235]">{{ owner.address }}</td>
-<td class="py-2 px-4 border-b border-[#182235] text-[#182235]">
-  <img
-    v-if="owner.photo1"
-    :src="`/storage/${owner.photo1}`"
-    alt="Photo 1"
-    class="h-16 w-16 object-cover rounded"
-  />
-  <span v-else>No photo</span>
-</td>
-<td class="py-2 px-4 border-b border-[#182235] text-[#182235]">
-  <img
-    v-if="owner.photo2"
-    :src="`/storage/${owner.photo2}`"
-    alt="Photo 2"
-    class="h-16 w-16 object-cover rounded"
-  />
-  <span v-else>No photo</span>
-</td>
-<td class="py-2 px-4 border-b border-[#182235] text-[#182235]">
-  <img
-    v-if="owner.photo3"
-    :src="`/storage/${owner.photo3}`"
-    alt="Photo 3"
-    class="h-16 w-16 object-cover rounded"
-  />
-  <span v-else>No photo</span>
-</td>
-          <td class="py-2 px-4 border-b border-[#182235] text-[#182235]">{{ owner.status }}</td>
-          <td class="py-2 px-4 border-b border-[#182235] text-[#182235]">{{ owner.remember_token }}</td>
-          <td class="py-2 px-4 border-b border-[#182235] text-[#182235]">{{ owner.created_at }}</td>
-          <td class="py-2 px-4 border-b border-[#182235] text-[#182235]">{{ owner.updated_at }}</td>
-          <td class="py-2 px-4 border-b border-[#182235] text-[#182235]">
-            <button @click="approve(owner.id)" class="bg-green-500 text-white px-2 py-1 rounded">Approve</button>
-            <button @click="decline(owner.id)" class="bg-red-500 text-white px-2 py-1 rounded ml-2">Decline</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+        <h1 class="text-2xl font-bold mb-4 text-[#182235]">Car Wash Owners</h1>
+        <table class="min-w-[1000px] w-full bg-white border border-gray-200 shadow-sm rounded-lg text-xs sm:text-sm">
+          <thead class="bg-gray-100">
+            <tr>
+              <th class="px-2 sm:px-4 py-2 sm:py-3 font-semibold text-[#182235] whitespace-nowrap">ID</th>
+              <th class="px-2 sm:px-4 py-2 sm:py-3 font-semibold text-[#182235] whitespace-nowrap">Name</th>
+              <th class="px-2 sm:px-4 py-2 sm:py-3 font-semibold text-[#182235] whitespace-nowrap">Email</th>
+              <th class="px-2 sm:px-4 py-2 sm:py-3 font-semibold text-[#182235] whitespace-nowrap">Verified At</th>
+              <th class="px-2 sm:px-4 py-2 sm:py-3 font-semibold text-[#182235] whitespace-nowrap">Password</th>
+              <th class="px-2 sm:px-4 py-2 sm:py-3 font-semibold text-[#182235] whitespace-nowrap">District</th>
+              <th class="px-2 sm:px-4 py-2 sm:py-3 font-semibold text-[#182235] whitespace-nowrap">Address</th>
+              <th class="px-2 sm:px-4 py-2 sm:py-3 font-semibold text-[#182235] whitespace-nowrap">Photo1</th>
+              <th class="px-2 sm:px-4 py-2 sm:py-3 font-semibold text-[#182235] whitespace-nowrap">Photo2</th>
+              <th class="px-2 sm:px-4 py-2 sm:py-3 font-semibold text-[#182235] whitespace-nowrap">Photo3</th>
+              <th class="px-2 sm:px-4 py-2 sm:py-3 font-semibold text-[#182235] whitespace-nowrap">Status</th>
+              <th class="px-2 sm:px-4 py-2 sm:py-3 font-semibold text-[#182235] whitespace-nowrap">Remember Token</th>
+              <th class="px-2 sm:px-4 py-2 sm:py-3 font-semibold text-[#182235] whitespace-nowrap">Created At</th>
+              <th class="px-2 sm:px-4 py-2 sm:py-3 font-semibold text-[#182235] whitespace-nowrap">Updated At</th>
+              <th class="px-2 sm:px-4 py-2 sm:py-3 font-semibold text-[#182235] whitespace-nowrap">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="text-[#182235] font-medium bg-white">
+            <tr v-for="owner in owners" :key="owner.id" class="border-t hover:bg-[#F8FAFC] transition">
+              <td class="px-2 sm:px-4 py-2 sm:py-3 text-center">{{ owner.id }}</td>
+              <td class="px-2 sm:px-4 py-2 sm:py-3">{{ owner.name }}</td>
+              <td class="px-2 sm:px-4 py-2 sm:py-3">{{ owner.email }}</td>
+              <td class="px-2 sm:px-4 py-2 sm:py-3">{{ owner.email_verified_at }}</td>
+              <td class="px-2 sm:px-4 py-2 sm:py-3">{{ owner.password }}</td>
+              <td class="px-2 sm:px-4 py-2 sm:py-3">{{ owner.district }}</td>
+              <td class="px-2 sm:px-4 py-2 sm:py-3">{{ owner.address }}</td>
+              <td class="px-2 sm:px-4 py-2 sm:py-3 text-center">
+                <img
+                  v-if="owner.photo1"
+                  :src="`/storage/${owner.photo1}`"
+                  alt="Photo 1"
+                  class="h-12 w-12 sm:h-16 sm:w-16 object-cover rounded border border-gray-300 mx-auto"
+                />
+                <span v-else class="text-gray-400 italic">No photo</span>
+              </td>
+              <td class="px-2 sm:px-4 py-2 sm:py-3 text-center">
+                <img
+                  v-if="owner.photo2"
+                  :src="`/storage/${owner.photo2}`"
+                  alt="Photo 2"
+                  class="h-12 w-12 sm:h-16 sm:w-16 object-cover rounded border border-gray-300 mx-auto"
+                />
+                <span v-else class="text-gray-400 italic">No photo</span>
+              </td>
+              <td class="px-2 sm:px-4 py-2 sm:py-3 text-center">
+                <img
+                  v-if="owner.photo3"
+                  :src="`/storage/${owner.photo3}`"
+                  alt="Photo 3"
+                  class="h-12 w-12 sm:h-16 sm:w-16 object-cover rounded border border-gray-300 mx-auto"
+                />
+                <span v-else class="text-gray-400 italic">No photo</span>
+              </td>
+              <td class="px-2 sm:px-4 py-2 sm:py-3 text-center">{{ owner.status }}</td>
+              <td class="px-2 sm:px-4 py-2 sm:py-3 text-center">{{ owner.remember_token }}</td>
+              <td class="px-2 sm:px-4 py-2 sm:py-3 text-center">{{ owner.created_at }}</td>
+              <td class="px-2 sm:px-4 py-2 sm:py-3 text-center">{{ owner.updated_at }}</td>
+              <td class="px-2 sm:px-4 py-2 sm:py-3 text-center space-x-2">
+                <button @click="approve(owner.id)" class="px-3 py-1 sm:px-4 sm:py-1 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition text-xs sm:text-sm">Approve</button>
+                <button @click="decline(owner.id)" class="px-3 py-1 sm:px-4 sm:py-1 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition text-xs sm:text-sm">Decline</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </main>
   </div>

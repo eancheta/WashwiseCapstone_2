@@ -1,85 +1,92 @@
 <!-- resources/js/Pages/Public/PaymentPage.vue -->
 <template>
-  <div class="min-h-screen py-10 px-4 flex justify-center">
+  <div class="min-h-screen py-10 px-4 flex justify-center bg-[#F8FAFC]">
     <div class="w-full max-w-xl bg-white rounded-2xl shadow-lg p-6">
-      <h1 class="text-2xl font-bold text-center text-[#002B5C] mb-6">Confirm & Pay for {{ shop.name }}</h1>
+      <h1 class="text-3xl font-extrabold text-center text-[#002B5C] mb-6 tracking-tight">Confirm & Pay for <span class="text-[#FF2D2D]">{{ shop.name }}</span></h1>
 
       <!-- Success & Error Alerts -->
-      <div v-if="$page.props.flash.success" class="bg-green-100 text-green-800 p-3 rounded-lg mb-4 text-sm">
+      <div v-if="$page.props.flash.success" class="bg-green-100 text-green-800 p-3 rounded-lg mb-4 text-base font-medium">
         {{ $page.props.flash.success }}
       </div>
-      <div v-if="$page.props.flash.error" class="bg-red-100 text-red-800 p-3 rounded-lg mb-4 text-sm">
+      <div v-if="$page.props.flash.error" class="bg-red-100 text-red-800 p-3 rounded-lg mb-4 text-base font-medium">
         {{ $page.props.flash.error }}
       </div>
 
       <!-- Error for Null Booking -->
-      <div v-if="error || !booking" class="bg-red-100 text-red-800 p-3 rounded-lg mb-4 text-sm">
+      <div v-if="error || !booking" class="bg-red-100 text-red-800 p-3 rounded-lg mb-4 text-base font-medium">
         {{ error || 'Please submit booking details to proceed with payment.' }}
         <div class="mt-2">
-          <a :href="`/shop/${shop.id}/book`" class="text-[#002B5C] underline">Go to Booking Form</a>
+          <a :href="`/shop/${shop.id}/book`" class="text-[#002B5C] underline font-semibold">Go to Booking Form</a>
         </div>
       </div>
 
       <!-- Booking Details -->
       <div v-if="booking" class="space-y-4 mb-6">
         <div class="mb-6 text-center">
-          <h2 class="text-sm font-semibold text-gray-700 mb-2">Scan to Pay (QR)</h2>
+          <h2 class="text-base font-bold text-[#182235] mb-2">Scan to Pay <span class="font-normal text-gray-500">(QR Code)</span></h2>
           <img
             :src="qrSrc"
             @error="handleImageError"
             alt="Shop QR Code"
             class="mx-auto h-40 w-40 object-contain rounded-lg border border-gray-200 bg-white"
           />
-          <p class="text-xs text-gray-500 mt-2">Scan this QR with your payment app, then upload a screenshot as proof.</p>
+          <p class="text-sm text-gray-500 mt-2">Scan this QR with your payment app, then upload a screenshot as proof of payment.</p>
         </div>
 
         <div>
           <h3 class="text-sm font-semibold text-gray-700">Name</h3>
-          <p class="text-gray-900">{{ booking.name }}</p>
+          <p class="text-base text-[#182235] font-medium">{{ booking.name }}</p>
         </div>
         <div>
           <h3 class="text-sm font-semibold text-gray-700">Email</h3>
-          <p class="text-gray-900">{{ booking.email }}</p>
+          <p class="text-base text-[#182235] font-medium">{{ booking.email }}</p>
         </div>
         <div>
           <h3 class="text-sm font-semibold text-gray-700">Size</h3>
-          <p class="text-gray-900">{{ booking.size_of_the_car }}</p>
+          <p class="text-base text-[#182235] font-medium">{{ booking.size_of_the_car }}</p>
         </div>
         <div>
           <h3 class="text-sm font-semibold text-gray-700">Contact</h3>
-          <p class="text-gray-900">{{ booking.contact_no }}</p>
+          <p class="text-base text-[#182235] font-medium">{{ booking.contact_no }}</p>
         </div>
         <div class="flex gap-4">
           <div>
             <h3 class="text-sm font-semibold text-gray-700">Date</h3>
-            <p class="text-gray-900">{{ booking.date_of_booking }}</p>
+            <p class="text-base text-[#182235] font-medium">{{ booking.date_of_booking }}</p>
           </div>
           <div>
             <h3 class="text-sm font-semibold text-gray-700">Time</h3>
-            <p class="text-gray-900">{{ booking.time_of_booking }}</p>
+            <p class="text-base text-[#182235] font-medium">{{ booking.time_of_booking }}</p>
           </div>
         </div>
         <div>
           <h3 class="text-sm font-semibold text-gray-700">Slot Number</h3>
-          <p class="text-gray-900">{{ booking.slot_number }}</p>
+          <p class="text-base text-[#182235] font-medium">{{ booking.slot_number }}</p>
         </div>
         <div>
           <h3 class="text-sm font-semibold text-gray-700">Payment Amount</h3>
-          <p class="text-gray-900">PHP 50.00</p>
+          <p class="text-base text-[#FF2D2D] font-bold">PHP 50.00</p>
         </div>
       </div>
 
       <!-- Payment Form -->
       <form v-if="booking" @submit.prevent="confirm" class="space-y-4" enctype="multipart/form-data">
         <div>
-          <label class="block text-sm font-semibold text-gray-700">Upload proof (screenshot of receipt)</label>
-          <input @change="handleFile" type="file" accept="image/jpeg,image/png"
-            class="w-full mt-1 p-2 border border-gray-300 rounded-lg" required />
+          <label class="block text-base font-bold text-[#182235] mb-2">
+            Upload Payment Proof <span class="font-normal text-gray-500">(screenshot of receipt)</span>
+          </label>
+          <input
+            @change="handleFile"
+            type="file"
+            accept="image/jpeg,image/png"
+            class="w-full mt-1 p-2 border-2 border-[#182235] bg-[#F8FAFC] text-[#182235] rounded-lg font-semibold cursor-pointer"
+            required
+          />
           <div v-if="form.errors.payment_proof" class="text-red-600 text-sm mt-1">{{ form.errors.payment_proof }}</div>
         </div>
 
         <button type="submit"
-          class="w-full bg-[#002B5C] text-white py-2 rounded-lg font-semibold hover:opacity-90 transition disabled:opacity-50"
+          class="w-full bg-[#FF2D2D] text-white py-2 rounded-lg font-bold text-lg hover:opacity-90 transition disabled:opacity-50"
           :disabled="form.processing">
           <span v-if="form.processing">Booking...</span>
           <span v-else>Confirm Booking</span>
