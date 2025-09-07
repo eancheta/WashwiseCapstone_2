@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
 import { ref } from 'vue';
+import { route } from 'ziggy-js'
 
 const sidebarOpen = ref(false);
 const profileMenuOpen = ref(false);
@@ -105,12 +106,15 @@ function toggleProfileMenu() {
         Customers data
       </a>
 
-      <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-gradient-to-r from-[#1F3A5F] to-[#162B4A] hover:from-[#E74C3C] hover:to-[#C0392B] text-white font-semibold shadow-md transition-all duration-300">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#E74C3C]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
-        </svg>
-        Feedback
-      </a>
+<Link
+  :href="route('owner.reviews')"
+  class="flex items-center gap-3 px-4 py-3 rounded-lg bg-gradient-to-r from-[#1F3A5F] to-[#162B4A] hover:from-[#E74C3C] hover:to-[#C0392B] text-white font-semibold shadow-md transition-all duration-300"
+>
+  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#E74C3C]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+  </svg>
+  Reviews
+</Link>
     </nav>
   </aside>
 

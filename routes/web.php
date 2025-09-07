@@ -20,6 +20,16 @@ use App\Http\Controllers\CustomerDashboardController;
 use App\Http\Controllers\PublicBookingController;
 use App\Http\Controllers\OwnerAppointmentController;
 
+use App\Http\Controllers\Customer\FeedbackController;
+use App\Http\Controllers\Owner\ReviewController;
+
+
+Route::prefix('customer')->name('customer.')->group(function () {
+    Route::get('/feedback/{shop}', [FeedbackController::class, 'create'])->name('feedback.create');
+    Route::post('/feedback/{shop}', [FeedbackController::class, 'store'])->name('feedback.store');
+});
+
+
 /*
 |--------------------------------------------------------------------------
 | PUBLIC + CUSTOMER BOOKING
@@ -63,6 +73,8 @@ Route::prefix('owner')->group(function () {
         Route::post('/appointments/{id}/decline', [OwnerAppointmentController::class, 'decline'])->name('owner.appointments.decline');
         Route::get('/shop/create', [OwnerShopController::class, 'create'])->name('owner.shop.create');
         Route::post('/shop', [OwnerShopController::class, 'store'])->name('owner.shop.store');
+
+         Route::get('/reviews', [ReviewController::class, 'index'])->name('owner.reviews');
     });
 });
 

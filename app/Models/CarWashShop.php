@@ -19,4 +19,10 @@ class CarWashShop extends Model
         'services_offered',
         'qr_code'
     ];
+
+    // ✅ Relationship: a shop has many feedback
+    public function feedback()
+    {
+        return $this->hasMany(\App\Models\Feedback::class, 'shop_id');
+    }
 }

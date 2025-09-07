@@ -5,17 +5,16 @@ namespace App\Http\Controllers;
 use App\Models\CarWashShop;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class ShopBookingController extends Controller
 {
     /**
      * GET /shops/{shop}/availability?date=YYYY-MM-DD
-     * Returns available bookings for a shop on a specific date.
      */
     public function availability(Request $request, int $shopId)
     {
@@ -38,7 +37,6 @@ class ShopBookingController extends Controller
 
     /**
      * POST /shops/{shop}/book
-     * Creates a booking without payment, assigns a slot, and redirects back.
      */
     public function store(Request $request, int $shopId)
     {
@@ -49,6 +47,7 @@ class ShopBookingController extends Controller
             'date_of_booking' => 'required|date',
             'time_of_booking' => ['required', 'date_format:H:i', 'regex:/^[0-2][0-3]:[0-5][0-9]$/'],
             'slot_number' => 'required|integer|min:1|max:4',
+            'email' => 'nullable|email|max:255',
         ]);
 
         $shop = CarWashShop::findOrFail($shopId);
@@ -57,49 +56,39 @@ class ShopBookingController extends Controller
         // Ensure per-shop booking table exists
         OwnerShopController::ensureBookingTableExists($shop->id);
 
-        // Trim inputs to avoid trailing spaces
         $data['date_of_booking'] = trim($data['date_of_booking']);
         $data['time_of_booking'] = trim($data['time_of_booking']);
 
-        try {
-            $newStart = Carbon::createFromFormat('Y-m-d H:i', $data['date_of_booking'] . ' ' . $data['time_of_booking']);
-            $newEnd = (clone $newStart)->addHours(3);
-        } catch (\Exception $e) {
-            Log::error('Carbon parsing error: ' . $e->getMessage());
-            return back()->withErrors(['time_of_booking' => 'Invalid date or time format. Please use YYYY-MM-DD for date and HH:MM for time.'])->withInput();
-        }
+        $newStart = Carbon::createFromFormat('Y-m-d H:i', $data['date_of_booking'] . ' ' . $data['time_of_booking']);
+        $newEnd = (clone $newStart)->addHours(3);
 
-        // Check for slot overlap
+        // Check slot overlap
         $existing = DB::table($table)
             ->where('date_of_booking', $data['date_of_booking'])
             ->where('slot_number', $data['slot_number'])
-            ->orderBy('time_of_booking')
             ->get();
 
         foreach ($existing as $b) {
-            try {
-                $start = Carbon::createFromFormat('Y-m-d H:i', $data['date_of_booking'] . ' ' . $b->time_of_booking);
-                $end = (clone $start)->addHours(3);
-            } catch (\Exception $e) {
-                Log::error('Carbon parsing error for existing booking: ' . $e->getMessage());
-                continue;
-            }
+            $start = Carbon::createFromFormat('Y-m-d H:i', $data['date_of_booking'] . ' ' . $b->time_of_booking);
+            $end = (clone $start)->addHours(3);
 
             if ($start->lt($newEnd) && $newStart->lt($end)) {
                 return back()->withErrors([
-                    'time_of_booking' => 'The selected slot is occupied within 3 hours of that time. Please choose another time or slot.'
+                    'time_of_booking' => 'The selected slot is occupied within 3 hours of that time.'
                 ])->withInput();
             }
         }
 
         DB::table($table)->insert([
             'name' => $data['name'],
+            'email' => $data['email'] ?? null,
             'size_of_the_car' => $data['size_of_the_car'],
             'contact_no' => $data['contact_no'],
             'time_of_booking' => $data['time_of_booking'],
             'date_of_booking' => $data['date_of_booking'],
             'slot_number' => $data['slot_number'],
             'created_at' => now(),
+            'updated_at' => now(),
         ]);
 
         return back()->with('success', "Booked on slot #{$data['slot_number']} at {$shop->name}.");
@@ -107,7 +96,6 @@ class ShopBookingController extends Controller
 
     /**
      * GET /customer/book/{shop}/payment
-     * Handles invalid GET requests to the payment route.
      */
     public function showPaymentPage(int $shopId)
     {
@@ -122,16 +110,9 @@ class ShopBookingController extends Controller
 
     /**
      * POST /customer/book/{shop}/payment
-     * Accepts preliminary booking fields and renders the payment page (Inertia).
      */
     public function paymentPage(Request $request, int $shopId)
     {
-        Log::info('Request to paymentPage', [
-            'method' => $request->method(),
-            'shopId' => $shopId,
-            'input' => $request->all(),
-        ]);
-
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'size_of_the_car' => 'required|in:HatchBack,Sedan,MPV,SUV,Pickup,Van,Motorcycle',
@@ -153,8 +134,6 @@ class ShopBookingController extends Controller
 
     /**
      * POST /customer/book/{shop}/confirm
-     * Validates payment (image), assigns a slot, and saves booking.
-     * Redirects to 'dashboard' route.
      */
     public function confirmBooking(Request $request, int $shopId)
     {
@@ -176,56 +155,67 @@ class ShopBookingController extends Controller
         // Ensure per-shop booking table exists
         OwnerShopController::ensureBookingTableExists($shop->id);
 
-        // Trim inputs to avoid trailing spaces
         $data['date_of_booking'] = trim($data['date_of_booking']);
         $data['time_of_booking'] = trim($data['time_of_booking']);
 
-        try {
-            $newStart = Carbon::createFromFormat('Y-m-d H:i', $data['date_of_booking'] . ' ' . $data['time_of_booking']);
-            $newEnd = (clone $newStart)->addHours(3);
-        } catch (\Exception $e) {
-            Log::error('Carbon parsing error: ' . $e->getMessage());
-            return back()->withErrors(['time_of_booking' => 'Invalid date or time format. Please use YYYY-MM-DD for date and HH:MM for time.'])->withInput();
-        }
+        $newStart = Carbon::createFromFormat('Y-m-d H:i', $data['date_of_booking'] . ' ' . $data['time_of_booking']);
+        $newEnd = (clone $newStart)->addHours(3);
 
-        // Check for slot overlap
         $existing = DB::table($table)
             ->where('date_of_booking', $data['date_of_booking'])
             ->where('slot_number', $data['slot_number'])
-            ->orderBy('time_of_booking')
             ->get();
 
         foreach ($existing as $b) {
-            try {
-                $start = Carbon::createFromFormat('Y-m-d H:i', $data['date_of_booking'] . ' ' . $b->time_of_booking);
-                $end = (clone $start)->addHours(3);
-            } catch (\Exception $e) {
-                Log::error('Carbon parsing error for existing booking: ' . $e->getMessage());
-                continue;
-            }
+            $start = Carbon::createFromFormat('Y-m-d H:i', $data['date_of_booking'] . ' ' . $b->time_of_booking);
+            $end = (clone $start)->addHours(3);
 
             if ($start->lt($newEnd) && $newStart->lt($end)) {
                 return back()->withErrors([
-                    'time_of_booking' => 'The selected slot is occupied within 3 hours of that time. Please choose another time or slot.'
+                    'time_of_booking' => 'The selected slot is occupied within 3 hours of that time.'
                 ])->withInput();
             }
         }
 
-        // Store payment proof
         $paymentProofPath = $request->file('payment_proof')->store('payment_proofs', 'public');
 
-        DB::table($table)->insert([
-            'name' => $data['name'],
-            'size_of_the_car' => $data['size_of_the_car'],
-            'contact_no' => $data['contact_no'],
-            'email' => $data['email'],
-            'time_of_booking' => $data['time_of_booking'],
-            'date_of_booking' => $data['date_of_booking'],
-            'slot_number' => $data['slot_number'],
-            'payment_amount' => $data['payment_amount'],
-            'payment_proof' => $paymentProofPath,
-            'created_at' => now(),
-        ]);
+        $now = now();
+
+        // Update existing booking or insert new
+        $query = DB::table($table)
+            ->where('name', $data['name'])
+            ->where('email', $data['email'])
+            ->where('date_of_booking', $data['date_of_booking'])
+            ->where('time_of_booking', $data['time_of_booking'])
+            ->where('slot_number', $data['slot_number']);
+
+        $existingBooking = $query->first();
+
+        if ($existingBooking) {
+            $query->update([
+                'payment_amount' => $data['payment_amount'],
+                'payment_proof' => $paymentProofPath,
+                'payment_status' => 'paid',
+                'user_id' => Auth::id(),
+                'updated_at' => $now,
+            ]);
+        } else {
+            DB::table($table)->insert([
+                'user_id' => Auth::id(),
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'size_of_the_car' => $data['size_of_the_car'],
+                'contact_no' => $data['contact_no'],
+                'time_of_booking' => $data['time_of_booking'],
+                'date_of_booking' => $data['date_of_booking'],
+                'slot_number' => $data['slot_number'],
+                'payment_amount' => $data['payment_amount'],
+                'payment_proof' => $paymentProofPath,
+                'payment_status' => 'paid',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ]);
+        }
 
         return redirect()->route('dashboard')
             ->with('success', "Booked on slot #{$data['slot_number']} at {$shop->name}. Payment proof saved.");

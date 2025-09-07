@@ -1,4 +1,3 @@
-<!-- resources/js/Pages/Public/PaymentPage.vue -->
 <template>
   <div class="min-h-screen py-10 px-4 flex justify-center bg-[#F8FAFC]">
     <div class="w-full max-w-xl bg-white rounded-2xl shadow-lg p-6">
@@ -99,6 +98,7 @@
 <script setup lang="ts">
 import { useForm } from '@inertiajs/vue3'
 import { ref } from 'vue'
+import { Inertia } from '@inertiajs/inertia'
 
 interface Shop {
   id: number
@@ -162,7 +162,7 @@ const confirm = () => {
 
   form.post(`/customer/book/${props.shop.id}/confirm`, {
     forceFormData: true, // Required for file uploads
-    onSuccess: () => console.log('Payment confirmed successfully'),
+    onSuccess: () => Inertia.visit('/settings/appearance'),
     onError: (errors) => console.error('Payment submission error:', errors),
   })
 }

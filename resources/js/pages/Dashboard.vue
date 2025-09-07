@@ -1,3 +1,4 @@
+```vue
 <script setup lang="ts">
 import { Head } from '@inertiajs/vue3'
 import { ref } from 'vue'
@@ -15,6 +16,7 @@ interface AuthUser {
   id: number
   name: string
   email: string
+  email_verified_at?: string | null
 }
 
 interface Props {
@@ -26,7 +28,7 @@ interface Props {
 
 const props = defineProps<Props>()
 
-// Define backend base URL from environment variable or fallback
+// Define backend base URL from env or fallback
 const backendBaseUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost/Washwise'
 
 // Profile menu toggle
@@ -131,18 +133,21 @@ props.shops.forEach((shop) => {
       >
         <div class="py-2 space-y-1">
           <button
-            class="flex items-center gap-2 px-4 py-2 w-full text-left text-gray-700 hover:bg-gray-100 hover:text-black transition rounded-lg"
-          >
-            <span>👤</span>
-            Edit Profile
-          </button>
-          <button
+            @click.prevent="Inertia.get('/settings/profile')"
             class="flex items-center gap-2 px-4 py-2 w-full text-left text-gray-700 hover:bg-gray-100 hover:text-black transition rounded-lg"
           >
             <span>⚙️</span>
-            Settings
+            Edit Profile
           </button>
           <button
+            @click.prevent="Inertia.get('/settings/password')"
+            class="flex items-center gap-2 px-4 py-2 w-full text-left text-gray-700 hover:bg-gray-100 hover:text-black transition rounded-lg"
+          >
+            <span>⚙️</span>
+            Password
+          </button>
+          <button
+            @click.prevent="Inertia.get('/settings/appearance')"
             class="flex items-center gap-2 px-4 py-2 w-full text-left text-gray-700 hover:bg-gray-100 hover:text-black transition rounded-lg"
           >
             <span>💳</span>
@@ -189,7 +194,7 @@ props.shops.forEach((shop) => {
 
     <div
       v-if="props.shops.length > 0"
-      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-6"
     >
       <div
         v-for="shop in props.shops"
@@ -210,6 +215,13 @@ props.shops.forEach((shop) => {
         >
           Book Now
         </button>
+
+<a
+  :href="`/customer/feedback/${shop.id}`"
+  class="px-5 py-2 rounded-full bg-green-600 text-white font-medium shadow hover:bg-green-700 hover:scale-105 transition"
+>
+  Feedback
+</a>
       </div>
     </div>
 
@@ -252,3 +264,4 @@ props.shops.forEach((shop) => {
   opacity: 0;
 }
 </style>
+```

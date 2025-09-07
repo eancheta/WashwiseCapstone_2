@@ -24,6 +24,9 @@ class ProfileController extends Controller
         return Inertia::render('settings/Profile', [
             'mustVerifyEmail' => $user instanceof MustVerifyEmail,
             'status' => $request->session()->get('status'),
+            'auth' => [
+                'user' => $user,
+            ],
         ]);
     }
 
@@ -38,7 +41,7 @@ class ProfileController extends Controller
         $user->fill($request->validated());
 
         if ($user->isDirty('email')) {
-            // No null — placeholder date for "unverified"
+            // Set placeholder date for unverified email
             $user->forceFill([
                 'email_verified_at' => now()->setDate(1970, 1, 1)->startOfDay(),
             ]);
@@ -50,7 +53,7 @@ class ProfileController extends Controller
 
         $user->save();
 
-        return to_route('profile.edit');
+        return to_route('profile.edit')->with('success', 'Profile updated successfully.');
     }
 
     /**
@@ -71,6 +74,6 @@ class ProfileController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        return redirect('/')->with('success', 'Account deleted successfully.');
     }
 }
