@@ -10,16 +10,49 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use Inertia\Inertia;
+use Illuminate\Validation\ValidationException;
 
 class ShopBookingController extends Controller
 {
+    /**
+     * Check for overlapping bookings within a 3-hour window
+     */
+    private function checkForOverlap(string $table, string $date, string $time, int $slotNumber, int $shopId): ?string
+    {
+        try {
+            $newStart = Carbon::parse("$date $time");
+            $newEnd = $newStart->copy()->addHours(3);
+
+            $dates = [
+                $newStart->copy()->subDay()->format('Y-m-d'),
+                $newStart->format('Y-m-d'),
+                $newStart->copy()->addDay()->format('Y-m-d'),
+            ];
+
+            $existing = DB::table($table)
+                ->whereIn('date_of_booking', $dates)
+                ->where('slot_number', $slotNumber)
+                ->get();
+
+            foreach ($existing as $booking) {
+                $existingStart = Carbon::parse("{$booking->date_of_booking} {$booking->time_of_booking}");
+                $existingEnd = $existingStart->copy()->addHours(3);
+                if ($existingStart->lt($newEnd) && $newStart->lt($existingEnd)) {
+                    return 'The selected slot is occupied within 3 hours of that time.';
+                }
+            }
+        } catch (\Exception $e) {
+            return 'Invalid date or time format provided.';
+        }
+        return null;
+    }
+
     /**
      * GET /shops/{shop}/availability?date=YYYY-MM-DD
      */
     public function availability(Request $request, int $shopId)
     {
         $request->validate(['date' => 'required|date']);
-
         $shop = CarWashShop::findOrFail($shopId);
         $table = "bookings_shop_{$shop->id}";
 
@@ -27,10 +60,26 @@ class ShopBookingController extends Controller
             return response()->json(['bookings' => []]);
         }
 
+        $date = Carbon::parse($request->date)->format('Y-m-d');
+        $dates = [
+            Carbon::parse($date)->subDay()->format('Y-m-d'),
+            $date,
+            Carbon::parse($date)->addDay()->format('Y-m-d'),
+        ];
+
         $bookings = DB::table($table)
-            ->where('date_of_booking', $request->date)
+            ->whereIn('date_of_booking', $dates)
+            ->select('date_of_booking', 'time_of_booking', 'slot_number')
+            ->orderBy('date_of_booking')
             ->orderBy('time_of_booking')
-            ->get();
+            ->get()
+            ->map(function ($booking) {
+                return [
+                    'date_of_booking' => $booking->date_of_booking,
+                    'time_of_booking' => $booking->time_of_booking,
+                    'slot_number' => $booking->slot_number,
+                ];
+            });
 
         return response()->json(['bookings' => $bookings]);
     }
@@ -44,7 +93,7 @@ class ShopBookingController extends Controller
             'name' => 'required|string|max:255',
             'size_of_the_car' => 'required|in:HatchBack,Sedan,MPV,SUV,Pickup,Van,Motorcycle',
             'contact_no' => 'required|string|max:20',
-            'date_of_booking' => 'required|date',
+            'date_of_booking' => 'required|date_format:Y-m-d',
             'time_of_booking' => ['required', 'date_format:H:i', 'regex:/^[0-2][0-3]:[0-5][0-9]$/'],
             'slot_number' => 'required|integer|min:1|max:4',
             'email' => 'nullable|email|max:255',
@@ -52,31 +101,14 @@ class ShopBookingController extends Controller
 
         $shop = CarWashShop::findOrFail($shopId);
         $table = "bookings_shop_{$shop->id}";
-
-        // Ensure per-shop booking table exists
         OwnerShopController::ensureBookingTableExists($shop->id);
 
         $data['date_of_booking'] = trim($data['date_of_booking']);
         $data['time_of_booking'] = trim($data['time_of_booking']);
 
-        $newStart = Carbon::createFromFormat('Y-m-d H:i', $data['date_of_booking'] . ' ' . $data['time_of_booking']);
-        $newEnd = (clone $newStart)->addHours(3);
-
-        // Check slot overlap
-        $existing = DB::table($table)
-            ->where('date_of_booking', $data['date_of_booking'])
-            ->where('slot_number', $data['slot_number'])
-            ->get();
-
-        foreach ($existing as $b) {
-            $start = Carbon::createFromFormat('Y-m-d H:i', $data['date_of_booking'] . ' ' . $b->time_of_booking);
-            $end = (clone $start)->addHours(3);
-
-            if ($start->lt($newEnd) && $newStart->lt($end)) {
-                return back()->withErrors([
-                    'time_of_booking' => 'The selected slot is occupied within 3 hours of that time.'
-                ])->withInput();
-            }
+        // Check for overlaps
+        if ($error = $this->checkForOverlap($table, $data['date_of_booking'], $data['time_of_booking'], $data['slot_number'], $shop->id)) {
+            return back()->withErrors(['time_of_booking' => $error])->withInput();
         }
 
         DB::table($table)->insert([
@@ -113,21 +145,31 @@ class ShopBookingController extends Controller
      */
     public function paymentPage(Request $request, int $shopId)
     {
-        $validated = $request->validate([
+        $data = $request->validate([
             'name' => 'required|string|max:255',
             'size_of_the_car' => 'required|in:HatchBack,Sedan,MPV,SUV,Pickup,Van,Motorcycle',
             'contact_no' => 'required|string|max:20',
             'email' => 'required|email|max:255',
-            'date_of_booking' => 'required|date',
+            'date_of_booking' => 'required|date_format:Y-m-d',
             'time_of_booking' => ['required', 'date_format:H:i', 'regex:/^[0-2][0-3]:[0-5][0-9]$/'],
             'slot_number' => 'required|integer|min:1|max:4',
         ]);
 
         $shop = CarWashShop::findOrFail($shopId);
+        $table = "bookings_shop_{$shop->id}";
+        OwnerShopController::ensureBookingTableExists($shop->id);
+
+        $data['date_of_booking'] = trim($data['date_of_booking']);
+        $data['time_of_booking'] = trim($data['time_of_booking']);
+
+        // Check for overlaps
+        if ($error = $this->checkForOverlap($table, $data['date_of_booking'], $data['time_of_booking'], $data['slot_number'], $shop->id)) {
+            return back()->withErrors(['time_of_booking' => $error])->withInput();
+        }
 
         return Inertia::render('Public/PaymentPage', [
             'shop' => $shop,
-            'booking' => $validated,
+            'booking' => $data,
             'pageTitle' => "Pay for booking at {$shop->name}",
         ]);
     }
@@ -142,7 +184,7 @@ class ShopBookingController extends Controller
             'size_of_the_car' => 'required|in:HatchBack,Sedan,MPV,SUV,Pickup,Van,Motorcycle',
             'contact_no' => 'required|string|max:20',
             'email' => 'required|email|max:255',
-            'date_of_booking' => 'required|date',
+            'date_of_booking' => 'required|date_format:Y-m-d',
             'time_of_booking' => ['required', 'date_format:H:i', 'regex:/^[0-2][0-3]:[0-5][0-9]$/'],
             'slot_number' => 'required|integer|min:1|max:4',
             'payment_amount' => 'required|numeric|in:50',
@@ -151,37 +193,20 @@ class ShopBookingController extends Controller
 
         $shop = CarWashShop::findOrFail($shopId);
         $table = "bookings_shop_{$shop->id}";
-
-        // Ensure per-shop booking table exists
         OwnerShopController::ensureBookingTableExists($shop->id);
 
         $data['date_of_booking'] = trim($data['date_of_booking']);
         $data['time_of_booking'] = trim($data['time_of_booking']);
 
-        $newStart = Carbon::createFromFormat('Y-m-d H:i', $data['date_of_booking'] . ' ' . $data['time_of_booking']);
-        $newEnd = (clone $newStart)->addHours(3);
-
-        $existing = DB::table($table)
-            ->where('date_of_booking', $data['date_of_booking'])
-            ->where('slot_number', $data['slot_number'])
-            ->get();
-
-        foreach ($existing as $b) {
-            $start = Carbon::createFromFormat('Y-m-d H:i', $data['date_of_booking'] . ' ' . $b->time_of_booking);
-            $end = (clone $start)->addHours(3);
-
-            if ($start->lt($newEnd) && $newStart->lt($end)) {
-                return back()->withErrors([
-                    'time_of_booking' => 'The selected slot is occupied within 3 hours of that time.'
-                ])->withInput();
-            }
+        // Check for overlaps
+        if ($error = $this->checkForOverlap($table, $data['date_of_booking'], $data['time_of_booking'], $data['slot_number'], $shop->id)) {
+            return back()->withErrors(['time_of_booking' => $error])->withInput();
         }
 
         $paymentProofPath = $request->file('payment_proof')->store('payment_proofs', 'public');
-
         $now = now();
 
-        // Update existing booking or insert new
+        // Check for existing booking to update or insert new
         $query = DB::table($table)
             ->where('name', $data['name'])
             ->where('email', $data['email'])

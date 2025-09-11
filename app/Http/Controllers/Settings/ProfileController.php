@@ -41,9 +41,9 @@ class ProfileController extends Controller
         $user->fill($request->validated());
 
         if ($user->isDirty('email')) {
-            // Set placeholder date for unverified email
+            // Set email_verified_at to NULL when email changes
             $user->forceFill([
-                'email_verified_at' => now()->setDate(1970, 1, 1)->startOfDay(),
+                'email_verified_at' => null,
             ]);
 
             if ($user instanceof MustVerifyEmail) {
