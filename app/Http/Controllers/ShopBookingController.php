@@ -69,15 +69,18 @@ class ShopBookingController extends Controller
 
         $bookings = DB::table($table)
             ->whereIn('date_of_booking', $dates)
-            ->select('date_of_booking', 'time_of_booking', 'slot_number')
+            ->select('id', 'date_of_booking', 'time_of_booking', 'slot_number', 'name')
             ->orderBy('date_of_booking')
             ->orderBy('time_of_booking')
             ->get()
-            ->map(function ($booking) {
+            ->map(function ($booking) use ($date) {
+                $includeName = ($booking->date_of_booking === $date);
                 return [
+                    'id' => $booking->id,
                     'date_of_booking' => $booking->date_of_booking,
                     'time_of_booking' => $booking->time_of_booking,
                     'slot_number' => $booking->slot_number,
+                    ...( $includeName ? ['name' => $booking->name] : [] ),
                 ];
             });
 
@@ -177,72 +180,73 @@ class ShopBookingController extends Controller
     /**
      * POST /customer/book/{shop}/confirm
      */
-    public function confirmBooking(Request $request, int $shopId)
-    {
-        $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'size_of_the_car' => 'required|in:HatchBack,Sedan,MPV,SUV,Pickup,Van,Motorcycle',
-            'contact_no' => 'required|string|max:20',
-            'email' => 'required|email|max:255',
-            'date_of_booking' => 'required|date_format:Y-m-d',
-            'time_of_booking' => ['required', 'date_format:H:i', 'regex:/^[0-2][0-3]:[0-5][0-9]$/'],
-            'slot_number' => 'required|integer|min:1|max:4',
-            'payment_amount' => 'required|numeric|in:50',
-            'payment_proof' => 'required|image|mimes:jpg,jpeg,png|max:5120',
-        ]);
+public function confirmBooking(Request $request, int $shopId)
+{
+    $data = $request->validate([
+        'name' => 'required|string|max:255',
+        'size_of_the_car' => 'required|in:HatchBack,Sedan,MPV,SUV,Pickup,Van,Motorcycle',
+        'contact_no' => 'required|string|max:20',
+        'email' => 'required|email|max:255',
+        'date_of_booking' => 'required|date_format:Y-m-d',
+        'time_of_booking' => ['required', 'date_format:H:i', 'regex:/^[0-2][0-3]:[0-5][0-9]$/'],
+        'slot_number' => 'required|integer|min:1|max:4',
+        'payment_amount' => 'required|numeric|in:50',
+        'payment_proof' => 'required|image|mimes:jpg,jpeg,png|max:5120',
+    ]);
 
-        $shop = CarWashShop::findOrFail($shopId);
-        $table = "bookings_shop_{$shop->id}";
-        OwnerShopController::ensureBookingTableExists($shop->id);
+    $shop = CarWashShop::findOrFail($shopId);
+    $table = "bookings_shop_{$shop->id}";
+    OwnerShopController::ensureBookingTableExists($shop->id);
 
-        $data['date_of_booking'] = trim($data['date_of_booking']);
-        $data['time_of_booking'] = trim($data['time_of_booking']);
+    $data['date_of_booking'] = trim($data['date_of_booking']);
+    $data['time_of_booking'] = trim($data['time_of_booking']);
 
-        // Check for overlaps
-        if ($error = $this->checkForOverlap($table, $data['date_of_booking'], $data['time_of_booking'], $data['slot_number'], $shop->id)) {
-            return back()->withErrors(['time_of_booking' => $error])->withInput();
-        }
-
-        $paymentProofPath = $request->file('payment_proof')->store('payment_proofs', 'public');
-        $now = now();
-
-        // Check for existing booking to update or insert new
-        $query = DB::table($table)
-            ->where('name', $data['name'])
-            ->where('email', $data['email'])
-            ->where('date_of_booking', $data['date_of_booking'])
-            ->where('time_of_booking', $data['time_of_booking'])
-            ->where('slot_number', $data['slot_number']);
-
-        $existingBooking = $query->first();
-
-        if ($existingBooking) {
-            $query->update([
-                'payment_amount' => $data['payment_amount'],
-                'payment_proof' => $paymentProofPath,
-                'payment_status' => 'paid',
-                'user_id' => Auth::id(),
-                'updated_at' => $now,
-            ]);
-        } else {
-            DB::table($table)->insert([
-                'user_id' => Auth::id(),
-                'name' => $data['name'],
-                'email' => $data['email'],
-                'size_of_the_car' => $data['size_of_the_car'],
-                'contact_no' => $data['contact_no'],
-                'time_of_booking' => $data['time_of_booking'],
-                'date_of_booking' => $data['date_of_booking'],
-                'slot_number' => $data['slot_number'],
-                'payment_amount' => $data['payment_amount'],
-                'payment_proof' => $paymentProofPath,
-                'payment_status' => 'paid',
-                'created_at' => $now,
-                'updated_at' => $now,
-            ]);
-        }
-
-        return redirect()->route('dashboard')
-            ->with('success', "Booked on slot #{$data['slot_number']} at {$shop->name}. Payment proof saved.");
+    // Check for overlaps
+    if ($error = $this->checkForOverlap($table, $data['date_of_booking'], $data['time_of_booking'], $data['slot_number'], $shop->id)) {
+        return back()->withErrors(['time_of_booking' => $error])->withInput();
     }
+
+    $paymentProofPath = $request->file('payment_proof')->store('payment_proofs', 'public');
+    $now = now();
+
+    // Check for existing booking to update or insert new
+    $query = DB::table($table)
+        ->where('name', $data['name'])
+        ->where('email', $data['email'])
+        ->where('date_of_booking', $data['date_of_booking'])
+        ->where('time_of_booking', $data['time_of_booking'])
+        ->where('slot_number', $data['slot_number']);
+
+    $existingBooking = $query->first();
+
+    if ($existingBooking) {
+        $query->update([
+            'payment_amount' => $data['payment_amount'],
+            'payment_proof' => $paymentProofPath,
+            'payment_status' => 'paid',
+            'user_id' => Auth::id(),
+            'updated_at' => $now,
+        ]);
+    } else {
+        DB::table($table)->insert([
+            'user_id' => Auth::id(),
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'size_of_the_car' => $data['size_of_the_car'],
+            'contact_no' => $data['contact_no'],
+            'time_of_booking' => $data['time_of_booking'],
+            'date_of_booking' => $data['date_of_booking'],
+            'slot_number' => $data['slot_number'],
+            'payment_amount' => $data['payment_amount'],
+            'payment_proof' => $paymentProofPath,
+            'payment_status' => 'paid',
+            'created_at' => $now,
+            'updated_at' => $now,
+        ]);
+    }
+
+    // Use redirect() for server-side navigation with flash message
+    return redirect()->route('dashboard')
+        ->with('success', "Booked on slot #{$data['slot_number']} at {$shop->name}. Payment proof saved.");
+}
 }

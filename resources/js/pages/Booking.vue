@@ -5,8 +5,8 @@
       <div class="space-y-5">
         <h1 class="text-2xl font-bold text-center text-[#002B5C] mb-6"> Book at {{ shop.name }} </h1>
         <!-- Success & Error Alerts -->
-        <div v-if="$page.props.flash.success" class="bg-green-100 text-green-800 p-3 rounded-lg mb-4 text-sm"> {{ $page.props.flash.success }} </div>
-        <div v-if="$page.props.flash.error" class="bg-red-100 text-red-800 p-3 rounded-lg mb-4 text-sm"> {{ $page.props.flash.error }} </div>
+        <div v-if="$page.props.flash?.success" class="bg-green-100 text-green-800 p-3 rounded-lg mb-4 text-sm"> {{ $page.props.flash.success }} </div>
+        <div v-if="$page.props.flash?.error" class="bg-red-100 text-red-800 p-3 rounded-lg mb-4 text-sm"> {{ $page.props.flash.error }} </div>
         <div v-if="shopError" class="bg-red-100 text-red-800 p-3 rounded-lg mb-4 text-sm"> {{ shopError }} </div>
         <div v-if="overlapError" class="bg-red-100 text-red-800 p-3 rounded-lg mb-4 text-sm"> {{ overlapError }} </div>
         <!-- Form -->
@@ -59,10 +59,40 @@
           <!-- Slot -->
           <div>
             <label class="block text-sm font-semibold text-gray-700">Slot Number</label>
-            <input type="number" v-model.number="form.slot_number" min="1" max="4" class="w-full mt-1 p-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-[#002B5C] focus:outline-none" required />
+            <input type="number" v-model="form.slot_number" min="1" max="4" class="w-full mt-1 p-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-[#002B5C] focus:outline-none" required />
             <div v-if="form.errors.slot_number" class="text-red-600 text-sm mt-1">{{ form.errors.slot_number }}</div>
           </div>
-          <!-- Button -->
+          <!-- Taken Bookings Table (View Only) -->
+          <div v-if="form.date_of_booking" class="mt-6">
+            <h3 class="text-sm font-semibold text-gray-700 mb-2">Taken Slots on {{ formattedDate }} (View Only)</h3>
+            <div class="overflow-x-auto">
+              <table v-if="takenBookings.length > 0" class="min-w-full bg-white border border-gray-200 rounded-lg">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Time</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Slot</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                  <tr v-for="group in takenBookings" :key="`${group.time}-${group.slot}-${group.id || 0}`" class="bg-red-50 border-l-4 border-red-400 hover:bg-red-100">
+                    <td class="px-4 py-2 text-sm text-gray-900 font-medium">{{ group.time }}</td>
+                    <td class="px-4 py-2 text-sm text-gray-900">#{{ group.slot }}</td>
+                    <td class="px-4 py-2 text-sm">
+                      <span class="text-red-600 font-semibold">Taken</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <p v-else class="text-sm text-gray-500 italic">No taken slots on this date yet.</p>
+            </div>
+            <p class="text-xs text-gray-500 mt-2">Bookings are sorted by time. Each lasts 3 hours; avoid overlaps.</p>
+          </div>
+          <!-- Return to Dashboard Button -->
+          <button type="button" @click="returnToDashboard" class="w-full bg-gray-500 text-white py-2 rounded-lg font-semibold hover:bg-gray-600 transition">
+            Return to Dashboard
+          </button>
+          <!-- Submit Button -->
           <button type="submit" class="w-full bg-[#FF2D2D] text-white py-2 rounded-lg font-semibold hover:bg-red-700 transition disabled:opacity-50" :disabled="form.processing || hasOverlap">
             <span v-if="form.processing">Processing...</span>
             <span v-else>Pay Now</span>
@@ -106,10 +136,11 @@
 </template>
 
 <script setup lang="ts">
-import { useForm } from '@inertiajs/vue3';
-import { ref, watch, computed } from 'vue';
-import axios from 'axios';
+import { useForm, router } from '@inertiajs/vue3';
+import { watch, ref, computed } from 'vue'; // Kept ref and computed as they are used
+import axios from 'axios'; // Used in fetchBookings
 
+// Interfaces (ensure Props is defined before use)
 interface Shop {
   id: number;
   name: string;
@@ -122,9 +153,18 @@ interface Shop {
 }
 
 interface Booking {
+  id?: number;
   date_of_booking: string;
   time_of_booking: string;
   slot_number: number;
+  name?: string;
+}
+
+interface GroupedBooking {
+  id?: number; // Optional ID for uniqueness
+  time: string;
+  slot: number;
+  takenBy: string;
 }
 
 interface Props {
@@ -151,6 +191,51 @@ const shopError = ref<string>('');
 const overlapError = ref<string>('');
 const bookings = ref<Booking[]>(props.bookings || []);
 
+const formattedDate = computed(() => {
+  if (!form.date_of_booking) return '';
+  return new Date(form.date_of_booking).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+});
+
+const takenBookings = computed((): GroupedBooking[] => {
+  if (!form.date_of_booking) return [];
+  const selectedDate = form.date_of_booking;
+  const filtered = bookings.value.filter(booking => booking.date_of_booking === selectedDate);
+
+  // Group by time + slot
+  const groups: { [key: string]: GroupedBooking } = {};
+  filtered.forEach(booking => {
+    const key = `${booking.time_of_booking}-${booking.slot_number}`;
+    if (!groups[key]) {
+      groups[key] = {
+        id: booking.id,
+        time: booking.time_of_booking,
+        slot: booking.slot_number,
+        takenBy: '',
+      };
+    }
+    // Aggregate names
+    if (booking.name) {
+      if (groups[key].takenBy === '') {
+        groups[key].takenBy = booking.name;
+      } else if (groups[key].takenBy !== booking.name) {
+        groups[key].takenBy = 'Multiple';
+      }
+    } else if (groups[key].takenBy === '') {
+      groups[key].takenBy = 'Unknown';
+    }
+  });
+
+  // Convert to array and sort by time
+  const groupArray = Object.values(groups);
+  groupArray.sort((a, b) => {
+    const timeA = new Date(`2000-01-01T${a.time}:00`).getTime();
+    const timeB = new Date(`2000-01-01T${b.time}:00`).getTime();
+    return timeA - timeB;
+  });
+
+  return groupArray;
+});
+
 const hasOverlap = computed(() => {
   if (!form.date_of_booking || !form.time_of_booking || !form.slot_number) return false;
 
@@ -171,8 +256,8 @@ const handleImageError = (event: Event, fallbackSrc: string) => {
   }
 };
 
-const fetchBookings = async (date: string, slotNumber: number) => {
-  if (!date || !props.shop?.id || !slotNumber) return;
+const fetchBookings = async (date: string) => {
+  if (!date || !props.shop?.id) return;
 
   const dates: string[] = [];
   const d = new Date(date);
@@ -180,16 +265,36 @@ const fetchBookings = async (date: string, slotNumber: number) => {
   dates.push(new Date(d.getTime() - 24 * 60 * 60 * 1000).toISOString().split('T')[0]);
   dates.push(new Date(d.getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0]);
 
-  bookings.value = [];
+  const allFetched: Booking[] = [];
 
   for (const fetchDate of [...new Set(dates)]) {
     try {
       const response = await axios.get(`/shops/${props.shop.id}/availability?date=${fetchDate}`);
-      bookings.value.push(...response.data.bookings.filter((b: Booking) => b.slot_number === slotNumber));
+      allFetched.push(...response.data.bookings);
     } catch (error) {
       console.warn(`No bookings found for ${fetchDate}:`, error);
     }
   }
+
+  // Deduplicate by unique key (date-time-slot)
+  const uniqueBookings = allFetched.filter((booking, index, self) =>
+    index === self.findIndex(b =>
+      b.date_of_booking === booking.date_of_booking &&
+      b.time_of_booking === booking.time_of_booking &&
+      b.slot_number === booking.slot_number
+    )
+  );
+
+  bookings.value = uniqueBookings;
+};
+
+const returnToDashboard = () => {
+  if (form.isDirty) {
+    if (!confirm('You have unsaved changes. Are you sure you want to leave?')) {
+      return;
+    }
+  }
+  router.visit(route('dashboard'));
 };
 
 const submit = () => {
@@ -222,16 +327,17 @@ const submit = () => {
   });
 };
 
-watch([() => form.date_of_booking, () => form.slot_number], ([newDate, newSlot]) => {
-  if (newDate && newSlot) {
-    fetchBookings(newDate, newSlot);
+// Watchers (place after fetchBookings definition)
+watch(() => form.date_of_booking, (newDate) => {
+  if (newDate) {
+    fetchBookings(newDate);
   }
 });
 
 watch(() => props.shop, (newShop) => {
   console.log('Shop updated:', newShop);
-  if (newShop?.id && form.date_of_booking && form.slot_number) {
-    fetchBookings(form.date_of_booking, form.slot_number);
+  if (newShop?.id && form.date_of_booking) {
+    fetchBookings(form.date_of_booking);
   }
 });
 </script>
