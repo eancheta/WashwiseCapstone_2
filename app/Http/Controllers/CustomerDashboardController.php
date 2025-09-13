@@ -16,12 +16,16 @@ class CustomerDashboardController extends Controller
                 'car_wash_shops.id',
                 'car_wash_shops.name',
                 'car_wash_shops.address',
+                'car_wash_shops.district',
                 'car_wash_shops.logo'
             )
             ->get();
 
+        $districts = $shops->pluck('district')->unique()->values();
+
         return Inertia::render('Dashboard', [
             'shops' => $shops,
+            'districts' => $districts,
             'auth' => [
                 'user' => Auth::user(),
             ]
