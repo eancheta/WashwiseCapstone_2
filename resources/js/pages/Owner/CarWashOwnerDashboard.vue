@@ -1,23 +1,17 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { Head, Link, usePage } from '@inertiajs/vue3'
+import { ref, computed } from 'vue'
 import { route } from 'ziggy-js'
 
-const sidebarOpen = ref(false);
-const profileMenuOpen = ref(false);
-
-const user = {
-  name: 'John Doe',
-  avatar: '/images/default-avatar.png'
-};
+const sidebarOpen = ref(false)
 
 function toggleSidebar() {
-  sidebarOpen.value = !sidebarOpen.value;
+  sidebarOpen.value = !sidebarOpen.value
 }
 
-function toggleProfileMenu() {
-  profileMenuOpen.value = !profileMenuOpen.value;
-}
+// ✅ Get user safely from Inertia props
+const page = usePage()
+const user = computed(() => page.props.auth?.user ?? null)
 </script>
 
 <template>
@@ -44,33 +38,12 @@ function toggleProfileMenu() {
       />
     </div>
 
-    <!-- Right: Styled Profile Dropdown -->
-    <div class="relative">
-      <button @click="toggleProfileMenu" class="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition">
-        <img :src="user.avatar" alt="Profile" class="w-8 h-8 rounded-full border border-gray-300" />
-        <span class="text-gray-700 font-medium">{{ user.name }}</span>
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-        </svg>
-      </button>
 
-      <!-- Dropdown -->
-      <div
-        v-if="profileMenuOpen"
-        class="absolute right-0 mt-2 w-56 rounded-xl shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50 animate-fadeIn"
-      >
-        <div class="py-2">
-          <Link href="/profile/edit" class="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-black transition rounded-lg">
-            <span>👤</span> Edit Profile
-          </Link>
-          <Link href="/settings" class="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-black transition rounded-lg">
-            <span>⚙️</span> Settings
-          </Link>
-          <Link href="/logout" method="post" as="button" class="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 hover:text-red-700 transition rounded-lg">
-            <span>🚪</span> Log Out
-          </Link>
-        </div>
-      </div>
+    <!-- Right: Owner Name -->
+    <div class="flex items-center space-x-2 px-3 py-2 rounded-lg">
+      <span class="text-gray-700 font-medium">
+        {{ user ? user.name : 'Owner' }}
+      </span>
     </div>
   </div>
 
@@ -85,36 +58,33 @@ function toggleProfileMenu() {
 
     <!-- Menu -->
     <nav class="flex-1 space-y-2 px-3 mt-4">
-<Link :href="route('owner.appointments')" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-gradient-to-r from-[#1F3A5F] to-[#162B4A] hover:from-[#E74C3C] hover:to-[#C0392B] text-white font-semibold shadow-md transition-all duration-300">
-  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#E74C3C]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2v-7H3v7a2 2 0 002 2z" />
-  </svg>
-  Appointments
-</Link>
+        <Link :href="route('owner.appointments')" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-gradient-to-r from-[#1F3A5F] to-[#162B4A] hover:from-[#E74C3C] hover:to-[#C0392B] text-white font-semibold shadow-md transition-all duration-300">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#E74C3C]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2v-7H3v7a2 2 0 002 2z" />
+            </svg>
+            Appointments
+        </Link>
 
-      <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-gradient-to-r from-[#1F3A5F] to-[#162B4A] hover:from-[#E74C3C] hover:to-[#C0392B] text-white font-semibold shadow-md transition-all duration-300">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#E74C3C]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7h18M3 12h18M3 17h18" />
-        </svg>
-        Services
-      </a>
+        <Link :href="route('owner.reviews')" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-gradient-to-r from-[#1F3A5F] to-[#162B4A] hover:from-[#E74C3C] hover:to-[#C0392B] text-white font-semibold shadow-md transition-all duration-300">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#E74C3C]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+            </svg>
+            Reviews
+        </Link>
 
-      <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-gradient-to-r from-[#1F3A5F] to-[#162B4A] hover:from-[#E74C3C] hover:to-[#C0392B] text-white font-semibold shadow-md transition-all duration-300">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#E74C3C]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-5m0 0l-5 5m5-5H3" />
-        </svg>
-        Customers data
-      </a>
+        <Link :href="route('owner.walkin')" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-gradient-to-r from-[#1F3A5F] to-[#162B4A] hover:from-[#27AE60] hover:to-[#1E8449] text-white font-semibold shadow-md transition-all duration-300">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#27AE60]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            Walk-in
+        </Link>
 
-<Link
-  :href="route('owner.reviews')"
-  class="flex items-center gap-3 px-4 py-3 rounded-lg bg-gradient-to-r from-[#1F3A5F] to-[#162B4A] hover:from-[#E74C3C] hover:to-[#C0392B] text-white font-semibold shadow-md transition-all duration-300"
->
-  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#E74C3C]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
-  </svg>
-  Reviews
-</Link>
+        <Link href="/logout" method="post" as="button" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-gradient-to-r from-[#1F3A5F] to-[#162B4A] hover:from-[#27AE60] hover:to-[#1E8449] text-white font-semibold shadow-md transition-all duration-300">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#27AE60]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            <span>🚪</span> Log Out
+        </Link>
     </nav>
   </aside>
 

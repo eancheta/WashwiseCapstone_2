@@ -50,6 +50,14 @@
                     Submit Feedback
                 </button>
             </form>
+
+            {{-- Return Button --}}
+            <div class="mt-6 text-center">
+                <a href="{{ route('dashboard') }}"
+                   class="inline-block bg-[#002B5C] text-white px-6 py-2 rounded-lg font-bold text-lg hover:opacity-90 transition">
+                    ⬅ Return to Dashboard
+                </a>
+            </div>
         </div>
     </div>
 </div>

@@ -1,11 +1,18 @@
-
 @extends('layouts.blade')
 
 @section('title', 'Customer Reviews')
 
 @section('content')
 <div class="p-6 bg-gray-50 min-h-screen">
-    <h1 class="text-3xl font-bold mb-6 text-gray-800">Customer Reviews</h1>
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">Customer Reviews</h1>
+
+        <!-- 🔹 Return Button -->
+        <a href="{{ route('carwashownerdashboard') }}"
+           class="px-4 py-2 bg-[#002B5C] text-white font-semibold rounded-lg shadow hover:bg-[#003366] transition">
+            ← Return to Dashboard
+        </a>
+    </div>
 
     @if($shops->count() > 0)
         @foreach($shops as $shop)

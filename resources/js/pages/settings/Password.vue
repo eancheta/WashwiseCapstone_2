@@ -1,5 +1,9 @@
 <script setup lang="ts">
-import { Head, useForm } from '@inertiajs/vue3'
+import { Head, useForm, router } from '@inertiajs/vue3'
+
+function goBack() {
+  router.visit('/dashboard') // for customer dashboard
+}
 
 const form = useForm({
   current_password: '',
@@ -25,7 +29,13 @@ const submit = () => {
         <h1 class="text-2xl font-extrabold text-center text-[#002B5C] mb-6 tracking-tight">
           Change Password
         </h1>
-
+<button
+  @click="goBack"
+  type="button"
+  class="mt-6 bg-[#002B5C] text-white px-6 py-2 rounded-lg font-bold text-base hover:opacity-90 transition"
+>
+  ⬅ Return to Dashboard
+</button>
         <form @submit.prevent="submit" class="space-y-6">
           <div>
             <label class="block text-base font-bold text-[#182235] mb-1">Current Password</label>

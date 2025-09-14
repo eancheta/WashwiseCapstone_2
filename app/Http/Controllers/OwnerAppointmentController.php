@@ -61,11 +61,58 @@ class OwnerAppointmentController extends Controller
                 return $appointment;
             });
 
-        Log::info('Appointments fetched: ', $appointments->toArray());
-
         return Inertia::render('OwnerAppointments', [
             'appointments' => $appointments
         ]);
+    }
+
+    /**
+     * Show Walk-in form.
+     */
+    public function walkinForm()
+    {
+        return view('owner.walkin');
+    }
+
+    /**
+     * Store Walk-in appointment.
+     */
+    public function storeWalkin(Request $request)
+    {
+        $ownerId = Auth::guard('carwashowner')->id();
+        if (!$ownerId) {
+            return redirect()->route('owner.login.show');
+        }
+
+        $shopId = CarWashShop::where('owner_id', $ownerId)->value('id');
+        if (!$shopId) {
+            return redirect()->route('owner.shop.create');
+        }
+
+        $tableName = "bookings_shop_{$shopId}";
+
+        if (!DB::getSchemaBuilder()->hasTable($tableName)) {
+            return back()->with('error', 'Bookings table not found.');
+        }
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'nullable|email|max:255',
+            'size_of_the_car' => 'required|string',
+            'contact_no' => 'required|string|max:20',
+            'date_of_booking' => 'required|date',
+            'time_of_booking' => 'required',
+            'slot_number' => 'required|integer|min:1|max:4',
+        ]);
+
+        $validated['status'] = 'approved'; // walk-ins are instantly approved
+        $validated['created_at'] = now();
+        $validated['updated_at'] = now();
+
+        DB::table($tableName)->insert($validated);
+
+        return redirect()->route('owner.appointments')
+            ->with('success', 'Walk-in appointment added successfully.');
     }
 
     /**
@@ -78,47 +125,39 @@ class OwnerAppointmentController extends Controller
         $tableName = "bookings_shop_{$shopId}";
 
         if (!DB::getSchemaBuilder()->hasTable($tableName)) {
-            Log::warning('No bookings table found for shop ID: ' . $shopId);
             return back()->with('error', 'No bookings found for this shop.');
         }
 
-        $booking = DB::table($tableName)
-            ->where('id', $id)
-            ->first();
+        $booking = DB::table($tableName)->where('id', $id)->first();
 
         if (!$booking) {
             return back()->with('error', 'Booking not found.');
-        }
-
-        if (!$booking->email) {
-            Log::warning('No email address found for booking ID: ' . $id);
-            return back()->with('error', 'Booking approved but no email address provided for confirmation.');
         }
 
         DB::table($tableName)
             ->where('id', $id)
             ->update(['status' => 'approved']);
 
-        $shop = CarWashShop::findOrFail($shopId);
+        if ($booking->email) {
+            $shop = CarWashShop::findOrFail($shopId);
 
-        $emailData = [
-            'customer_name' => $booking->name,
-            'service_name' => $booking->size_of_the_car . ' Wash',
-            'date_time' => $booking->date_of_booking . ' ' . $booking->time_of_booking,
-            'car_wash_name' => $shop->name,
-            'car_wash_address' => $shop->address,
-            'amount_paid' => $booking->payment_amount,
-        ];
+            $emailData = [
+                'customer_name' => $booking->name,
+                'service_name' => $booking->size_of_the_car . ' Wash',
+                'date_time' => $booking->date_of_booking . ' ' . $booking->time_of_booking,
+                'car_wash_name' => $shop->name,
+                'car_wash_address' => $shop->address,
+                'amount_paid' => $booking->payment_amount,
+            ];
 
-        try {
-            Mail::to($booking->email)->send(new AppointmentApprovedMail($emailData));
-            Log::info('Confirmation email sent for booking ID: ' . $id);
-        } catch (\Exception $e) {
-            Log::error('Failed to send confirmation email for booking ID: ' . $id . '. Error: ' . $e->getMessage());
-            return back()->with('error', 'Booking approved but failed to send confirmation email.');
+            try {
+                Mail::to($booking->email)->send(new AppointmentApprovedMail($emailData));
+            } catch (\Exception $e) {
+                Log::error('Failed to send confirmation email for booking ID: ' . $id . ' | ' . $e->getMessage());
+            }
         }
 
-        return back()->with('success', 'Booking approved and confirmation email sent.');
+        return back()->with('success', 'Booking approved successfully.');
     }
 
     /**

@@ -19,16 +19,19 @@ use App\Http\Controllers\CustomerBookingController;
 use App\Http\Controllers\CustomerDashboardController;
 use App\Http\Controllers\PublicBookingController;
 use App\Http\Controllers\OwnerAppointmentController;
-
+use App\Http\Controllers\Owner\WalkinController;
 use App\Http\Controllers\Customer\FeedbackController;
 use App\Http\Controllers\Owner\ReviewController;
 
+Route::middleware(['auth:carwashowner'])->prefix('owner')->name('owner.')->group(function () {
+    Route::get('/walkin', [WalkinController::class, 'create'])->name('walkin');
+    Route::post('/walkin', [WalkinController::class, 'store'])->name('walkin.store');
+});
 
 Route::prefix('customer')->name('customer.')->group(function () {
     Route::get('/feedback/{shop}', [FeedbackController::class, 'create'])->name('feedback.create');
     Route::post('/feedback/{shop}', [FeedbackController::class, 'store'])->name('feedback.store');
 });
-
 
 /*
 |--------------------------------------------------------------------------
@@ -73,8 +76,7 @@ Route::prefix('owner')->group(function () {
         Route::post('/appointments/{id}/decline', [OwnerAppointmentController::class, 'decline'])->name('owner.appointments.decline');
         Route::get('/shop/create', [OwnerShopController::class, 'create'])->name('owner.shop.create');
         Route::post('/shop', [OwnerShopController::class, 'store'])->name('owner.shop.store');
-
-         Route::get('/reviews', [ReviewController::class, 'index'])->name('owner.reviews');
+        Route::get('/reviews', [ReviewController::class, 'index'])->name('owner.reviews');
     });
 });
 

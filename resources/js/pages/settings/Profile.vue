@@ -1,5 +1,9 @@
 <script setup lang="ts">
-import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
+import { Head, Link, useForm, usePage, router } from '@inertiajs/vue3'
+
+function goBack() {
+  router.visit('/dashboard') // for customer dashboard
+}
 
 // Access page props
 const page = usePage();
@@ -38,6 +42,13 @@ const isEmailUnverified = !user.email_verified_at; // Check for null instead of 
   <div class="app-layout">
     <Head title="Profile settings" />
     <div class="settings-layout flex flex-col space-y-6">
+        <button
+  @click="goBack"
+  type="button"
+  class="mt-6 bg-[#002B5C] text-white px-6 py-2 rounded-lg font-bold text-base hover:opacity-90 transition"
+>
+  ⬅ Return to Dashboard
+</button>
       <div>
         <h2 class="text-xl font-semibold custom-heading">Profile information</h2>
         <p class="text-sm text-neutral-600">Update your name and email address</p>

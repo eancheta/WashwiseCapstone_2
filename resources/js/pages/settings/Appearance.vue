@@ -1,6 +1,11 @@
 <script setup lang="ts">
-import { Head } from '@inertiajs/vue3'
+
 import { withDefaults } from 'vue';
+import { Head, router } from '@inertiajs/vue3'
+
+function goBack() {
+  router.visit('/dashboard') // for customer dashboard
+}
 
 interface Shop {
   id: number
@@ -41,6 +46,15 @@ const props = withDefaults(defineProps<{
       <h1 class="text-2xl font-bold text-[#182235] mb-6 text-center tracking-tight">
         {{ props.pageTitle }}
       </h1>
+<div class="mt-6 text-center">
+<button
+  @click="goBack"
+  type="button"
+  class="mt-6 bg-[#002B5C] text-white px-6 py-2 rounded-lg font-bold text-base hover:opacity-90 transition"
+>
+  ⬅ Return to Dashboard
+</button>
+</div>
 
       <div v-if="props.bookings.length > 0" class="overflow-x-auto">
         <table class="min-w-full bg-white border border-gray-200 rounded-lg text-sm">
