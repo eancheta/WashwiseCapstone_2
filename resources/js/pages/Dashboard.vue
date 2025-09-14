@@ -76,56 +76,58 @@ const filteredShops = computed(() => {
       </div>
 
       <!-- Nearby District Filter -->
-      <div>
-        <label for="district" class="block text-sm font-medium text-gray-700">Nearby</label>
-        <select
-          id="district"
-          v-model="selectedDistrict"
-          class="mt-2 w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
-        >
-          <option value="all">All Districts</option>
-          <option
-            v-for="district in props.districts"
-            :key="district"
-            :value="district"
-          >
-            District {{ district }}
-          </option>
-        </select>
-      </div>
+   <div>
+  <label for="district" class="block text-sm font-medium text-gray-900">Nearby</label>
+  <select
+    id="district"
+    v-model="selectedDistrict"
+    class="mt-2 w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm text-gray-900"
+  >
+    <option value="all">All Districts</option>
+    <option
+      v-for="district in props.districts"
+      :key="district"
+      :value="district"
+    >
+      District {{ district }}
+    </option>
+  </select>
+</div>
+
 
       <!-- Sidebar Links -->
-      <nav class="space-y-3">
-        <button
-          @click.prevent="Inertia.get('/settings/profile')"
-          class="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 transition"
-        >
-          ⚙️ Edit Profile
-        </button>
-        <button
-          @click.prevent="Inertia.get('/settings/password')"
-          class="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 transition"
-        >
-          🔒 Password
-        </button>
-        <button
-          @click.prevent="Inertia.get('/settings/appearance')"
-          class="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 transition"
-        >
-          💳 Transaction History
-        </button>
-        <button
-          @click="logout"
-          class="w-full text-left px-3 py-2 rounded-lg text-red-600 hover:bg-red-50 transition"
-        >
-          🚪 Log Out
-        </button>
-      </nav>
+<nav class="space-y-3">
+  <button
+    @click.prevent="Inertia.get('/settings/profile')"
+    class="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 transition text-gray-900 font-bold"
+  >
+    ⚙️ Edit Profile
+  </button>
+  <button
+    @click.prevent="Inertia.get('/settings/password')"
+    class="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 transition text-gray-900 font-bold"
+  >
+    🔒 Password
+  </button>
+  <button
+    @click.prevent="Inertia.get('/settings/appearance')"
+    class="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 transition text-gray-900 font-bold"
+  >
+    💳 Transaction History
+  </button>
+  <button
+    @click="logout"
+    class="w-full text-left px-3 py-2 rounded-lg text-red-600 hover:bg-red-50 transition font-bold"
+  >
+    🚪 Log Out
+  </button>
+</nav>
+
     </aside>
 
     <!-- Main Content -->
     <main class="flex-1 p-8 bg-gradient-to-br from-white via-blue-50 to-[#002B5C]">
-      <h1 class="text-3xl font-extrabold text-gray-900 text-center">Available Car Wash Shops</h1>
+      <h1 class="text-3xl font-extrabold text-gray-900 text-center">Available Car Wash Services</h1>
 
       <div
         v-if="filteredShops.length > 0"
@@ -151,7 +153,7 @@ const filteredShops = computed(() => {
           </button>
           <a
             :href="`/customer/feedback/${shop.id}`"
-            class="mt-2 px-5 py-2 rounded-full bg-green-600 text-white font-medium shadow hover:bg-green-700 hover:scale-105 transition"
+            class="mt-2 px-5 py-2 rounded-full bg-[#FF2D2D] text-white font-medium shadow hover:bg-[#002B5C] hover:scale-105 transition"
           >
             Feedback
           </a>

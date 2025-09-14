@@ -35,78 +35,85 @@ const submit = () => {
 // Email verification status
 const isMustVerify = Boolean(props.mustVerifyEmail);
 const status = props.status as string | undefined;
-const isEmailUnverified = !user.email_verified_at; // Check for null instead of placeholder date
+const isEmailUnverified = !user.email_verified_at;
 </script>
 
 <template>
-  <div class="app-layout">
-    <Head title="Profile settings" />
-    <div class="settings-layout flex flex-col space-y-6">
-        <button
-  @click="goBack"
-  type="button"
-  class="mt-6 bg-[#002B5C] text-white px-6 py-2 rounded-lg font-bold text-base hover:opacity-90 transition"
->
-  ⬅ Return to Dashboard
-</button>
-      <div>
-        <h2 class="text-xl font-semibold custom-heading">Profile information</h2>
-        <p class="text-sm text-neutral-600">Update your name and email address</p>
-      </div>
+  <Head title="Profile Settings" />
+
+  <div class="min-h-screen flex items-center justify-center bg-[#F8FAFC] py-10 px-4">
+    <!-- Return button -->
+    <div class="absolute top-6 left-6">
+      <button
+        @click="goBack"
+        type="button"
+        class="flex items-center gap-2 px-4 py-2 bg-gray-200 text-[#002B5C] rounded-lg font-medium shadow hover:bg-[#FF2D2D] hover:text-white transition"
+      >
+        ⬅ Return
+      </button>
+    </div>
+
+    <!-- Profile Card -->
+    <div class="w-full max-w-lg bg-white shadow-xl rounded-2xl p-8 relative z-10">
+      <h2 class="text-2xl font-extrabold text-[#002B5C] mb-2">Edit Profile</h2>
+      <p class="text-sm text-gray-500 mb-6">Update your name and email address</p>
 
       <form @submit.prevent="submit" class="space-y-6">
-        <div class="grid gap-2">
-          <label for="name" class="text-sm font-medium">Name</label>
+        <!-- Name -->
+        <div>
+          <label for="name" class="block text-sm font-bold text-[#182235] mb-1">Full Name</label>
           <input
             id="name"
-            class="mt-1 block w-full border border-gray-300 rounded-md p-2"
             v-model="form.name"
             required
             autocomplete="name"
-            placeholder="Full name"
+            placeholder="Enter your full name"
+            class="w-full border-2 border-gray-300 rounded-lg p-2 text-[#182235] focus:ring-2 focus:ring-[#FF2D2D] transition"
           />
-          <p v-if="form.errors.name" class="error mt-2 text-sm text-red-600">{{ form.errors.name }}</p>
+          <p v-if="form.errors.name" class="text-red-500 text-sm mt-1">{{ form.errors.name }}</p>
         </div>
 
-        <div class="grid gap-2">
-          <label for="email" class="text-sm font-medium">Email address</label>
+        <!-- Email -->
+        <div>
+          <label for="email" class="block text-sm font-bold text-[#182235] mb-1">Email Address</label>
           <input
             id="email"
             type="email"
-            class="mt-1 block w-full border border-gray-300 rounded-md p-2"
             v-model="form.email"
             required
             autocomplete="username"
-            placeholder="Email address"
+            placeholder="Enter your email"
+            class="w-full border-2 border-gray-300 rounded-lg p-2 text-[#182235] focus:ring-2 focus:ring-[#FF2D2D] transition"
           />
-          <p v-if="form.errors.email" class="error mt-2 text-sm text-red-600">{{ form.errors.email }}</p>
+          <p v-if="form.errors.email" class="text-red-500 text-sm mt-1">{{ form.errors.email }}</p>
         </div>
 
-        <div v-if="isMustVerify && isEmailUnverified" class="-mt-4 text-sm text-neutral-500">
+        <!-- Email Verification -->
+        <div v-if="isMustVerify && isEmailUnverified" class="text-sm text-gray-600">
           <p>
             Your email address is unverified.
             <Link
               href="/email/verification-notification"
               method="post"
               as="button"
-              class="text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current dark:decoration-neutral-500 ml-1"
+              class="ml-1 text-[#FF2D2D] underline hover:opacity-80 transition"
             >
-              Click here to resend the verification email.
+              Resend verification email
             </Link>
           </p>
-
-          <div v-if="status === 'verification-link-sent'" class="mt-2 text-sm font-medium text-green-600">
-            A new verification link has been sent to your email address.
+          <div v-if="status === 'verification-link-sent'" class="mt-2 text-sm font-semibold text-green-600">
+            ✅ A new verification link has been sent to your email.
           </div>
         </div>
 
+        <!-- Actions -->
         <div class="flex items-center gap-4">
           <button
             type="submit"
-            class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+            class="w-full bg-[#002B5C] text-white py-2 rounded-lg font-bold hover:bg-[#FF2D2D] transition"
             :disabled="form.processing"
           >
-            Save
+            Save Changes
           </button>
 
           <Transition
@@ -115,19 +122,10 @@ const isEmailUnverified = !user.email_verified_at; // Check for null instead of 
             leave-active-class="transition ease-in-out"
             leave-to-class="opacity-0"
           >
-            <p v-show="form.recentlySuccessful" class="text-sm text-neutral-600">Saved.</p>
+            <p v-show="form.recentlySuccessful" class="text-sm text-green-600 font-medium">✅ Saved.</p>
           </Transition>
         </div>
       </form>
     </div>
   </div>
 </template>
-
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600;800&display=swap');
-
-.custom-heading {
-  font-family: 'Montserrat', sans-serif;
-  letter-spacing: 0.5px;
-}
-</style>

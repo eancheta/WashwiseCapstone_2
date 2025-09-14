@@ -14,28 +14,34 @@ const form = useForm({
 const submit = () => {
   form.put('/settings/password')
 }
-
 </script>
 
 <template>
   <Head title="Change Password" />
 
-  <div class="min-h-screen flex items-center justify-center bg-[#F8FAFC] py-8 px-2">
+  <div class="min-h-screen flex items-center justify-center bg-[#F8FAFC] py-8 px-2 relative">
+    <!-- Return Button (outside the box, top-left) -->
+    <div class="absolute top-4 left-4">
+      <button
+        @click="goBack"
+        type="button"
+        class="flex items-center gap-1.5 px-3 py-1.5 bg-gray-200 text-black rounded-lg text-sm font-medium shadow hover:bg-[#FF2D2D] hover:text-white transition"
+      >
+        ⬅ Return
+      </button>
+    </div>
+
+    <!-- Main Form Box -->
     <div class="relative w-full max-w-md bg-white rounded-2xl shadow-xl p-8 z-10">
       <!-- Decorative background shapes -->
       <div class="absolute -top-10 -left-10 w-24 h-24 bg-[#FF2D2D] opacity-10 rounded-full blur-2xl z-0"></div>
       <div class="absolute -bottom-10 -right-10 w-32 h-32 bg-[#002B5C] opacity-10 rounded-full blur-2xl z-0"></div>
+
       <div class="relative z-10">
         <h1 class="text-2xl font-extrabold text-center text-[#002B5C] mb-6 tracking-tight">
           Change Password
         </h1>
-<button
-  @click="goBack"
-  type="button"
-  class="mt-6 bg-[#002B5C] text-white px-6 py-2 rounded-lg font-bold text-base hover:opacity-90 transition"
->
-  ⬅ Return to Dashboard
-</button>
+
         <form @submit.prevent="submit" class="space-y-6">
           <div>
             <label class="block text-base font-bold text-[#182235] mb-1">Current Password</label>
@@ -78,7 +84,7 @@ const submit = () => {
 
           <button
             type="submit"
-            class="w-full bg-[#002B5C] text-white py-2 rounded-lg font-bold text-lg hover:bg-[#FF2D2D] transition"
+            class="w-full bg-[#FF2D2D] text-white py-2 rounded-lg font-bold text-lg hover:bg-[#002B5C] transition"
             :disabled="form.processing"
           >
             Save Changes

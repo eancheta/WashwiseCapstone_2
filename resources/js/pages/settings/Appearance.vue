@@ -41,20 +41,21 @@ const props = withDefaults(defineProps<{
 <template>
   <Head :title="props.pageTitle" />
 
-  <div class="min-h-screen bg-[#F8FAFC] flex flex-col items-center py-10 px-2">
+  <div class="min-h-screen bg-[#F8FAFC] flex flex-col items-center  px-2 pt-16 ">
     <div class="w-full max-w-3xl bg-white rounded-xl shadow border border-gray-100 p-8">
       <h1 class="text-2xl font-bold text-[#182235] mb-6 text-center tracking-tight">
         {{ props.pageTitle }}
       </h1>
-<div class="mt-6 text-center">
-<button
-  @click="goBack"
-  type="button"
-  class="mt-6 bg-[#002B5C] text-white px-6 py-2 rounded-lg font-bold text-base hover:opacity-90 transition"
->
-  ⬅ Return to Dashboard
-</button>
+<div class="absolute top-4 left-4">
+  <button
+    @click="goBack"
+    type="button"
+     class="flex items-center gap-1.5 px-3 py-1.5 bg-gray-200 text-black rounded-lg text-sm font-medium shadow-md hover:bg-[#FF2D2D] transition">
+  
+    ⬅ Return
+  </button>
 </div>
+
 
       <div v-if="props.bookings.length > 0" class="overflow-x-auto">
         <table class="min-w-full bg-white border border-gray-200 rounded-lg text-sm">
