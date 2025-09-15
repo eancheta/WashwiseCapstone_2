@@ -122,16 +122,18 @@ const user = computed(() => page.props.auth?.user ?? null)
     <div class="relative z-10 flex flex-col items-center justify-center w-full px-4 py-20">
       <div class="uppercase tracking-widest text-sm text-[#FF2D2D] font-bold mb-4">Book Online</div>
       <h1 class="text-4xl md:text-6xl font-extrabold text-white text-center mb-4 leading-tight drop-shadow">
-        Effortless Booking. Exceptional Service
+          Welcome,      <span class="text-4xl md:text-6xl font-extrabold text-white text-center mb-4 leading-tight drop-shadow">
+        {{ user ? user.name : 'Owner' }}
+      </span>!
       </h1>
       <div class="text-base md:text-lg text-gray-100 text-center mb-8 max-w-2xl">
-        “Effortlessly book appointments with trusted car wash providers. Fast. Reliable. Hassle-free.”
+        Your dashboard is ready and waiting. Let’s make today productive—review appointments, check feedback, and keep your business running smoothly.
       </div>
       <Link
-        href="#"
+        :href="route('owner.walkin')"
         class="px-8 py-3 rounded-full bg-[#FF2D2D] text-white font-bold text-lg shadow hover:bg-[#d72626] transition"
       >
-        Explore More
+        Walk-in
       </Link>
     </div>
   </section>
