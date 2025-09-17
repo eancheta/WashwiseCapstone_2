@@ -3,6 +3,12 @@ import { Head } from '@inertiajs/vue3'
 import { ref, computed } from 'vue'
 import { Inertia } from '@inertiajs/inertia'
 
+const sidebarOpen = ref(false)
+
+function toggleSidebar() {
+  sidebarOpen.value = !sidebarOpen.value
+}
+
 // Interfaces
 interface Shop {
   id: number
@@ -62,37 +68,54 @@ const filteredShops = computed(() => {
 })
 </script>
 
+
 <template>
   <Head title="Customer Dashboard" />
+<!-- Top Navigation -->
+<div class="w-full bg-white flex items-center justify-between px-6 py-3 border-b border-gray-200 shadow-sm sticky top-0 z-40">
+  <!-- Left: Hamburger + Logo -->
+  <div class="flex items-center gap-4">
+    <!-- Hamburger for Sidebar -->
+    <button
+      @click="toggleSidebar"
+      class="flex flex-col justify-between w-6 h-5 focus:outline-none hover:opacity-80 transition"
+    >
+      <span class="block h-0.5 bg-gray-800 rounded"></span>
+      <span class="block h-0.5 bg-gray-800 rounded"></span>
+      <span class="block h-0.5 bg-gray-800 rounded"></span>
+    </button>
 
-  <div class="flex min-h-screen">
-    <!-- Sidebar -->
-    <aside class="w-64 bg-white border-r border-gray-200 p-6 space-y-6">
-      <!-- User Info -->
+    <!-- Logo -->
+    <img
+      src="/images/washwiselogo2.png"
+      alt="WashWise Logo"
+      class="h-10 w-auto select-none"
+      draggable="false"
+    />
+  </div>
+
+
+    <!-- Right: Owner Name -->
       <div class="text-center">
         <h2 class="text-lg font-semibold text-gray-800">
           {{ props.auth.user?.name || 'Guest' }}
         </h2>
       </div>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="flex min-h-screen">
+    <!-- Sidebar -->
+  <aside
+    :class="['fixed top-0 left-0 h-full w-64 bg-gradient-to-b from-[#182235] to-[#0f172a] text-white shadow-lg z-50 transform transition-transform duration-300', sidebarOpen ? 'translate-x-0' : '-translate-x-full']"
+  >
+    <div class="flex justify-between items-center p-4 border-b border-gray-700">
+      <h2 class="text-lg font-bold">Menu</h2>
+      <button @click="toggleSidebar" class="text-gray-400 hover:text-red-500 text-2xl">&times;</button>
+    </div>
 
       <!-- Nearby District Filter -->
-   <div>
-  <label for="district" class="block text-sm font-medium text-gray-900">Nearby</label>
-  <select
-    id="district"
-    v-model="selectedDistrict"
-    class="mt-2 w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm text-gray-900"
-  >
-    <option value="all">All Districts</option>
-    <option
-      v-for="district in props.districts"
-      :key="district"
-      :value="district"
-    >
-      District {{ district }}
-    </option>
-  </select>
-</div>
+
 
 
       <!-- Sidebar Links -->
@@ -125,10 +148,27 @@ const filteredShops = computed(() => {
 
     </aside>
 
-    <!-- Main Content -->
+  <!-- Hero Section -->
     <main class="flex-1 p-8 bg-gradient-to-br from-white via-blue-50 to-[#002B5C]">
       <h1 class="text-3xl font-extrabold text-gray-900 text-center">Available Car Wash Services</h1>
 
+         <div>
+  <label for="district" class="block text-sm font-medium text-gray-900">Nearby</label>
+  <select
+    id="district"
+    v-model="selectedDistrict"
+    class="mt-2 w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm text-gray-900"
+  >
+    <option value="all">All Districts</option>
+    <option
+      v-for="district in props.districts"
+      :key="district"
+      :value="district"
+    >
+      District {{ district }}
+    </option>
+  </select>
+</div>
       <div
         v-if="filteredShops.length > 0"
         class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-6"
