@@ -8,7 +8,7 @@ export default defineConfig({
     laravel({
       input: [
         path.resolve(__dirname, 'resources/js/app.ts'),
-        path.resolve(__dirname, 'resources/js/pages/Welcome.vue'),
+        path.resolve(__dirname, 'resources/js/Pages/Welcome.vue'),
       ],
       refresh: true,
     }),
