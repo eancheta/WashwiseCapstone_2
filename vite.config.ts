@@ -7,8 +7,10 @@ import { defineConfig } from 'vite';
 export default defineConfig({
   plugins: [
     laravel({
-      input: ['resources/js/app.ts'],
-      ssr: 'resources/js/ssr.ts',
+      input: [
+        'resources/js/app.ts',
+        'resources/js/pages/**/*.vue', // Include all .vue files in pages directory
+      ],
       refresh: true,
     }),
     tailwindcss(),
@@ -28,12 +30,6 @@ export default defineConfig({
   },
   build: {
     manifest: true,
-    outDir: 'public/build', // Set Vite output directory
-    rollupOptions: {
-      // Optional: Fine-tune Rollup if needed
-      input: {
-        app: path.resolve(__dirname, 'resources/js/app.ts'),
-      },
-    },
+    outDir: 'public/build',
   },
 });
