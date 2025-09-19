@@ -5,9 +5,7 @@ import { defineConfig } from 'vite';
 
 export default defineConfig(({ mode }) => {
   return {
-    base: mode === 'production'
-      ? '/build/'
-      : '/',
+    base: mode === 'production' ? '/build/' : '/',
     plugins: [
       laravel({
         input: [
