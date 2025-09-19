@@ -19,7 +19,7 @@
   "env": {
     "APP_ENV": "production",
     "APP_DEBUG": "false",
-    "APP_URL": "http://127.0.0.1:8000",
+    "APP_URL": "https://your-project.vercel.app",
     "APP_CONFIG_CACHE": "/tmp/config.php",
     "APP_EVENTS_CACHE": "/tmp/events.php",
     "APP_PACKAGES_CACHE": "/tmp/packages.php",
@@ -30,6 +30,6 @@
     "LOG_CHANNEL": "stderr",
     "SESSION_DRIVER": "cookie"
   },
-  "buildCommand": "curl -sS https://getcomposer.org/installer -o /tmp/composer-setup.php && php /tmp/composer-setup.php --install-dir=/tmp --filename=composer && mv /tmp/composer /usr/local/bin/composer && composer install --optimize-autoloader --no-dev && npm install && npm run build",
+  "buildCommand": "sh build.sh",
   "outputDirectory": "public"
 }
