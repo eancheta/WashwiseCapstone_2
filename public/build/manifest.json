@@ -216,7 +216,7 @@
       "assets/ShopView-eHnxQl6n.css"
     ]
   },
-  "resources/js/pages/Welcome.vue": {
+  "resources/js/Pages/Welcome.vue": {
     "file": "assets/Welcome-DMEFHbhN.js",
     "name": "Welcome",
     "src": "resources/js/Pages/Welcome.vue",
