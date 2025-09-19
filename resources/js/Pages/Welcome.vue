@@ -16,7 +16,6 @@ function closeModals() {
   showRegisterModal.value = false;
 }
 </script>
-
 <template>
   <Head title="Welcome" />
 
