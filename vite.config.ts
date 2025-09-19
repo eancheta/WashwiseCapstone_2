@@ -29,18 +29,12 @@ export default defineConfig({
   build: {
     manifest: true,
     outDir: 'public/build',
-    rollupOptions: {
-      input: {
-        app: path.resolve(__dirname, 'resources/js/app.ts'),
-        welcome: path.resolve(__dirname, 'resources/js/Pages/Welcome.vue'),
-      },
-    },
   },
   server: {
     host: '0.0.0.0',
     hmr: {
-      host: 'localhost',
       protocol: 'ws',
+      host: 'localhost',
     },
   },
 });
