@@ -9,7 +9,7 @@ export default defineConfig({
     laravel({
       input: [
         'resources/js/app.ts',
-        'resources/js/pages/**/*.vue', // Ensures all page components like Welcome.vue are included
+        'resources/js/Pages/Welcome.vue', // specific page(s)
       ],
       refresh: true,
     }),
