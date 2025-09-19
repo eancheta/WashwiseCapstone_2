@@ -23,6 +23,42 @@ use App\Http\Controllers\Owner\WalkinController;
 use App\Http\Controllers\Customer\FeedbackController;
 use App\Http\Controllers\Owner\ReviewController;
 
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Response;
+
+if (app()->environment('local')) {
+    Route::get('build/{path}', function ($path) {
+        $full = public_path('build/' . $path);
+
+        if (! File::exists($full)) {
+            abort(404);
+        }
+
+        $ext = pathinfo($full, PATHINFO_EXTENSION);
+
+        $mimeTypes = [
+            'js'   => 'application/javascript',
+            'css'  => 'text/css',
+            'json' => 'application/json',
+            'mjs'  => 'application/javascript',
+        ];
+
+        $mime = $mimeTypes[$ext] ?? File::mimeType($full) ?? 'application/octet-stream';
+
+        $headers = ['Content-Type' => $mime];
+
+        if (in_array($ext, ['js','css','mjs','json'])) {
+            $headers['Cache-Control'] = 'public, max-age=31536000, immutable';
+        } elseif (in_array($ext, ['png','jpg','jpeg','gif','svg','webp','ico'])) {
+            $headers['Cache-Control'] = 'public, max-age=2592000';
+        }
+
+        return response()->file($full, $headers);
+    })->where('path', '.*');
+}
+
+
+
 Route::middleware(['auth:carwashowner'])->prefix('owner')->name('owner.')->group(function () {
     Route::get('/walkin', [WalkinController::class, 'create'])->name('walkin');
     Route::post('/walkin', [WalkinController::class, 'store'])->name('walkin.store');
