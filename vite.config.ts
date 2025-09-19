@@ -6,7 +6,7 @@ import { defineConfig } from 'vite';
 export default defineConfig(({ mode }) => {
   return {
     base: mode === 'production'
-      ? 'https://washwisecapstone2-production.up.railway.app/'
+      ? '/build/'
       : '/',
     plugins: [
       laravel({
