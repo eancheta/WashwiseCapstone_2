@@ -30,6 +30,6 @@
     "LOG_CHANNEL": "stderr",
     "SESSION_DRIVER": "cookie"
   },
-  "buildCommand": "sh build.sh",
+  "buildCommand": "sh build.sh || /usr/local/bin/php build.sh",
   "outputDirectory": "public"
 }
