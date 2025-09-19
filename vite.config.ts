@@ -13,7 +13,7 @@ export default defineConfig({
     laravel({
       input: [
         'resources/js/app.ts',                // main JS/TS entry
-        'resources/js/pages/Welcome.vue',     // adjust path to your actual folder
+        'resources/js/Pages/Welcome.vue',     // adjust path to your actual folder
       ],
       refresh: true,
     }),
