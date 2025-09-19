@@ -30,6 +30,6 @@
     "LOG_CHANNEL": "stderr",
     "SESSION_DRIVER": "cookie"
   },
-  "buildCommand": "/usr/local/bin/php build.php",
+  "buildCommand": "echo 'Skipping build; handled by runtime' && exit 0",
   "outputDirectory": "public"
 }
