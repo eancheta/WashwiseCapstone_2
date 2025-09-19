@@ -1,27 +1,17 @@
 import vue from '@vitejs/plugin-vue';
 import laravel from 'laravel-vite-plugin';
 import path from 'path';
-import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-  // Base URL for production builds
-  base: '/build/',
-
   plugins: [
-    // Laravel plugin
     laravel({
       input: [
-        'resources/js/app.ts',                // main JS/TS entry
-        'resources/js/Pages/Welcome.vue',     // adjust path to your actual folder
+        path.resolve(__dirname, 'resources/js/app.ts'),
+        path.resolve(__dirname, 'resources/js/pages/Welcome.vue'),
       ],
       refresh: true,
     }),
-
-    // Tailwind CSS plugin
-    tailwindcss(),
-
-    // Vue 3 plugin
     vue({
       template: {
         transformAssetUrls: {
@@ -31,21 +21,13 @@ export default defineConfig({
       },
     }),
   ],
-
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './resources/js'),
     },
   },
-
   build: {
-    manifest: true,         // required by Laravel to read assets
-    outDir: 'public/build', // make sure Laravel can find it
-    rollupOptions: {
-      input: [
-        'resources/js/app.ts',
-        'resources/js/pages/Welcome.vue',
-      ],
-    },
+    manifest: true,
+    outDir: 'public/build',
   },
 });
