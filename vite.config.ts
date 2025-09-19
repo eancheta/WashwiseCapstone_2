@@ -4,11 +4,8 @@ import path from 'path';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'vite';
 
-export default defineConfig(({ mode }) => {
-  return {
-    base: mode === 'production'
-      ? 'https://washwisecapstone2-production.up.railway.app/'
-      : '/',
+export default defineConfig({
+    base: '/', // ensures absolute paths in production,
   plugins: [
     laravel({
       input: [
@@ -35,6 +32,11 @@ export default defineConfig(({ mode }) => {
   build: {
     manifest: true,
     outDir: 'public/build',
+    rollupOptions: {
+    input: {
+        app: 'resources/js/app.js',
+            },
+    },
   },
-    };
+
 });
