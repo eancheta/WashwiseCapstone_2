@@ -1,0 +1,1 @@
+import{_ as o}from"./_plugin-vue_export-helper-DlAUqK2U.js";import{a as s,o as r,f as e}from"./index.esm-CCql3qLv.js";const a={},c={class:"p-6"};function n(l,t){return r(),s("div",c,[...t[0]||(t[0]=[e("h1",{class:"text-3xl font-bold"},"About Us",-1),e("p",{class:"mt-4 text-white-700"}," Hello ",-1)])])}const d=o(a,[["render",n]]);export{d as default};
