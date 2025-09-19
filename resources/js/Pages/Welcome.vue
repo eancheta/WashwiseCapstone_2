@@ -1,11 +1,116 @@
-<template>
-  <div class="min-h-screen flex items-center justify-center bg-gray-100">
-    <h1 class="text-4xl font-bold text-gray-900">Welcome to WashWise!</h1>
-  </div>
-</template>
-
 <script setup lang="ts">
+import { Head, Link } from '@inertiajs/vue3';
+import { ref } from 'vue';
+
+const showLoginModal = ref(false);
+const showRegisterModal = ref(false);
+
+function openLoginModal() {
+  showLoginModal.value = true;
+}
+function openRegisterModal() {
+  showRegisterModal.value = true;
+}
+function closeModals() {
+  showLoginModal.value = false;
+  showRegisterModal.value = false;
+}
 </script>
 
-<style scoped>
-</style>
+<template>
+  <Head title="Welcome" />
+
+  <!-- Top Info Bar -->
+  <div class="w-full bg-white flex flex-wrap items-center justify-between px-8 py-2 border-b border-gray-200 text-sm font-semibold">
+    <div class="flex items-center gap-2">
+      <!-- Logo Image -->
+      <img
+        src="/images/washwiselogo2.png"
+        alt="WashWise Logo"
+        class="h-14 w-auto mx-auto block"
+        draggable="false"
+      />
+    </div>
+    <div class="flex gap-8 items-center text-[#002B5C]">
+      <div class="flex items-center gap-2">
+        <span>📞</span> Call Us <span class="font-normal">+012 345 6789</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <span>✉️</span> Email Us <span class="font-normal">info@example.com</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation Bar -->
+  <nav class="w-full bg-[#182235] flex items-center px-8 py-2 text-white font-semibold shadow z-10">
+    <ul class="flex gap-8 items-center flex-1">
+      <li><Link :href="'#'" class="text-[#FF2D2D]">Home</Link></li>
+      <li><Link href="/about-us">About</Link></li>
+      <li><Link :href="'#'">Service</Link></li>
+    </ul>
+
+    <div class="flex items-center gap-4 ml-8">
+      <button
+        @click="openLoginModal"
+        class="text-white font-semibold hover:text-[#FF2D2D] transition [text-decoration:none]"
+        style="font-size: 1.0rem; line-height: 1; background: none; border: none; cursor: pointer;"
+      >
+        Log in
+      </button>
+      <button
+        @click="openRegisterModal"
+        class="px-6 py-2 rounded-full border-2 font-semibold transition [text-decoration:none]"
+        style="border-color:#FF2D2D; color:#FF2D2D; font-size: 1.0rem; line-height: 1; background: none; border-width: 2px; cursor: pointer;"
+      >
+        Register
+      </button>
+    </div>
+  </nav>
+
+  <!-- Login Modal -->
+  <div v-if="showLoginModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-8 w-full max-w-xs shadow-lg relative">
+      <button @click="closeModals" class="absolute top-2 right-2 text-gray-400 hover:text-[#FF2D2D] text-xl">&times;</button>
+      <h3 class="text-lg font-bold mb-4 text-[#182235] text-center">Login as:</h3>
+      <div class="flex flex-col gap-4">
+        <Link :href="route('login')" class="px-4 py-2 rounded bg-[#182235] text-white font-semibold text-center hover:bg-[#FF2D2D] transition">User</Link>
+        <Link href="/owner/login" class="px-4 py-2 rounded bg-[#182235] text-white font-semibold text-center hover:bg-[#FF2D2D] transition">Business Owner</Link>
+      </div>
+    </div>
+  </div>
+
+  <!-- Register Modal -->
+  <div v-if="showRegisterModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-8 w-full max-w-xs shadow-lg relative">
+      <button @click="closeModals" class="absolute top-2 right-2 text-gray-400 hover:text-[#FF2D2D] text-xl">&times;</button>
+      <h3 class="text-lg font-bold mb-4 text-[#182235] text-center">Register as:</h3>
+      <div class="flex flex-col gap-4">
+        <Link :href="route('register')" class="px-4 py-2 rounded bg-[#182235] text-white font-semibold text-center hover:bg-[#FF2D2D] transition">User</Link>
+        <Link href="/owner/register" class="px-4 py-2 rounded bg-[#182235] text-white font-semibold text-center hover:bg-[#FF2D2D] transition">Business Owner</Link>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hero Section -->
+  <section
+    class="relative flex items-center justify-center min-h-screen bg-cover bg-center"
+    style="background-image: url('/images/hero-carwash.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat;"
+  >
+    <div class="absolute inset-0 bg-black/60"></div>
+    <div class="relative z-10 flex flex-col items-center justify-center w-full px-4 py-20">
+      <div class="uppercase tracking-widest text-sm text-[#FF2D2D] font-bold mb-4">Book Online</div>
+      <h1 class="text-4xl md:text-6xl font-extrabold text-white text-center mb-4 leading-tight drop-shadow">
+         Effortless Booking. Exceptional Service
+      </h1>
+      <div class="text-base md:text-lg text-gray-100 text-center mb-8 max-w-2xl">
+        “Effortlessly book appointments with trusted car wash providers. Fast. Reliable. Hassle-free.”<br>
+      </div>
+      <Link
+        :href="'#'"
+        class="px-8 py-3 rounded-full bg-[#FF2D2D] text-white font-bold text-lg shadow hover:bg-[#d72626] transition"
+      >
+        Explore More
+      </Link>
+    </div>
+  </section>
+</template>
