@@ -1,43 +1,40 @@
 import vue from '@vitejs/plugin-vue';
 import laravel from 'laravel-vite-plugin';
 import path from 'path';
+import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'vite';
 
 export default defineConfig(({ mode }) => {
   return {
-    base: mode === 'production' ? '/build/' : '/',
-    plugins: [
-      laravel({
-        input: [
-          path.resolve(__dirname, 'resources/js/app.ts'),
-          path.resolve(__dirname, 'resources/js/Pages/Welcome.vue'),
-        ],
-        refresh: true,
-      }),
-      vue({
-        template: {
-          transformAssetUrls: {
-            base: null,
-            includeAbsolute: false,
-          },
+    base: mode === 'production'
+      ? 'https://washwisecapstone2-production.up.railway.app/'
+      : '/',
+  plugins: [
+    laravel({
+      input: [
+        'resources/js/app.ts',
+        'resources/js/pages/**/*.vue', // Include all .vue files in pages directory
+      ],
+      refresh: true,
+    }),
+    tailwindcss(),
+    vue({
+      template: {
+        transformAssetUrls: {
+          base: null,
+          includeAbsolute: false,
         },
-      }),
-    ],
-    resolve: {
-      alias: {
-        '@': path.resolve(__dirname, './resources/js'),
       },
+    }),
+  ],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './resources/js'),
     },
-    build: {
-      manifest: true,
-      outDir: 'public/build',
-    },
-    server: {
-      host: '0.0.0.0',
-      hmr: {
-        protocol: 'ws',
-        host: 'localhost',
-      },
-    },
-  };
+  },
+  build: {
+    manifest: true,
+    outDir: 'public/build',
+  },
+    };
 });
