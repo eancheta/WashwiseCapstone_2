@@ -3,7 +3,8 @@
   "framework": null,
   "functions": {
     "api/index.php": {
-      "runtime": "vercel-php@0.7.4"
+      "runtime": "vercel-php@0.7.4",
+      "includeFiles": ["build.php"]
     }
   },
   "routes": [
@@ -30,6 +31,6 @@
     "LOG_CHANNEL": "stderr",
     "SESSION_DRIVER": "cookie"
   },
-  "buildCommand": "echo 'Skipping build; handled by runtime' && exit 0",
+  "buildCommand": "/vercel/path0/php build.php || echo 'Build failed'",
   "outputDirectory": "public"
 }
