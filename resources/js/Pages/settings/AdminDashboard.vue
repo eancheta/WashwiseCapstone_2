@@ -134,7 +134,7 @@
               <td class="px-2 sm:px-4 py-2 sm:py-3 text-center">{{ owner.created_at }}</td>
               <td class="px-2 sm:px-4 py-2 sm:py-3 text-center">{{ owner.updated_at }}</td>
               <td class="px-2 sm:px-4 py-2 sm:py-3 text-center space-x-2">
-                <button @click="approve(owner.id)" class="px-3 py-1 sm:px-4 sm:py-1 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition text-xs sm:text-sm">Approve</button>
+                <a href="#" @click.prevent="approve(owner.id)" class="text-green-600 hover:underline">Approve</a>
                 <button @click="decline(owner.id)" class="px-3 py-1 sm:px-4 sm:py-1 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition text-xs sm:text-sm">Decline</button>
               </td>
             </tr>
