@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use App\Mail\OwnerVerificationCodeMail;
 
 class OwnerAuthController extends Controller
 {
@@ -29,44 +30,28 @@ class OwnerAuthController extends Controller
             'photo3' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
         ]);
 
-        // store images
         $data['photo1'] = $request->file('photo1')->store('carwash_owners', 'public');
         $data['photo2'] = $request->hasFile('photo2') ? $request->file('photo2')->store('carwash_owners', 'public') : null;
         $data['photo3'] = $request->hasFile('photo3') ? $request->file('photo3')->store('carwash_owners', 'public') : null;
 
         $data['password'] = Hash::make($data['password']);
 
-        // generate verification code
+        // Generate 6-digit verification code
         $code = (string) rand(100000, 999999);
         $data['verification_code'] = $code;
 
         $owner = CarWashOwner::create($data);
 
-        // build email
-        $subject = "Your WashWise Verification Code";
-        $html = "<p>Hi {$owner->name},</p>
-                 <p>Your verification code is: <strong>{$code}</strong></p>
-                 <p>Enter this code in the app to verify your account.</p>
-                 <p>– WashWise</p>";
-
-        // ✅ send using Laravel Mail
         try {
-            Mail::send([], [], function ($message) use ($owner, $subject, $html) {
-                $message->to($owner->email)
-                        ->subject($subject)
-                        ->from(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'))
-                        ->setBody($html, 'text/html');
-            });
-        } catch (\Throwable $e) {
-            Log::error('Email sending failed', [
-                'error' => $e->getMessage(),
-                'to' => $owner->email,
-            ]);
+            Mail::to($owner->email)->send(new OwnerVerificationCodeMail($code, $owner->name));
+        } catch (\Exception $e) {
+            Log::error('Registration email sending failed: ' . $e->getMessage());
         }
 
-        // save email in session for verification step
+        // Store email in session to use on verify page
         session(['owner_verification_email' => $owner->email]);
 
+        // Redirect to verify code page
         return redirect()->route('owner.verify.show')->with('email', $owner->email);
     }
 
@@ -92,7 +77,7 @@ class OwnerAuthController extends Controller
             return back()->withErrors(['email' => 'Your account is pending approval by the admin.'])->withInput();
         }
 
-        if (!$owner->email_verified_at) {
+        if (! $owner->email_verified_at) {
             return back()->withErrors(['email' => 'Please verify your email before logging in.'])->withInput();
         }
 
