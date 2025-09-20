@@ -1,51 +1,33 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" @class(['dark' => ($appearance ?? 'system') === 'dark'])>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    {{-- Inline script: system dark mode detection --}}
-    <script>
-        (function() {
-            const appearance = '{{ $appearance ?? "system" }}';
-
-            if (appearance === 'system') {
-                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                if (prefersDark) document.documentElement.classList.add('dark');
-            }
-        })();
-    </script>
-
-    {{-- Background color fallback + modern OKLCH --}}
-    <style>
-        html {
-            background-color: #fff; /* fallback */
-            background-color: oklch(1 0 0);
-        }
-        html.dark {
-            background-color: #1a1a1a; /* fallback */
-            background-color: oklch(0.145 0 0);
-        }
-    </style>
-
     <title inertia>{{ config('app.name', 'Laravel') }}</title>
 
-    {{-- Favicon --}}
-    <link rel="icon" href="/favicon.ico" sizes="any">
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-
-    {{-- Fonts --}}
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
-
-    {{-- Inertia & Vite --}}
     @routes
-    @vite([
-        'resources/js/app.ts',
-        "resources/js/pages/{$page['component']}.vue"
-    ])
     @inertiaHead
+
+    @if (app()->environment('local'))
+        {{-- Dev: use Vite HMR --}}
+        @vite(['resources/js/app.ts', "resources/js/pages/{$page['component']}.vue"])
+    @else
+        {{-- Prod: read manifest.json --}}
+        @php
+            $manifestPath = public_path('build/manifest.json');
+            $manifest = file_exists($manifestPath) ? json_decode(file_get_contents($manifestPath), true) : null;
+            $entryName = 'resources/js/app.ts';
+        @endphp
+
+        @if ($manifest && isset($manifest[$entryName]))
+            <script type="module" src="{{ asset('build/' . $manifest[$entryName]['file']) }}"></script>
+            @if (!empty($manifest[$entryName]['css']))
+                @foreach ($manifest[$entryName]['css'] as $cssFile)
+                    <link rel="stylesheet" href="{{ asset('build/' . $cssFile) }}">
+                @endforeach
+            @endif
+        @endif
+    @endif
 </head>
 <body class="font-sans antialiased">
     @inertia
