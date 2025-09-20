@@ -10,6 +10,8 @@ use Inertia\Inertia;
 use App\Mail\OwnerDeclinedMail;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\OwnerApprovedMail;
+use Illuminate\Support\Facades\Log;
+
 
 class AdminController extends Controller
 {
@@ -42,8 +44,18 @@ class AdminController extends Controller
     $owner->status = 'approved';
     $owner->save();
 
-    Mail::to($owner->email)->send(new OwnerApprovedMail($owner));
+    try {
+        Mail::to($owner->email)->send(new OwnerApprovedMail($owner));
+    } catch (\Throwable $e) {
+        // Log details for debugging but don't block the user action
+        Log::error('Owner approval email failed', [
+            'owner_id' => $owner->id,
+            'email' => $owner->email,
+            'error' => $e->getMessage(),
+        ]);
 
+        return redirect()->back()->with('success', 'Owner account approved. (Email failed — see logs.)');
+    }
     return redirect()->back()->with('success', 'Owner account approved.');
     }
 
