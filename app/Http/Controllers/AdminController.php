@@ -33,6 +33,11 @@ class AdminController extends Controller
 
     public function approve($id)
     {
+
+            @ini_set('max_execution_time', '120');
+    @set_time_limit(120);
+
+
     $owner = CarWashOwner::findOrFail($id);
     $owner->status = 'approved';
     $owner->save();
