@@ -1,0 +1,1 @@
+@import"https://fonts.googleapis.com/css2?family=Montserrat:wght@600;800&display=swap";@keyframes fadeIn{0%{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}.animate-fadeIn{animation:fadeIn .3s ease-out}

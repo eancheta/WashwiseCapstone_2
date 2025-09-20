@@ -6,13 +6,12 @@ import { defineConfig } from 'vite';
 
 export default defineConfig(({ mode }) => {
   return {
-    base: mode === 'production'
-      ? 'https://washwisecapstone2-production.up.railway.app/'
-      : '/',
+    // production assets should be served from /build/ so runtime asks for /build/assets/...
+    base: mode === 'production' ? '/build/' : '/',
     plugins: [
       laravel({
         input: [
-          'resources/js/app.ts', // only main entry point
+          'resources/js/app.ts', // main entry
           'resources/css/app.css', // optional CSS
         ],
         refresh: true,
@@ -35,6 +34,8 @@ export default defineConfig(({ mode }) => {
     build: {
       manifest: true,
       outDir: 'public/build',
+      // make assets folder explicit (Vite default is 'assets' anyway)
+      assetsDir: 'assets',
     },
   };
 });
