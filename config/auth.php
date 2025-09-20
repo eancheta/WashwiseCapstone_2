@@ -44,7 +44,7 @@ return [
         ],
         'carwashowners' => [
             'driver' => 'eloquent',
-            'model' => App\Models\CarwashOwner::class,
+            'model' => App\Models\CarWashOwner::class,
         ],
         // Optionally remove the 'user' provider if not needed
         // 'user' => [
