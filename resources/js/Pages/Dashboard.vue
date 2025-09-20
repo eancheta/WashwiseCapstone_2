@@ -179,7 +179,7 @@ const filteredShops = computed(() => {
           class="bg-white shadow-md rounded-xl p-6 flex flex-col items-center text-center border border-gray-200 hover:shadow-xl hover:-translate-y-1 transition"
         >
           <img
-            :src="shop.logo ? `${backendBaseUrl}/storage/${shop.logo}` : `${backendBaseUrl}/images/default-carwash.png`"
+            :src="shop.logo ? `${backendBaseUrl}/storage/${shop.logo}` : `${backendBaseUrl}/logos/default-carwash.png`"
             alt="Car Wash Logo"
             class="h-20 w-20 object-contain mb-4"
           />
