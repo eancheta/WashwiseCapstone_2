@@ -37,33 +37,23 @@ return [
 
     'mailers' => [
 
-<<<<<<< HEAD
-        'sendgrid' => [
-        'transport' => 'sendgrid',
-        'key' => env('SENDGRID_API_KEY'),
-    ],
-'smtp' => [
-    'transport' => 'smtp',
-    'host' => env('MAIL_HOST', 'smtp.sendgrid.net'),
-    'port' => env('MAIL_PORT', 587),
-    'username' => env('MAIL_USERNAME'),
-    'password' => env('MAIL_PASSWORD'),
-    'encryption' => env('MAIL_ENCRYPTION', 'tls'),
-    'timeout' => 3000,
-],
-=======
         'smtp' => [
             'transport' => 'smtp',
-            'scheme' => env('MAIL_SCHEME'),
-            'url' => env('MAIL_URL'),
-            'host' => env('MAIL_HOST', '127.0.0.1'),
-            'port' => env('MAIL_PORT', 2525),
-            'username' => env('MAIL_USERNAME'),
-            'password' => env('MAIL_PASSWORD'),
+            'host' => env('MAIL_HOST', 'smtp-relay.brevo.com'),
+            'port' => env('MAIL_PORT', 587),
+            'username' => env('MAIL_USERNAME','92b03a001@smtp-brevo.com'),
+            'password' => env('MAIL_PASSWORD','xjbS3I2mfcLVrXTP'),
             'timeout' => null,
-            'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url(env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
+    'auth_mode' => null,
+    'stream' => [
+        'ssl' => [
+            'allow_self_signed' => false,
+            'verify_peer' => true,
+            'verify_peer_name' => true,
+            'crypto_method' => STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT,
         ],
->>>>>>> parent of 5a0504d5 (mail fix)
+    ],
+        ],
 
         'ses' => [
             'transport' => 'ses',
