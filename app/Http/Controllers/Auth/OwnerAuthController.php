@@ -7,7 +7,7 @@ use App\Models\CarWashOwner;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Mail;
 
 class OwnerAuthController extends Controller
 {
@@ -29,28 +29,42 @@ class OwnerAuthController extends Controller
             'photo3' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
         ]);
 
+        // store images
         $data['photo1'] = $request->file('photo1')->store('carwash_owners', 'public');
         $data['photo2'] = $request->hasFile('photo2') ? $request->file('photo2')->store('carwash_owners', 'public') : null;
         $data['photo3'] = $request->hasFile('photo3') ? $request->file('photo3')->store('carwash_owners', 'public') : null;
 
         $data['password'] = Hash::make($data['password']);
 
-        // Generate 6-digit verification code
+        // generate verification code
         $code = (string) rand(100000, 999999);
         $data['verification_code'] = $code;
 
         $owner = CarWashOwner::create($data);
 
-        // Send verification email via SendGrid API
+        // build email
         $subject = "Your WashWise Verification Code";
         $html = "<p>Hi {$owner->name},</p>
                  <p>Your verification code is: <strong>{$code}</strong></p>
                  <p>Enter this code in the app to verify your account.</p>
                  <p>– WashWise</p>";
 
-        $this->sendSendGridEmail($owner->email, $subject, $html);
+        // ✅ send using Laravel Mail
+        try {
+            Mail::send([], [], function ($message) use ($owner, $subject, $html) {
+                $message->to($owner->email)
+                        ->subject($subject)
+                        ->from(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'))
+                        ->setBody($html, 'text/html');
+            });
+        } catch (\Throwable $e) {
+            Log::error('Email sending failed', [
+                'error' => $e->getMessage(),
+                'to' => $owner->email,
+            ]);
+        }
 
-        // Store email in session for verify page
+        // save email in session for verification step
         session(['owner_verification_email' => $owner->email]);
 
         return redirect()->route('owner.verify.show')->with('email', $owner->email);
@@ -78,7 +92,7 @@ class OwnerAuthController extends Controller
             return back()->withErrors(['email' => 'Your account is pending approval by the admin.'])->withInput();
         }
 
-        if (! $owner->email_verified_at) {
+        if (!$owner->email_verified_at) {
             return back()->withErrors(['email' => 'Please verify your email before logging in.'])->withInput();
         }
 
@@ -88,55 +102,5 @@ class OwnerAuthController extends Controller
         }
 
         return back()->withErrors(['email' => 'Invalid credentials'])->withInput();
-    }
-
-    protected function sendSendGridEmail(string $toEmail, string $subject, string $htmlContent): bool
-    {
-        $apiKey = config('services.sendgrid.api_key') ?? env('SENDGRID_API_KEY');
-
-        if (empty($apiKey)) {
-            Log::warning('SendGrid API key missing when attempting to send email.', ['to' => $toEmail]);
-            return false;
-        }
-
-        $payload = [
-            'personalizations' => [
-                [
-                    'to' => [['email' => $toEmail]],
-                    'subject' => $subject,
-                ]
-            ],
-            'from' => [
-                'email' => env('MAIL_FROM_ADDRESS', 'no-reply@example.com'),
-                'name' => env('MAIL_FROM_NAME', 'WashWise'),
-            ],
-            'content' => [
-                ['type' => 'text/html', 'value' => $htmlContent]
-            ]
-        ];
-
-        try {
-            $response = Http::withToken($apiKey)
-                ->acceptJson()
-                ->timeout(10) // fail fast if SendGrid is blocked
-                ->post('https://api.sendgrid.com/v3/mail/send', $payload);
-
-            if ($response->successful()) {
-                return true;
-            }
-
-            Log::error('SendGrid API returned error', [
-                'status' => $response->status(),
-                'body' => $response->body(),
-                'to' => $toEmail,
-            ]);
-            return false;
-        } catch (\Throwable $e) {
-            Log::error('SendGrid API exception', [
-                'error' => $e->getMessage(),
-                'to' => $toEmail,
-            ]);
-            return false;
-        }
     }
 }
