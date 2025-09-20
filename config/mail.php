@@ -37,23 +37,19 @@ return [
 
     'mailers' => [
 
-        'smtp' => [
-            'transport' => 'smtp',
-            'host' => env('MAIL_HOST', 'smtp-relay.brevo.com'),
-            'port' => env('MAIL_PORT', 587),
-            'username' => env('MAIL_USERNAME','92b03a001@smtp-brevo.com'),
-            'password' => env('MAIL_PASSWORD','xjbS3I2mfcLVrXTP'),
-            'timeout' => null,
-    'auth_mode' => null,
-    'stream' => [
-        'ssl' => [
-            'allow_self_signed' => false,
-            'verify_peer' => true,
-            'verify_peer_name' => true,
-            'crypto_method' => STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT,
-        ],
+        'sendgrid' => [
+        'transport' => 'sendgrid',
+        'key' => env('SENDGRID_API_KEY'),
     ],
-        ],
+ 'smtp' => [
+    'transport' => 'smtp',
+    'host' => env('MAIL_HOST', 'smtp.sendgrid.net'),
+    'port' => env('MAIL_PORT', 587),
+    'username' => env('MAIL_USERNAME'),
+    'password' => env('MAIL_PASSWORD'),
+    'encryption' => env('MAIL_ENCRYPTION', 'tls'),
+    'timeout' => null,
+],
 
         'ses' => [
             'transport' => 'ses',
