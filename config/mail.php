@@ -41,14 +41,14 @@ return [
         'transport' => 'sendgrid',
         'key' => env('SENDGRID_API_KEY'),
     ],
- 'smtp' => [
+'smtp' => [
     'transport' => 'smtp',
     'host' => env('MAIL_HOST', 'smtp.sendgrid.net'),
     'port' => env('MAIL_PORT', 587),
     'username' => env('MAIL_USERNAME'),
     'password' => env('MAIL_PASSWORD'),
     'encryption' => env('MAIL_ENCRYPTION', 'tls'),
-    'timeout' => null,
+    'timeout' => 30,
 ],
 
         'ses' => [
