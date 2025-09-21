@@ -23,6 +23,24 @@ use App\Http\Controllers\Owner\WalkinController;
 use App\Http\Controllers\Customer\FeedbackController;
 use App\Http\Controllers\Owner\ReviewController;
 
+Route::get('/debug-send-mail', function () {
+    $payload = [
+        'sender' => ['name' => env('MAIL_FROM_NAME', 'WashWise'), 'email' => env('MAIL_FROM_ADDRESS')],
+        'to' => [['email' => 'Cireancheta2003@gmail.com', 'name' => 'Test']],
+        'subject' => 'Debug: sendinblue test',
+        'htmlContent' => '<p>Debug send from app</p>'
+    ];
+
+    $resp = Http::withHeaders([
+        'api-key' => env('SENDINBLUE_API_KEY'),
+        'Accept' => 'application/json',
+    ])->post('https://api.sendinblue.com/v3/smtp/email', $payload);
+
+    Log::info('debug-send-mail response', ['status' => $resp->status(), 'body' => $resp->body()]);
+    return response()->json(['status' => $resp->status(), 'body' => $resp->body()]);
+});
+
+
 Route::middleware(['auth:carwashowner'])->prefix('owner')->name('owner.')->group(function () {
     Route::get('/walkin', [WalkinController::class, 'create'])->name('walkin');
     Route::post('/walkin', [WalkinController::class, 'store'])->name('walkin.store');

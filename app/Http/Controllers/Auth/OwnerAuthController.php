@@ -7,8 +7,7 @@ use App\Models\CarWashOwner;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
-use App\Mail\OwnerVerificationCodeMail;
+use Illuminate\Support\Facades\Http;
 
 class OwnerAuthController extends Controller
 {
@@ -19,44 +18,59 @@ class OwnerAuthController extends Controller
 
     public function store(Request $request)
     {
-
-            ini_set('max_execution_time', 3600);
+        // (Optional) extend execution time just for safety; not ideal but harmless here.
+        ini_set('max_execution_time', 3600);
 
         $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:car_wash_owners,email',
-            'password' => 'required|string|min:6|confirmed',
-            'district' => 'required|integer|min:1|max:6',
-            'address' => 'required|string|max:255',
-            'photo1' => 'required|image|mimes:jpg,jpeg,png|max:5120',
-            'photo2' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
-            'photo3' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
+            'name'      => 'required|string|max:255',
+            'email'     => 'required|email|unique:car_wash_owners,email',
+            'password'  => 'required|string|min:6|confirmed',
+            'district'  => 'required|integer|min:1|max:6',
+            'address'   => 'required|string|max:255',
+            'photo1'    => 'required|image|mimes:jpg,jpeg,png|max:5120',
+            'photo2'    => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
+            'photo3'    => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
         ]);
 
+        // store files
         $data['photo1'] = $request->file('photo1')->store('carwash_owners', 'public');
         $data['photo2'] = $request->hasFile('photo2') ? $request->file('photo2')->store('carwash_owners', 'public') : null;
         $data['photo3'] = $request->hasFile('photo3') ? $request->file('photo3')->store('carwash_owners', 'public') : null;
 
         $data['password'] = Hash::make($data['password']);
 
-        // Generate 6-digit verification code
+        // generate verification code
         $code = (string) rand(100000, 999999);
         $data['verification_code'] = $code;
 
+        // create owner
         $owner = CarWashOwner::create($data);
 
-try {
-    Mail::to($owner->email)
-        ->send(new OwnerVerificationCodeMail($code, $owner->name));
-    Log::info('Verification email sent to: ' . $owner->email);
-} catch (\Exception $e) {
-    Log::error('Email sending failed: ' . $e->getMessage());
-}
+        // attempt to send verification via Brevo API
+        try {
+            $apiResponse = $this->sendVerificationViaBrevo($owner->email, $owner->name, $code);
 
-        // Store email in session to use on verify page
+            if ($apiResponse['ok']) {
+                Log::info('Verification email sent via Brevo', [
+                    'email' => $owner->email,
+                    'response' => $apiResponse['body'] ?? null,
+                ]);
+            } else {
+                // Save details for debugging and fallback
+                Log::error('Brevo send failed', [
+                    'email' => $owner->email,
+                    'status' => $apiResponse['status'] ?? null,
+                    'body' => $apiResponse['body'] ?? null,
+                ]);
+            }
+        } catch (\Exception $e) {
+            Log::error('Brevo API call exception', ['message' => $e->getMessage()]);
+        }
+
+        // store email for verification page
         session(['owner_verification_email' => $owner->email]);
 
-        // Redirect to verify code page
+        // redirect to verify page
         return redirect()->route('owner.verify.show')->with('email', $owner->email);
     }
 
@@ -92,5 +106,49 @@ try {
         }
 
         return back()->withErrors(['email' => 'Invalid credentials'])->withInput();
+    }
+
+    /**
+     * Send verification email using Brevo (Sendinblue) transactional API.
+     * Returns array ['ok' => bool, 'status' => int|null, 'body' => mixed|null]
+     */
+    private function sendVerificationViaBrevo(string $toEmail, string $toName, string $code): array
+    {
+        $apiKey = env('SENDINBLUE_API_KEY');
+        if (! $apiKey) {
+            Log::error('SENDINBLUE_API_KEY is not configured in .env');
+            return ['ok' => false, 'status' => null, 'body' => 'No API key configured'];
+        }
+
+        $payload = [
+            'sender' => [
+                'name'  => env('MAIL_FROM_NAME', 'WashWise'),
+                'email' => env('MAIL_FROM_ADDRESS', 'noreply@example.com'),
+            ],
+            'to' => [
+                ['email' => $toEmail, 'name' => $toName],
+            ],
+            'subject' => 'WashWise — Your verification code',
+            'htmlContent' => "
+                <p>Hello " . e($toName) . ",</p>
+                <p>Your WashWise verification code is: <strong>{$code}</strong></p>
+                <p>If you did not request this, please ignore this email.</p>
+                <p>Thanks,<br/>WashWise</p>
+            ",
+            'textContent' => "Hello {$toName},\nYour WashWise verification code is: {$code}\n\nThanks,\nWashWise",
+        ];
+
+        $response = Http::withHeaders([
+            'api-key' => $apiKey,
+            'Accept' => 'application/json',
+            'Content-Type' => 'application/json',
+        ])->post('https://api.sendinblue.com/v3/smtp/email', $payload);
+
+        // Return structured result for logging/inspection
+        return [
+            'ok' => $response->successful(),
+            'status' => $response->status(),
+            'body' => $response->ok() ? $response->json() : $response->body(),
+        ];
     }
 }
