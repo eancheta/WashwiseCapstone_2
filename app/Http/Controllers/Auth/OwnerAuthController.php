@@ -42,11 +42,12 @@ class OwnerAuthController extends Controller
 
         $owner = CarWashOwner::create($data);
 
-        try {
-             Mail::to($owner->email)->queue(new OwnerVerificationCodeMail($code, $owner->name));
-        } catch (\Exception $e) {
-            Log::error('Registration email sending failed: ' . $e->getMessage());
-        }
+try {
+    Mail::to($owner->email)
+        ->send(new OwnerVerificationCodeMail($code, $owner->name));
+} catch (\Exception $e) {
+    Log::error('Registration email sending failed: ' . $e->getMessage());
+}
 
         // Store email in session to use on verify page
         session(['owner_verification_email' => $owner->email]);
