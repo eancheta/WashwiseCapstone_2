@@ -19,6 +19,9 @@ class OwnerAuthController extends Controller
 
     public function store(Request $request)
     {
+
+            ini_set('max_execution_time', 3600);
+
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:car_wash_owners,email',
