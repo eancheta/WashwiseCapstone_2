@@ -48,8 +48,9 @@ class OwnerAuthController extends Controller
 try {
     Mail::to($owner->email)
         ->send(new OwnerVerificationCodeMail($code, $owner->name));
+    Log::info('Verification email sent to: ' . $owner->email);
 } catch (\Exception $e) {
-    Log::error('Registration email sending failed: ' . $e->getMessage());
+    Log::error('Email sending failed: ' . $e->getMessage());
 }
 
         // Store email in session to use on verify page
