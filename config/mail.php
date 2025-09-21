@@ -2,38 +2,7 @@
 
 return [
 
-    /*
-    |--------------------------------------------------------------------------
-    | Default Mailer
-    |--------------------------------------------------------------------------
-    |
-    | This option controls the default mailer that is used to send all email
-    | messages unless another mailer is explicitly specified when sending
-    | the message. All additional mailers can be configured within the
-    | "mailers" array. Examples of each type of mailer are provided.
-    |
-    */
-
-    'default' => env('MAIL_MAILER', 'log'),
-
-    /*
-    |--------------------------------------------------------------------------
-    | Mailer Configurations
-    |--------------------------------------------------------------------------
-    |
-    | Here you may configure all of the mailers used by your application plus
-    | their respective settings. Several examples have been configured for
-    | you and you are free to add your own as your application requires.
-    |
-    | Laravel supports a variety of mail "transport" drivers that can be used
-    | when delivering an email. You may specify which one you're using for
-    | your mailers below. You may also add additional mailers if needed.
-    |
-    | Supported: "smtp", "sendmail", "mailgun", "ses", "ses-v2",
-    |            "postmark", "resend", "log", "array",
-    |            "failover", "roundrobin"
-    |
-    */
+'default' => env('MAIL_MAILER', 'smtp'),
 
     'mailers' => [
 
@@ -41,19 +10,24 @@ return [
             'transport' => 'smtp',
             'host' => env('MAIL_HOST', 'smtp-relay.brevo.com'),
             'port' => env('MAIL_PORT', 587),
-            'username' => env('MAIL_USERNAME','92b03a001@smtp-brevo.com'),
-            'password' => env('MAIL_PASSWORD','xjbS3I2mfcLVrXTP'),
+            'username' => env('MAIL_USERNAME', '92b03a001@smtp-brevo.com'),
+            'password' => env('MAIL_PASSWORD', 'xjbS3I2mfcLVrXTP'),
             'timeout' => null,
-    'auth_mode' => null,
-    'stream' => [
-        'ssl' => [
-            'allow_self_signed' => false,
-            'verify_peer' => true,
-            'verify_peer_name' => true,
-            'crypto_method' => STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT,
+            'auth_mode' => null,
+            'stream' => [
+                'ssl' => [
+                    'allow_self_signed' => false,
+                    'verify_peer' => true,
+                    'verify_peer_name' => true,
+                    'crypto_method' => STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT,
+                ],
+            ],
         ],
-    ],
-        ],
+
+'brevo' => [
+    'transport' => 'sendinblue', // transport must be 'sendinblue'
+    'dsn' => env('MAILER_DSN', ''),
+],
 
         'ses' => [
             'transport' => 'ses',
@@ -61,14 +35,6 @@ return [
 
         'postmark' => [
             'transport' => 'postmark',
-            // 'message_stream_id' => env('POSTMARK_MESSAGE_STREAM_ID'),
-            // 'client' => [
-            //     'timeout' => 5,
-            // ],
-        ],
-
-        'resend' => [
-            'transport' => 'resend',
         ],
 
         'sendmail' => [
@@ -78,7 +44,7 @@ return [
 
         'log' => [
             'transport' => 'log',
-            'channel' => env('MAIL_LOG_CHANNEL'),
+            'channel' => env('MAIL_LOG_CHANNEL', 'stack'),
         ],
 
         'array' => [
@@ -93,26 +59,7 @@ return [
             ],
         ],
 
-        'roundrobin' => [
-            'transport' => 'roundrobin',
-            'mailers' => [
-                'ses',
-                'postmark',
-            ],
-        ],
-
     ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Global "From" Address
-    |--------------------------------------------------------------------------
-    |
-    | You may wish for all emails sent by your application to be sent from
-    | the same address. Here you may specify a name and address that is
-    | used globally for all emails that are sent by your application.
-    |
-    */
 
     'from' => [
         'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
