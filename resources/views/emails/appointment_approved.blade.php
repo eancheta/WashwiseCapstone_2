@@ -5,16 +5,16 @@
   <title>Your appointment is confirmed</title>
 </head>
 <body>
-  <p>Hello {{ $appointment->name ?? 'Customer' }},</p>
+  <p>Hello {{ $customer_name ?? 'Customer' }},</p>
 
   <p>Thank you for booking with <strong>WashWise</strong>! 🎉</p>
 
   <p>Your appointment has been successfully confirmed. Below are your booking details:</p>
 
   <ul>
-    <li><strong>Service:</strong> {{ $booking->name ?? 'Car Wash' }}</li>
-    <li><strong>Date & Time:</strong> {{ ($appointment->date_of_booking ?? 'N/A') }} {{ ($appointment->time_of_booking ?? '') }}</li>
-    <li><strong>Car Wash Location:</strong> {{ $appointment->shop_name ?? $appointment->car_wash_name ?? 'WashWise Location' }}</li>
+    <li><strong>Service:</strong> Car Wash</li>
+    <li><strong>Date & Time:</strong> {{ ($date_time ?? 'N/A') }} </li>
+    <li><strong>Car Wash Location:</strong> {{ $car_wash_address ?? $appointment->car_wash_name ?? 'WashWise Location' }}</li>
     <li><strong>Reservation Fee:</strong> 50php</li>
   </ul>
 
