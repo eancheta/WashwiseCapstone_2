@@ -7,66 +7,100 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use App\Models\User;
 use Inertia\Inertia;
-use App\Mail\OwnerDeclinedMail;
-use Illuminate\Support\Facades\Mail;
-use App\Mail\OwnerApprovedMail;
 use Illuminate\Support\Facades\Log;
-
+use Illuminate\Support\Facades\Http;
 
 class AdminController extends Controller
 {
     public function index()
     {
-        // Custom session-based authentication check
         if (!Session::get('authenticated')) {
             return redirect()->route('loginAdmin');
         }
 
-        // Fetch all users from the database
         $users = User::all();
         $owners = CarWashOwner::all();
 
-        // Pass users to the Inertia view
         return Inertia::render('settings/AdminDashboard', [
-                        'users' => $users,
+            'users' => $users,
             'owners' => $owners,
         ]);
     }
 
     public function approve($id)
     {
+        $owner = CarWashOwner::findOrFail($id);
+        $owner->status = 'approved';
+        $owner->save();
 
-            @ini_set('max_execution_time', '120');
-    @set_time_limit(120);
+        try {
+            // Render the approved email Blade file
+            $htmlContent = view('emails.approved', ['owner' => $owner])->render();
 
+            // Send with Brevo API
+            Http::withHeaders([
+                'api-key' => env('SENDINBLUE_API_KEY'),
+                'Content-Type' => 'application/json',
+            ])->post('https://api.sendinblue.com/v3/smtp/email', [
+                'sender' => [
+                    'name'  => 'WashWise',
+                    'email' => env('MAIL_FROM_ADDRESS'),
+                ],
+                'to' => [
+                    ['email' => $owner->email, 'name' => $owner->name],
+                ],
+                'subject' => 'Your WashWise Account Has Been Approved',
+                'htmlContent' => $htmlContent,
+            ]);
 
-    $owner = CarWashOwner::findOrFail($id);
-    $owner->status = 'approved';
-    $owner->save();
+        } catch (\Throwable $e) {
+            Log::error('Owner approval email failed', [
+                'owner_id' => $owner->id,
+                'email' => $owner->email,
+                'error' => $e->getMessage(),
+            ]);
 
-    try {
-        Mail::to($owner->email)->send(new OwnerApprovedMail($owner));
-    } catch (\Throwable $e) {
-        // Log details for debugging but don't block the user action
-        Log::error('Owner approval email failed', [
-            'owner_id' => $owner->id,
-            'email' => $owner->email,
-            'error' => $e->getMessage(),
-        ]);
+            return redirect()->back()->with('success', 'Owner account approved. (Email failed — see logs.)');
+        }
 
-        return redirect()->back()->with('success', 'Owner account approved. (Email failed — see logs.)');
-    }
-    return redirect()->back()->with('success', 'Owner account approved.');
+        return redirect()->back()->with('success', 'Owner account approved and email sent.');
     }
 
     public function decline($id)
     {
-    $owner = CarWashOwner::findOrFail($id);
+        $owner = CarWashOwner::findOrFail($id);
 
-    Mail::to($owner->email)->send(new OwnerDeclinedMail($owner));
+        try {
+            // Render the declined email Blade file
+            $htmlContent = view('emails.declined', ['owner' => $owner])->render();
 
-    $owner->delete();
+            // Send with Brevo API
+            Http::withHeaders([
+                'api-key' => env('SENDINBLUE_API_KEY'),
+                'Content-Type' => 'application/json',
+            ])->post('https://api.sendinblue.com/v3/smtp/email', [
+                'sender' => [
+                    'name'  => 'WashWise',
+                    'email' => env('MAIL_FROM_ADDRESS'),
+                ],
+                'to' => [
+                    ['email' => $owner->email, 'name' => $owner->name],
+                ],
+                'subject' => 'Your WashWise Account Has Been Declined',
+                'htmlContent' => $htmlContent,
+            ]);
 
-    return back()->with('success', 'Owner declined, email sent, and account removed.');
+        } catch (\Throwable $e) {
+            Log::error('Owner declined email failed', [
+                'owner_id' => $owner->id,
+                'email' => $owner->email,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        // Delete the owner after sending email
+        $owner->delete();
+
+        return back()->with('success', 'Owner declined, email sent, and account removed.');
     }
 }
