@@ -118,47 +118,68 @@ class OwnerAppointmentController extends Controller
     /**
      * Approve a booking and send confirmation email.
      */
-    public function approve($id)
-    {
-        $ownerId = Auth::guard('carwashowner')->id();
-        $shopId = CarWashShop::where('owner_id', $ownerId)->value('id');
-        $tableName = "bookings_shop_{$shopId}";
+public function approve($id)
+{
+    $ownerId = Auth::guard('carwashowner')->id();
+    $shopId = CarWashShop::where('owner_id', $ownerId)->value('id');
+    $tableName = "bookings_shop_{$shopId}";
 
-        if (!DB::getSchemaBuilder()->hasTable($tableName)) {
-            return back()->with('error', 'No bookings found for this shop.');
-        }
-
-        $booking = DB::table($tableName)->where('id', $id)->first();
-
-        if (!$booking) {
-            return back()->with('error', 'Booking not found.');
-        }
-
-        DB::table($tableName)
-            ->where('id', $id)
-            ->update(['status' => 'approved']);
-
-        if ($booking->email) {
-            $shop = CarWashShop::findOrFail($shopId);
-
-            $emailData = [
-                'customer_name' => $booking->name,
-                'service_name' => $booking->size_of_the_car . ' Wash',
-                'date_time' => $booking->date_of_booking . ' ' . $booking->time_of_booking,
-                'car_wash_name' => $shop->name,
-                'car_wash_address' => $shop->address,
-                'amount_paid' => $booking->payment_amount,
-            ];
-
-            try {
-                Mail::to($booking->email)->send(new AppointmentApprovedMail($emailData));
-            } catch (\Exception $e) {
-                Log::error('Failed to send confirmation email for booking ID: ' . $id . ' | ' . $e->getMessage());
-            }
-        }
-
-        return back()->with('success', 'Booking approved successfully.');
+    if (!DB::getSchemaBuilder()->hasTable($tableName)) {
+        return back()->with('error', 'No bookings found for this shop.');
     }
+
+    $booking = DB::table($tableName)->where('id', $id)->first();
+
+    if (!$booking) {
+        return back()->with('error', 'Booking not found.');
+    }
+
+    DB::table($tableName)
+        ->where('id', $id)
+        ->update(['status' => 'approved']);
+
+    if ($booking->email) {
+        $shop = CarWashShop::findOrFail($shopId);
+
+        $emailData = [
+            'customer_name'   => $booking->name,
+            'service_name'    => $booking->size_of_the_car . ' Wash',
+            'date_time'       => $booking->date_of_booking . ' ' . $booking->time_of_booking,
+            'car_wash_name'   => $shop->name,
+            'car_wash_address'=> $shop->address,
+            'amount_paid'     => $booking->payment_amount,
+        ];
+
+        try {
+            // ✅ Use Brevo API directly
+            $apiKey = env('SENDINBLUE_API_KEY');
+
+            $response = \Illuminate\Support\Facades\Http::withHeaders([
+                'api-key'      => $apiKey,
+                'Content-Type' => 'application/json',
+            ])->post('https://api.sendinblue.com/v3/smtp/email', [
+                'sender' => [
+                    'name'  => env('MAIL_FROM_NAME', 'WashWise'),
+                    'email' => env('MAIL_FROM_ADDRESS', 'no-reply@washwise.com'),
+                ],
+                'to' => [
+                    ['email' => $booking->email, 'name' => $booking->name],
+                ],
+                'subject' => 'Your Car Wash Appointment is Approved',
+                'htmlContent' => view('emails.appointment_approved', $emailData)->render(),
+            ]);
+
+            if ($response->failed()) {
+                Log::error("Brevo email failed: " . $response->body());
+            }
+        } catch (\Exception $e) {
+            Log::error('Failed to send confirmation email for booking ID: ' . $id . ' | ' . $e->getMessage());
+        }
+    }
+
+    return back()->with('success', 'Booking approved successfully.');
+}
+
 
     /**
      * Decline a booking.
