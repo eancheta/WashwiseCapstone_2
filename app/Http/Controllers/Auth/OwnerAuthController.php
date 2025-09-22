@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\View;
 
 class OwnerAuthController extends Controller
 {
@@ -48,7 +49,7 @@ class OwnerAuthController extends Controller
 
         // attempt to send verification via Brevo API
         try {
-            $apiResponse = $this->sendVerificationViaBrevo($owner->email, $owner->name, $code);
+            $apiResponse = $this->sendVerificationCode($owner->email, $owner->name, $code);
 
             if ($apiResponse['ok']) {
                 Log::info('Verification email sent via Brevo', [
@@ -112,43 +113,37 @@ class OwnerAuthController extends Controller
      * Send verification email using Brevo (Sendinblue) transactional API.
      * Returns array ['ok' => bool, 'status' => int|null, 'body' => mixed|null]
      */
-    private function sendVerificationViaBrevo(string $toEmail, string $toName, string $code): array
-    {
-        $apiKey = env('SENDINBLUE_API_KEY');
-        if (! $apiKey) {
-            Log::error('SENDINBLUE_API_KEY is not configured in .env');
-            return ['ok' => false, 'status' => null, 'body' => 'No API key configured'];
-        }
+public function sendVerificationCode($toEmail, $toName, $code)
+{
+    // Render your Blade template into HTML
+    $htmlContent = View::make('emails.owner-verification-code', [
+        'name' => $toName,
+        'code' => $code,
+    ])->render();
 
-        $payload = [
-            'sender' => [
-                'name'  => env('MAIL_FROM_NAME', 'WashWise'),
-                'email' => env('MAIL_FROM_ADDRESS', 'noreply@example.com'),
-            ],
-            'to' => [
-                ['email' => $toEmail, 'name' => $toName],
-            ],
-            'subject' => 'WashWise — Your verification code',
-            'htmlContent' => "
-                <p>Hello " . e($toName) . ",</p>
-                <p>Your WashWise verification code is: <strong>{$code}</strong></p>
-                <p>If you did not request this, please ignore this email.</p>
-                <p>Thanks,<br/>WashWise</p>
-            ",
-            'textContent' => "Hello {$toName},\nYour WashWise verification code is: {$code}\n\nThanks,\nWashWise",
-        ];
+    // Create fallback text-only version
+    $textContent = "Hello {$toName},\nYour WashWise verification code is: {$code}\n\nThanks,\nWashWise";
 
-        $response = Http::withHeaders([
-            'api-key' => $apiKey,
-            'Accept' => 'application/json',
-            'Content-Type' => 'application/json',
-        ])->post('https://api.sendinblue.com/v3/smtp/email', $payload);
+    // Build payload for Brevo API
+    $payload = [
+        'sender' => [
+            'name'  => env('MAIL_FROM_NAME', 'WashWise'),
+            'email' => env('MAIL_FROM_ADDRESS', 'noreply@example.com'),
+        ],
+        'to' => [
+            ['email' => $toEmail, 'name' => $toName],
+        ],
+        'subject' => 'WashWise — Your verification code',
+        'htmlContent' => $htmlContent,
+        'textContent' => $textContent,
+    ];
 
-        // Return structured result for logging/inspection
-        return [
-            'ok' => $response->successful(),
-            'status' => $response->status(),
-            'body' => $response->ok() ? $response->json() : $response->body(),
-        ];
-    }
+    // Send to Brevo API
+    $response = Http::withHeaders([
+        'api-key' => env('SENDINBLUE_API_KEY'),
+        'Content-Type' => 'application/json',
+    ])->post('https://api.sendinblue.com/v3/smtp/email', $payload);
+
+    return $response->json();
+}
 }
