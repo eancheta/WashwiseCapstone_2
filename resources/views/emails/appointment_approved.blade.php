@@ -18,6 +18,7 @@
     <li><strong>Reservation Fee:</strong> 50php</li>
   </ul>
 
+
   <p>Please arrive on time for your appointment. For any changes, you can manage your booking directly in your WashWise account (or contact the shop).</p>
 
   <p>We look forward to serving you!</p>
