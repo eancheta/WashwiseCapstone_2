@@ -12,7 +12,7 @@
   <p>Your appointment has been successfully confirmed. Below are your booking details:</p>
 
   <ul>
-    <li><strong>Service:</strong> {{ $appointment->service_name ?? 'Car Wash' }}</li>
+    <li><strong>Service:</strong> {{ $booking->name ?? 'Car Wash' }}</li>
     <li><strong>Date & Time:</strong> {{ ($appointment->date_of_booking ?? 'N/A') }} {{ ($appointment->time_of_booking ?? '') }}</li>
     <li><strong>Car Wash Location:</strong> {{ $appointment->shop_name ?? $appointment->car_wash_name ?? 'WashWise Location' }}</li>
     <li><strong>Reservation Fee:</strong> 50php</li>
