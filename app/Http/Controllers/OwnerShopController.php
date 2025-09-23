@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class OwnerShopController extends Controller
@@ -60,6 +59,9 @@ class OwnerShopController extends Controller
         }
     }
 
+    /**
+     * Show the form to create a shop.
+     */
     public function create()
     {
         return Inertia::render('Owner/ShopSetup', [
@@ -91,17 +93,14 @@ class OwnerShopController extends Controller
             'owner_id' => $ownerId,
             'name' => $validated['name'],
             'address' => $validated['address'],
-            'district' => $validated['district'],
-            'description' => $validated['description'],
-            'services_offered' => $validated['services_offered'],
+            'district' => $validated['district'] ?? null,
+            'description' => $validated['description'] ?? null,
+            'services_offered' => $validated['services_offered'] ?? null,
         ];
 
-        // ---------- File upload closure ----------
+        // Helper function to handle uploads
         $uploadFile = function ($file, $folder) {
-            // Check Cloudinary config
-            $cloudinaryConfigured = config('cloudinary.cloud.cloud_name') && config('cloudinary.cloud.api_key');
-
-            if ($cloudinaryConfigured && class_exists(Cloudinary::class)) {
+            if (config('cloudinary.cloud.cloud_name') && class_exists(Cloudinary::class)) {
                 try {
                     $result = Cloudinary::upload($file->getRealPath(), [
                         'folder' => $folder,
@@ -118,9 +117,9 @@ class OwnerShopController extends Controller
                 }
             }
 
-            // Fallback: store locally
+            // Fallback to local storage
             try {
-                return $file->store($folder, 'public'); // returns e.g., carwash_logos/abc.jpg
+                return $file->store($folder, 'public'); // storage/app/public/...
             } catch (\Throwable $e) {
                 Log::error('Local storage upload failed: ' . $e->getMessage());
                 return null;
@@ -137,15 +136,19 @@ class OwnerShopController extends Controller
             $shopData['qr_code'] = $uploadFile($request->file('qr_code'), 'carwash_qrcodes');
         }
 
+        // Create the shop
         $shop = CarWashShop::create($shopData);
 
-        // Create or update bookings table
+        // Ensure bookings table exists
         self::ensureBookingTableExists($shop->id);
 
         return redirect()->route('carwashownerdashboard')
             ->with('success', 'Shop created successfully!');
     }
 
+    /**
+     * Display the owner's shop.
+     */
     public function index()
     {
         $ownerId = Auth::guard('carwashowner')->id();
