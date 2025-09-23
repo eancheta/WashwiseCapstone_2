@@ -171,11 +171,9 @@ const filteredShops = computed(() => {
           class="bg-white shadow-md rounded-xl p-6 flex flex-col items-center text-center border border-gray-200 hover:shadow-xl hover:-translate-y-1 transition"
         >
 <img
-  :src="(
-    shop.logo
-      ? (shop.logo.startsWith('http') ? shop.logo : `${backendBaseUrl}/storage/${shop.logo}`)
-      : `${backendBaseUrl}/logos/default-carwash.png`)
-  "
+  :src="shop.logo?.startsWith('http')
+         ? shop.logo
+         : (shop.logo ? `${backendBaseUrl}/storage/${shop.logo}` : `${backendBaseUrl}/logos/default-carwash.png`)"
   alt="Car Wash Logo"
   class="h-20 w-20 object-contain mb-4"
   @error="(e) => { (e.target as HTMLImageElement).src = `${backendBaseUrl}/logos/default-carwash.png` }"
