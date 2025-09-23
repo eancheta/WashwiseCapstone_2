@@ -9,22 +9,21 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Inertia\Inertia;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class OwnerShopController extends Controller
 {
     /**
      * Ensure the bookings table for a specific shop exists.
-     * Will not duplicate columns if table already exists.
      */
     public static function ensureBookingTableExists($shopId)
     {
         $tableName = "bookings_shop_{$shopId}";
 
         if (!Schema::hasTable($tableName)) {
-            // Create table if it doesn't exist
             Schema::create($tableName, function (Blueprint $table) {
                 $table->id();
-                $table->unsignedBigInteger('user_id')->nullable(); // link to user if needed
+                $table->unsignedBigInteger('user_id')->nullable();
                 $table->string('name');
                 $table->string('size_of_the_car');
                 $table->string('contact_no');
@@ -38,7 +37,6 @@ class OwnerShopController extends Controller
                 $table->timestamps();
             });
         } else {
-            // Table exists, make sure all necessary columns exist
             $columns = Schema::getColumnListing($tableName);
 
             Schema::table($tableName, function (Blueprint $table) use ($columns) {
@@ -100,12 +98,22 @@ class OwnerShopController extends Controller
             'services_offered' => $validated['services_offered'],
         ];
 
+        // Upload logo to Cloudinary if provided
         if ($request->hasFile('logo')) {
-            $shopData['logo'] = $request->file('logo')->store('logos', 'public');
+            $uploadedLogo = Cloudinary::upload($request->file('logo')->getRealPath(), [
+                'folder' => 'washwise/logos'
+            ])->getSecurePath();
+
+            $shopData['logo'] = $uploadedLogo;
         }
 
+        // Upload QR code to Cloudinary if provided
         if ($request->hasFile('qr_code')) {
-            $shopData['qr_code'] = $request->file('qr_code')->store('qr_codes', 'public');
+            $uploadedQr = Cloudinary::upload($request->file('qr_code')->getRealPath(), [
+                'folder' => 'washwise/qr_codes'
+            ])->getSecurePath();
+
+            $shopData['qr_code'] = $uploadedQr;
         }
 
         $shop = CarWashShop::create($shopData);
