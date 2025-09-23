@@ -47,29 +47,26 @@ function getLogoSrc(shop: Shop) {
   const defaultImg = '/logos/default-carwash.png'
   if (!shop?.logo) return defaultImg
 
-  let logo = shop.logo.trim()
+  const logo = shop.logo.trim()
 
-  // Force HTTPS if full URL
+  // If it's already a full URL → use it
   if (/^https?:\/\//i.test(logo)) {
-    return logo.replace(/^http:\/\//i, 'https://')
+    return logo.replace(/^http:\/\//i, 'https://') // force HTTPS if needed
   }
 
-  // Strip out localhost references
-  logo = logo.replace(/^https?:\/\/127\.0\.0\.1:8000\/storage\//, '')
-
+  // Otherwise → treat it as a storage path
   return `/storage/${logo}`
 }
 
 // ✅ Compute safe QR code URL
 function getQrCodeSrc(shop: Shop) {
   if (!shop?.qr_code) return ''
-  let qr = shop.qr_code.trim()
+  const qr = shop.qr_code.trim()
 
   if (/^https?:\/\//i.test(qr)) {
     return qr.replace(/^http:\/\//i, 'https://')
   }
 
-  qr = qr.replace(/^https?:\/\/127\.0\.0\.1:8000\/storage\//, '')
   return `/storage/${qr}`
 }
 
