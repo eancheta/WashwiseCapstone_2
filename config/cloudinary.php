@@ -4,27 +4,25 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Cloudinary config
+    | Cloudinary Configuration
     |--------------------------------------------------------------------------
     |
-    | Provide CLOUDINARY_URL or the individual parts via env. This file
-    | simply exposes the env values to the app in a stable way so your
-    | editor / code can safely reference config('cloudinary.xxx').
+    | Make sure to set these in your .env file. The package will use these
+    | credentials to upload your images to Cloudinary.
     |
     */
 
-    // Full connection string (cloudinary://API_KEY:API_SECRET@CLOUD_NAME)
-    'cloud_url'    => env('CLOUDINARY_URL', null),
+    'cloud' => [
+        'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
+        'api_key'    => env('CLOUDINARY_API_KEY'),
+        'api_secret' => env('CLOUDINARY_API_SECRET'),
+        'secure'     => true,
+    ],
 
-    // Individual pieces (optional, may be null if using CLOUDINARY_URL)
-    'cloud_name'   => env('CLOUDINARY_CLOUD_NAME', null),
-    'api_key'      => env('CLOUDINARY_API_KEY', null),
-    'api_secret'   => env('CLOUDINARY_API_SECRET', null),
+    'url' => [
+        'secure' => true,
+    ],
 
-    // Optional upload preset name (if you use one)
-    'upload_preset' => env('CLOUDINARY_UPLOAD_PRESET', null),
-
-    // Optional: notification / webhook url for upload notifications
-    'notification_url' => env('CLOUDINARY_NOTIFICATION_URL', null),
-
+    'upload_preset' => env('CLOUDINARY_UPLOAD_PRESET'),
+    'notification_url' => env('CLOUDINARY_NOTIFICATION_URL'),
 ];

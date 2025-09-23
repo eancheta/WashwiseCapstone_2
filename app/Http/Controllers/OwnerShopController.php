@@ -5,14 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\CarWashShop;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-
-// Cloudinary facade may not be available in some environments so guard its usage.
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class OwnerShopController extends Controller
@@ -99,65 +96,50 @@ class OwnerShopController extends Controller
             'services_offered' => $validated['services_offered'],
         ];
 
-        // ---------- Upload logic with Cloudinary fallback ----------
-        // We'll try Cloudinary if cloudinary config exists, otherwise fall back to local storage.
-        // If Cloudinary fails we also fall back.
+        // ---------- File upload closure ----------
+        $uploadFile = function ($file, $folder) {
+            // Check Cloudinary config
+            $cloudinaryConfigured = config('cloudinary.cloud.cloud_name') && config('cloudinary.cloud.api_key');
 
-        // Helper closure to upload and return string to store in DB
-        $uploadFile = function ($file, $diskPathFolder = 'logos') use ($request) {
-            // If Cloudinary is configured and facade exists, try Cloudinary first
-            $cloudinaryConfigured = config('cloudinary.cloud_url') || (env('CLOUDINARY_URL') !== null);
             if ($cloudinaryConfigured && class_exists(Cloudinary::class)) {
                 try {
-                    // Cloudinary expects a path; using getRealPath() from uploaded file
                     $result = Cloudinary::upload($file->getRealPath(), [
-                        'folder' => $diskPathFolder,
+                        'folder' => $folder,
                         'overwrite' => true,
                         'resource_type' => 'image',
                     ]);
 
-                    // getSecurePath returns HTTPS URL
                     $secureUrl = $result->getSecurePath();
                     if ($secureUrl) {
-                        return $secureUrl; // store full HTTPS URL in DB
+                        return $secureUrl;
                     }
                 } catch (\Throwable $e) {
                     Log::error('Cloudinary upload failed: ' . $e->getMessage());
-                    // continue to fallback below
                 }
             }
 
-            // Fallback: store on local public disk (storage/app/public/...)
+            // Fallback: store locally
             try {
-                $path = $file->store($diskPathFolder, 'public'); // returns e.g. logos/abc.jpg
-                return $path;
+                return $file->store($folder, 'public'); // returns e.g., carwash_logos/abc.jpg
             } catch (\Throwable $e) {
-                Log::error('Local disk upload failed: ' . $e->getMessage());
+                Log::error('Local storage upload failed: ' . $e->getMessage());
                 return null;
             }
         };
 
-        // Logo upload
+        // Upload logo
         if ($request->hasFile('logo')) {
-            $uploadedLogo = $request->file('logo');
-            $logoPath = $uploadFile($uploadedLogo, 'carwash_logos'); // prefer folder carwash_logos
-            if ($logoPath) {
-                $shopData['logo'] = $logoPath;
-            }
+            $shopData['logo'] = $uploadFile($request->file('logo'), 'carwash_logos');
         }
 
-        // QR code upload
+        // Upload QR code
         if ($request->hasFile('qr_code')) {
-            $uploadedQr = $request->file('qr_code');
-            $qrPath = $uploadFile($uploadedQr, 'carwash_qrcodes');
-            if ($qrPath) {
-                $shopData['qr_code'] = $qrPath;
-            }
+            $shopData['qr_code'] = $uploadFile($request->file('qr_code'), 'carwash_qrcodes');
         }
 
         $shop = CarWashShop::create($shopData);
 
-        // Create or update bookings table for the new shop
+        // Create or update bookings table
         self::ensureBookingTableExists($shop->id);
 
         return redirect()->route('carwashownerdashboard')
