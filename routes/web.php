@@ -25,15 +25,16 @@ use App\Http\Controllers\Owner\ReviewController;
 
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
-
-Route::get('/test-cloudinary', function() {
-    $filePath = public_path('apple-touch-icon.png'); // your test image
+Route::get('/test-cloudinary', function () {
+    $filePath = public_path('apple-touch-icon.png');
 
     try {
-        $result = Cloudinary::upload($filePath, ['folder' => 'test_uploads']);
+        $result = Cloudinary::upload($filePath, [
+            'folder' => 'test_uploads',
+        ]);
         return $result->getSecurePath();
     } catch (\Throwable $e) {
-        return 'Error: ' . $e->getMessage();
+        return "Upload failed: " . $e->getMessage();
     }
 });
 
