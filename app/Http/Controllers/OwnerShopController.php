@@ -7,9 +7,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
-use Inertia\Inertia;
 use Illuminate\Support\Facades\Log;
-use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
+use Illuminate\Support\Facades\Storage;
+use Inertia\Inertia;
+use Cloudinary\Cloudinary;
 
 class OwnerShopController extends Controller
 {
@@ -38,7 +39,6 @@ class OwnerShopController extends Controller
             });
         } else {
             $columns = Schema::getColumnListing($tableName);
-
             Schema::table($tableName, function (Blueprint $table) use ($columns) {
                 if (!in_array('user_id', $columns)) {
                     $table->unsignedBigInteger('user_id')->nullable();
@@ -59,9 +59,6 @@ class OwnerShopController extends Controller
         }
     }
 
-    /**
-     * Show the form to create a shop.
-     */
     public function create()
     {
         return Inertia::render('Owner/ShopSetup', [
@@ -69,9 +66,6 @@ class OwnerShopController extends Controller
         ]);
     }
 
-    /**
-     * Store a new shop for the authenticated owner.
-     */
     public function store(Request $request)
     {
         $ownerId = Auth::guard('carwashowner')->id();
@@ -93,62 +87,79 @@ class OwnerShopController extends Controller
             'owner_id' => $ownerId,
             'name' => $validated['name'],
             'address' => $validated['address'],
-            'district' => $validated['district'] ?? null,
-            'description' => $validated['description'] ?? null,
-            'services_offered' => $validated['services_offered'] ?? null,
+            'district' => $validated['district'],
+            'description' => $validated['description'],
+            'services_offered' => $validated['services_offered'],
         ];
 
-        // Helper function to handle uploads
-        $uploadFile = function ($file, $folder) {
-            if (config('cloudinary.cloud.cloud_name') && class_exists(Cloudinary::class)) {
+        // Initialize Cloudinary SDK if env values exist
+        $cloudinary = null;
+        if (env('CLOUDINARY_CLOUD_NAME') && env('CLOUDINARY_API_KEY') && env('CLOUDINARY_API_SECRET')) {
+            try {
+                $cloudinary = new Cloudinary([
+                    'cloud' => [
+                        'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
+                        'api_key'    => env('CLOUDINARY_API_KEY'),
+                        'api_secret' => env('CLOUDINARY_API_SECRET'),
+                    ],
+                    'url' => ['secure' => true],
+                ]);
+            } catch (\Throwable $e) {
+                Log::warning('Cloudinary init failed: '.$e->getMessage());
+                $cloudinary = null;
+            }
+        }
+
+        // helper closure: upload to Cloudinary (preferred) else local public disk
+        $uploadFile = function ($file, $folder) use ($cloudinary) {
+            // Cloudinary path (preferred)
+            if ($cloudinary) {
                 try {
-                    $result = Cloudinary::upload($file->getRealPath(), [
+                    $result = $cloudinary->uploadApi()->upload($file->getRealPath(), [
                         'folder' => $folder,
-                        'overwrite' => true,
                         'resource_type' => 'image',
                     ]);
-
-                    $secureUrl = $result->getSecurePath();
-                    if ($secureUrl) {
-                        return $secureUrl;
+                    if (!empty($result['secure_url'])) {
+                        // store full https URL in DB
+                        return $result['secure_url'];
+                    } elseif (!empty($result['url'])) {
+                        return $result['url'];
                     }
                 } catch (\Throwable $e) {
-                    Log::error('Cloudinary upload failed: ' . $e->getMessage());
+                    Log::error('Cloudinary upload failed: '.$e->getMessage());
+                    // fall through to local storage
                 }
             }
 
-            // Fallback to local storage
+            // Local fallback: store on public disk
             try {
-                return $file->store($folder, 'public'); // storage/app/public/...
+                $path = $file->store($folder, 'public'); // returns e.g. carwash_logos/abc.jpg
+                // return Storage::url($path) => "/storage/carwash_logos/abc.jpg"
+                return Storage::url($path);
             } catch (\Throwable $e) {
-                Log::error('Local storage upload failed: ' . $e->getMessage());
+                Log::error('Local upload failed: '.$e->getMessage());
                 return null;
             }
         };
 
-        // Upload logo
         if ($request->hasFile('logo')) {
-            $shopData['logo'] = $uploadFile($request->file('logo'), 'carwash_logos');
+            $logo = $request->file('logo');
+            $uploaded = $uploadFile($logo, 'carwash_logos');
+            if ($uploaded) $shopData['logo'] = $uploaded;
         }
 
-        // Upload QR code
         if ($request->hasFile('qr_code')) {
-            $shopData['qr_code'] = $uploadFile($request->file('qr_code'), 'carwash_qrcodes');
+            $qr = $request->file('qr_code');
+            $uploaded = $uploadFile($qr, 'carwash_qrcodes');
+            if ($uploaded) $shopData['qr_code'] = $uploaded;
         }
 
-        // Create the shop
         $shop = CarWashShop::create($shopData);
-
-        // Ensure bookings table exists
         self::ensureBookingTableExists($shop->id);
 
-        return redirect()->route('carwashownerdashboard')
-            ->with('success', 'Shop created successfully!');
+        return redirect()->route('carwashownerdashboard')->with('success', 'Shop created successfully!');
     }
 
-    /**
-     * Display the owner's shop.
-     */
     public function index()
     {
         $ownerId = Auth::guard('carwashowner')->id();
