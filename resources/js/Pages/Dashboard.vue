@@ -68,25 +68,18 @@ function getLogoSrc(shop: Shop) {
 
   let logo = shop.logo as string
 
-  // Extract http(s) substring if value contains whole URL with junk
-  const httpIndex = logo.indexOf('http://') !== -1
-    ? logo.indexOf('http://')
-    : logo.indexOf('https://')
-  if (httpIndex !== -1) {
-    return logo.slice(httpIndex)
+  // Case 1: Already a full URL (Cloudinary, Imgur, etc.)
+  if (logo.startsWith('http://') || logo.startsWith('https://')) {
+    return logo
   }
 
-  // Already full URL
-  if (logo.startsWith('http://') || logo.startsWith('https://')) return logo
-
-  // Clean leading slash
+  // Case 2: Laravel-stored file path like "logos/filename.jpg"
   if (logo.startsWith('/')) logo = logo.slice(1)
-
-  // Build storage path
   if (backendBaseUrl) return `${backendBaseUrl}/storage/${logo}`
+
+  // Fallback relative
   return `/storage/${logo}`
 }
-
 // Fallback image handler
 function handleImgError(e: Event) {
   const target = e.target as HTMLImageElement | null
