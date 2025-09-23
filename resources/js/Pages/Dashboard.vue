@@ -4,50 +4,43 @@ import { ref, computed } from 'vue'
 import { Inertia } from '@inertiajs/inertia'
 
 const sidebarOpen = ref(false)
-
 function toggleSidebar() {
   sidebarOpen.value = !sidebarOpen.value
 }
 
-// Interfaces
+// Types
 interface Shop {
   id: number
   name: string
   address: string
   district: string | number
-  logo?: string // This will now hold Cloudinary URL
+  logo?: string | null
 }
-
 interface AuthUser {
   id: number
   name: string
   email: string
   email_verified_at?: string | null
 }
-
 interface Props {
   shops: Shop[]
   districts: (string | number)[]
-  auth: {
-    user: AuthUser | null
-  }
+  auth: { user: AuthUser | null }
 }
 
 const props = defineProps<Props>()
-
-// State
 const selectedDistrict = ref<string | number>('all')
 
-// Backend base URL (still used for fallback default image)
-const backendBaseUrl = import.meta.env.VITE_BACKEND_URL
+// backendBaseUrl used only for local-storage fallback paths
+const backendBaseUrl = import.meta.env.VITE_BACKEND_URL || ''
 
-// Logout
+// Logout function
 const logout = () => {
   Inertia.post('/logout', {}, {
     onSuccess: () => Inertia.get('/login'),
     onError: (errors) => {
       console.error('Logout error:', errors)
-      alert('Failed to log out. Please try again.')
+      alert('Failed to log out.')
     }
   })
 }
@@ -61,18 +54,51 @@ const goToBooking = (shopId: number) => {
   Inertia.get(`/customer/book/${shopId}`)
 }
 
-// Filtered shops
+// Filter shops by district
 const filteredShops = computed(() => {
   if (selectedDistrict.value === 'all') return props.shops
   return props.shops.filter((shop) => shop.district == selectedDistrict.value)
 })
+
+// Compute safe logo src
+function getLogoSrc(shop: Shop) {
+  const defaultImg = `${backendBaseUrl}/logos/default-carwash.png`
+
+  if (!shop?.logo) return defaultImg
+
+  let logo = shop.logo as string
+
+  // Extract http(s) substring if value contains whole URL with junk
+  const httpIndex = logo.indexOf('http://') !== -1
+    ? logo.indexOf('http://')
+    : logo.indexOf('https://')
+  if (httpIndex !== -1) {
+    return logo.slice(httpIndex)
+  }
+
+  // Already full URL
+  if (logo.startsWith('http://') || logo.startsWith('https://')) return logo
+
+  // Clean leading slash
+  if (logo.startsWith('/')) logo = logo.slice(1)
+
+  // Build storage path
+  if (backendBaseUrl) return `${backendBaseUrl}/storage/${logo}`
+  return `/storage/${logo}`
+}
+
+// Fallback image handler
+function handleImgError(e: Event) {
+  const target = e.target as HTMLImageElement | null
+  if (target) target.src = `${backendBaseUrl}/logos/default-carwash.png`
+}
 </script>
 
 <template>
   <Head title="Customer Dashboard" />
-  <!-- Top Navigation -->
+
+  <!-- Top navigation -->
   <div class="w-full bg-white flex items-center justify-between px-6 py-3 border-b border-gray-200 shadow-sm sticky top-0 z-40">
-    <!-- Left: Hamburger + Logo -->
     <div class="flex items-center gap-4">
       <button
         @click="toggleSidebar"
@@ -82,8 +108,6 @@ const filteredShops = computed(() => {
         <span class="block h-0.5 bg-gray-800 rounded"></span>
         <span class="block h-0.5 bg-gray-800 rounded"></span>
       </button>
-
-      <!-- Logo -->
       <img
         src="/images/washwiselogo2.png"
         alt="WashWise Logo"
@@ -92,7 +116,6 @@ const filteredShops = computed(() => {
       />
     </div>
 
-    <!-- Right: Owner Name -->
     <div class="text-center">
       <h2 class="text-lg font-semibold text-gray-800">
         {{ props.auth.user?.name || 'Guest' }}
@@ -100,17 +123,23 @@ const filteredShops = computed(() => {
     </div>
   </div>
 
-  <!-- Sidebar -->
   <div class="flex min-h-screen">
+    <!-- Sidebar -->
     <aside
-      :class="['fixed top-0 left-0 h-full w-64 bg-gradient-to-b from-[#182235] to-[#0f172a] text-white shadow-lg z-50 transform transition-transform duration-300', sidebarOpen ? 'translate-x-0' : '-translate-x-full']"
+      :class="[
+        'fixed top-0 left-0 h-full w-64 bg-gradient-to-b from-[#182235] to-[#0f172a] text-white shadow-lg z-50 transform transition-transform duration-300',
+        sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+      ]"
     >
       <div class="flex justify-between items-center p-4 border-b border-gray-700">
         <h2 class="text-lg font-bold">Menu</h2>
-        <button @click="toggleSidebar" class="text-gray-400 hover:text-red-500 text-2xl">&times;</button>
+        <button
+          @click="toggleSidebar"
+          class="text-gray-400 hover:text-red-500 text-2xl"
+        >
+          &times;
+        </button>
       </div>
-
-      <!-- Sidebar Links -->
       <nav class="space-y-3 p-4">
         <button
           @click.prevent="Inertia.get('/settings/profile')"
@@ -139,24 +168,27 @@ const filteredShops = computed(() => {
       </nav>
     </aside>
 
-    <!-- Hero Section -->
+    <!-- Main Content -->
     <main class="flex-1 p-8 bg-gradient-to-br from-white via-blue-50 to-[#002B5C]">
-      <h1 class="text-3xl font-extrabold text-gray-900 text-center">Available Car Wash Services</h1>
+      <h1 class="text-3xl font-extrabold text-gray-900 text-center">
+        Available Car Wash Services
+      </h1>
 
       <div class="mt-6">
-        <label for="district" class="block text-sm font-medium text-gray-900">Nearby</label>
+        <label
+          for="district"
+          class="block text-sm font-medium text-gray-900"
+        >
+          Nearby
+        </label>
         <select
           id="district"
           v-model="selectedDistrict"
           class="mt-2 w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm text-gray-900"
         >
           <option value="all">All Districts</option>
-          <option
-            v-for="district in props.districts"
-            :key="district"
-            :value="district"
-          >
-            District {{ district }}
+          <option v-for="d in props.districts" :key="d" :value="d">
+            District {{ d }}
           </option>
         </select>
       </div>
@@ -170,14 +202,12 @@ const filteredShops = computed(() => {
           :key="shop.id"
           class="bg-white shadow-md rounded-xl p-6 flex flex-col items-center text-center border border-gray-200 hover:shadow-xl hover:-translate-y-1 transition"
         >
-<img
-  :src="shop.logo?.startsWith('http')
-         ? shop.logo
-         : (shop.logo ? `${backendBaseUrl}/storage/${shop.logo}` : `${backendBaseUrl}/logos/default-carwash.png`)"
-  alt="Car Wash Logo"
-  class="h-20 w-20 object-contain mb-4"
-  @error="(e) => { (e.target as HTMLImageElement).src = `${backendBaseUrl}/logos/default-carwash.png` }"
-/>
+          <img
+            :src="getLogoSrc(shop)"
+            alt="Car Wash Logo"
+            class="h-20 w-20 object-contain mb-4"
+            @error="handleImgError"
+          />
           <h3 class="text-lg font-semibold text-gray-800">{{ shop.name }}</h3>
           <p class="text-sm text-gray-500 mb-5">{{ shop.address }}</p>
           <button
@@ -195,7 +225,9 @@ const filteredShops = computed(() => {
         </div>
       </div>
 
-      <p v-else class="text-gray-500 text-center mt-10">No approved shops available.</p>
+      <p v-else class="text-gray-500 text-center mt-10">
+        No approved shops available.
+      </p>
     </main>
   </div>
 </template>
@@ -204,10 +236,15 @@ const filteredShops = computed(() => {
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600;800&display=swap');
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
-
 .animate-fadeIn {
   animation: fadeIn 0.3s ease-out;
 }
