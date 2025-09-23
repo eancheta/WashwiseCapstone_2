@@ -39,7 +39,7 @@ const props = defineProps<Props>()
 const selectedDistrict = ref<string | number>('all')
 
 // Backend base URL
-const backendBaseUrl = import.meta.env.VITE_BACKEND_URL.replace('http://', 'https://');
+const backendBaseUrl = import.meta.env.VITE_BACKEND_URL
 
 // Logout
 const logout = () => {
@@ -178,12 +178,11 @@ const filteredShops = computed(() => {
           :key="shop.id"
           class="bg-white shadow-md rounded-xl p-6 flex flex-col items-center text-center border border-gray-200 hover:shadow-xl hover:-translate-y-1 transition"
         >
-<img
-  :src="shop.logo
-        ? `${backendBaseUrl}/storage/${shop.logo}`
-        : `${backendBaseUrl}/storage/logos/default-carwash.png`"
-  alt="Car Wash Logo"
-/>
+          <img
+            :src="shop.logo ? `${backendBaseUrl}/storage/${shop.logo}` : `${backendBaseUrl}/logos/default-carwash.png`"
+            alt="Car Wash Logo"
+            class="h-20 w-20 object-contain mb-4"
+          />
           <h3 class="text-lg font-semibold text-gray-800">{{ shop.name }}</h3>
           <p class="text-sm text-gray-500 mb-5">{{ shop.address }}</p>
           <button
