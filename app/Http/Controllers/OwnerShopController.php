@@ -69,117 +69,70 @@ class OwnerShopController extends Controller
     /**
      * Store a new shop for the authenticated owner.
      */
-    public function store(Request $request)
-    {
-        $ownerId = Auth::guard('carwashowner')->id();
-        if (! $ownerId) {
-            return redirect()->route('owner.login.show');
-        }
-
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'address' => 'required|string|max:255',
-            'district' => 'nullable|string|max:100',
-            'description' => 'nullable|string',
-            'services_offered' => 'nullable|string',
-            'logo' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
-            'qr_code' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
-        ]);
-
-        $shopData = [
-            'owner_id' => $ownerId,
-            'name' => $validated['name'],
-            'address' => $validated['address'],
-            'district' => $validated['district'] ?? null,
-            'description' => $validated['description'] ?? null,
-            'services_offered' => $validated['services_offered'] ?? null,
-        ];
-
-        // Helper that tries Cloudinary upload, returns secure URL or null
-        $tryCloudinaryUpload = function (\Illuminate\Http\UploadedFile $file, string $folder) {
-            if (! env('CLOUDINARY_CLOUD_NAME') || ! env('CLOUDINARY_API_KEY') || ! env('CLOUDINARY_API_SECRET')) {
-                // Not configured
-                return null;
-            }
-
-            try {
-                $cloudinary = new Cloudinary([
-                    'cloud' => [
-                        'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
-                        'api_key'    => env('CLOUDINARY_API_KEY'),
-                        'api_secret' => env('CLOUDINARY_API_SECRET'),
-                    ],
-                    'url' => ['secure' => true],
-                ]);
-
-                $response = $cloudinary->uploadApi()->upload($file->getRealPath(), [
-                    'folder' => $folder,
-                    'resource_type' => 'image',
-                    'overwrite' => true,
-                ]);
-
-                // Normalize response to array safely (avoids direct property access)
-                if (is_array($response)) {
-                    $arr = $response;
-                 } elseif (is_object($response)) {
-    // Convert any object to array via json_encode/decode
-    $arr = json_decode(json_encode($response), true) ?? [];
-} else {
-    $arr = [];
-}
-                // Look for secure_url in common places
-                if (isset($arr['secure_url'])) {
-                    return $arr['secure_url'];
-                }
-
-                if (isset($arr['storage']) && is_array($arr['storage']) && isset($arr['storage']['secure_url'])) {
-                    return $arr['storage']['secure_url'];
-                }
-
-                // older responses might have 'url' + 'secure_url' under top-level keys
-                if (isset($arr['url']) && isset($arr['secure_url'])) {
-                    return $arr['secure_url'];
-                }
-
-                return null;
-            } catch (\Throwable $e) {
-                Log::error('Cloudinary upload error: ' . $e->getMessage());
-                return null;
-            }
-        };
-
-        // Upload logo
-        if ($request->hasFile('logo')) {
-            $file = $request->file('logo');
-
-            // try Cloudinary then fallback to local public disk
-            $secure = $tryCloudinaryUpload($file, 'carwash_logos');
-            if ($secure) {
-                $shopData['logo'] = $secure; // store full HTTPS URL
-            } else {
-                $shopData['logo'] = $file->store('carwash_logos', 'public'); // e.g. carwash_logos/xxx.jpg
-            }
-        }
-
-        // Upload qr_code
-        if ($request->hasFile('qr_code')) {
-            $file = $request->file('qr_code');
-            $secure = $tryCloudinaryUpload($file, 'carwash_qrcodes');
-            if ($secure) {
-                $shopData['qr_code'] = $secure;
-            } else {
-                $shopData['qr_code'] = $file->store('carwash_qrcodes', 'public');
-            }
-        }
-
-        $shop = CarWashShop::create($shopData);
-
-        // Create bookings table for the shop (if not exists)
-        self::ensureBookingTableExists($shop->id);
-
-        return redirect()->route('carwashownerdashboard')
-            ->with('success', 'Shop created successfully!');
+public function store(Request $request)
+{
+    $ownerId = Auth::guard('carwashowner')->id();
+    if (! $ownerId) {
+        return redirect()->route('owner.login.show');
     }
+
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'address' => 'required|string|max:255',
+        'district' => 'nullable|string|max:100',
+        'description' => 'nullable|string',
+        'services_offered' => 'nullable|string',
+        'logo' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
+        'qr_code' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
+    ]);
+
+    $shopData = [
+        'owner_id' => $ownerId,
+        'name' => $validated['name'],
+        'address' => $validated['address'],
+        'district' => $validated['district'] ?? null,
+        'description' => $validated['description'] ?? null,
+        'services_offered' => $validated['services_offered'] ?? null,
+    ];
+
+    $cloudinary = new Cloudinary([
+        'cloud' => [
+            'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
+            'api_key'    => env('CLOUDINARY_API_KEY'),
+            'api_secret' => env('CLOUDINARY_API_SECRET'),
+        ],
+        'url' => ['secure' => true],
+    ]);
+
+    // Upload logo only to Cloudinary
+    if ($request->hasFile('logo')) {
+        $file = $request->file('logo');
+        $response = $cloudinary->uploadApi()->upload($file->getRealPath(), [
+            'folder' => 'carwash_logos',
+            'resource_type' => 'image',
+            'overwrite' => true,
+        ]);
+        $shopData['logo'] = $response['secure_url']; // ✅ always HTTPS
+    }
+
+    // Upload QR code only to Cloudinary
+    if ($request->hasFile('qr_code')) {
+        $file = $request->file('qr_code');
+        $response = $cloudinary->uploadApi()->upload($file->getRealPath(), [
+            'folder' => 'carwash_qrcodes',
+            'resource_type' => 'image',
+            'overwrite' => true,
+        ]);
+        $shopData['qr_code'] = $response['secure_url'];
+    }
+
+    $shop = CarWashShop::create($shopData);
+
+    self::ensureBookingTableExists($shop->id);
+
+    return redirect()->route('carwashownerdashboard')
+        ->with('success', 'Shop created successfully!');
+}
 
     /**
      * Display the owner's shop details.
