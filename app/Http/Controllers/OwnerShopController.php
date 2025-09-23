@@ -99,22 +99,23 @@ class OwnerShopController extends Controller
         ];
 
         // Upload logo to Cloudinary if provided
-        if ($request->hasFile('logo')) {
-            $uploadedLogo = Cloudinary::upload($request->file('logo')->getRealPath(), [
-                'folder' => 'washwise/logos'
-            ])->getSecurePath();
+if ($request->hasFile('logo')) {
+    $uploadedLogo = $request->file('logo');
+    $shopData['logo'] = Cloudinary::upload($uploadedLogo->getRealPath(), [
+        'folder' => 'carwash_logos',
+        'overwrite' => true,
+        'resource_type' => 'image'
+    ])->getSecurePath();
+}
 
-            $shopData['logo'] = $uploadedLogo;
-        }
-
-        // Upload QR code to Cloudinary if provided
-        if ($request->hasFile('qr_code')) {
-            $uploadedQr = Cloudinary::upload($request->file('qr_code')->getRealPath(), [
-                'folder' => 'washwise/qr_codes'
-            ])->getSecurePath();
-
-            $shopData['qr_code'] = $uploadedQr;
-        }
+if ($request->hasFile('qr_code')) {
+    $uploadedQr = $request->file('qr_code');
+    $shopData['qr_code'] = Cloudinary::upload($uploadedQr->getRealPath(), [
+        'folder' => 'carwash_qrcodes',
+        'overwrite' => true,
+        'resource_type' => 'image'
+    ])->getSecurePath();
+}
 
         $shop = CarWashShop::create($shopData);
 
