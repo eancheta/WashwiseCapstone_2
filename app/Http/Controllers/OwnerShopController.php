@@ -9,6 +9,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+
+// Cloudinary facade may not be available in some environments so guard its usage.
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class OwnerShopController extends Controller
@@ -59,9 +63,6 @@ class OwnerShopController extends Controller
         }
     }
 
-    /**
-     * Display the form to create a new shop.
-     */
     public function create()
     {
         return Inertia::render('Owner/ShopSetup', [
@@ -98,24 +99,61 @@ class OwnerShopController extends Controller
             'services_offered' => $validated['services_offered'],
         ];
 
-        // Upload logo to Cloudinary if provided
-if ($request->hasFile('logo')) {
-    $uploadedLogo = $request->file('logo');
-    $shopData['logo'] = Cloudinary::upload($uploadedLogo->getRealPath(), [
-        'folder' => 'carwash_logos',
-        'overwrite' => true,
-        'resource_type' => 'image'
-    ])->getSecurePath();
-}
+        // ---------- Upload logic with Cloudinary fallback ----------
+        // We'll try Cloudinary if cloudinary config exists, otherwise fall back to local storage.
+        // If Cloudinary fails we also fall back.
 
-if ($request->hasFile('qr_code')) {
-    $uploadedQr = $request->file('qr_code');
-    $shopData['qr_code'] = Cloudinary::upload($uploadedQr->getRealPath(), [
-        'folder' => 'carwash_qrcodes',
-        'overwrite' => true,
-        'resource_type' => 'image'
-    ])->getSecurePath();
-}
+        // Helper closure to upload and return string to store in DB
+        $uploadFile = function ($file, $diskPathFolder = 'logos') use ($request) {
+            // If Cloudinary is configured and facade exists, try Cloudinary first
+            $cloudinaryConfigured = config('cloudinary.cloud_url') || (env('CLOUDINARY_URL') !== null);
+            if ($cloudinaryConfigured && class_exists(Cloudinary::class)) {
+                try {
+                    // Cloudinary expects a path; using getRealPath() from uploaded file
+                    $result = Cloudinary::upload($file->getRealPath(), [
+                        'folder' => $diskPathFolder,
+                        'overwrite' => true,
+                        'resource_type' => 'image',
+                    ]);
+
+                    // getSecurePath returns HTTPS URL
+                    $secureUrl = $result->getSecurePath();
+                    if ($secureUrl) {
+                        return $secureUrl; // store full HTTPS URL in DB
+                    }
+                } catch (\Throwable $e) {
+                    Log::error('Cloudinary upload failed: ' . $e->getMessage());
+                    // continue to fallback below
+                }
+            }
+
+            // Fallback: store on local public disk (storage/app/public/...)
+            try {
+                $path = $file->store($diskPathFolder, 'public'); // returns e.g. logos/abc.jpg
+                return $path;
+            } catch (\Throwable $e) {
+                Log::error('Local disk upload failed: ' . $e->getMessage());
+                return null;
+            }
+        };
+
+        // Logo upload
+        if ($request->hasFile('logo')) {
+            $uploadedLogo = $request->file('logo');
+            $logoPath = $uploadFile($uploadedLogo, 'carwash_logos'); // prefer folder carwash_logos
+            if ($logoPath) {
+                $shopData['logo'] = $logoPath;
+            }
+        }
+
+        // QR code upload
+        if ($request->hasFile('qr_code')) {
+            $uploadedQr = $request->file('qr_code');
+            $qrPath = $uploadFile($uploadedQr, 'carwash_qrcodes');
+            if ($qrPath) {
+                $shopData['qr_code'] = $qrPath;
+            }
+        }
 
         $shop = CarWashShop::create($shopData);
 
@@ -126,9 +164,6 @@ if ($request->hasFile('qr_code')) {
             ->with('success', 'Shop created successfully!');
     }
 
-    /**
-     * Display the owner's shop details.
-     */
     public function index()
     {
         $ownerId = Auth::guard('carwashowner')->id();
