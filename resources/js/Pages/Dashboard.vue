@@ -22,7 +22,7 @@ const props = defineProps<Props>()
 const selectedDistrict = ref<string | number>('all')
 
 // backendBaseUrl for local-only paths (do not use in production for Cloudinary URLs)
-//const backendBaseUrl = import.meta.env.VITE_BACKEND_URL || ''
+const backendBaseUrl = import.meta.env.VITE_BACKEND_URL || ''
 
 const logout = () => {
   Inertia.post('/logout', {}, {
@@ -41,16 +41,19 @@ const filteredShops = computed(() => {
 
 // ✅ Utility: compute safe logo URL
 function getLogoSrc(shop: Shop) {
-  const defaultImg = '/logos/default-carwash.png'
+  const defaultImg = `${backendBaseUrl}/logos/default-carwash.png`
 
   if (!shop?.logo) return defaultImg
+
   const logo = shop.logo.trim()
 
-  // If Cloudinary/external → return as is
-  if (/^https?:\/\//i.test(logo)) return logo
+  // ✅ Case 1: Already a full external URL (Cloudinary, CDN, etc.)
+  if (/^https?:\/\//.test(logo)) {
+    return logo
+  }
 
-  // Else → assume local stored path like "carwash_logos/xxx.jpg"
-  return `/storage/${logo}`
+  // ✅ Case 2: Local storage file (e.g. "carwash_logos/abc123.jpg")
+  return `${backendBaseUrl}/storage/${logo}`
 }
 
 // ✅ Utility: compute safe QR code URL
