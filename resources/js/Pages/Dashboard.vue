@@ -47,27 +47,30 @@ function getLogoSrc(shop: Shop) {
   const defaultImg = '/logos/default-carwash.png'
   if (!shop?.logo) return defaultImg
 
-  const logo = shop.logo.trim()
+  let logo = shop.logo.trim()
 
-  // If it's already a full URL → use it
+  // Force HTTPS if full URL
   if (/^https?:\/\//i.test(logo)) {
-    return logo.replace(/^http:\/\//i, 'https://') // force HTTPS if needed
+    return logo.replace(/^http:\/\//i, 'https://')
   }
 
-  // Otherwise → treat it as a storage path
-  return `/storage/${logo.replace(/^https?:\/\/127\.0\.0\.1:8000\/storage\//, '')}`
+  // Strip out localhost references
+  logo = logo.replace(/^https?:\/\/127\.0\.0\.1:8000\/storage\//, '')
+
+  return `/storage/${logo}`
 }
 
 // ✅ Compute safe QR code URL
 function getQrCodeSrc(shop: Shop) {
   if (!shop?.qr_code) return ''
-  const qr = shop.qr_code.trim()
+  let qr = shop.qr_code.trim()
 
   if (/^https?:\/\//i.test(qr)) {
     return qr.replace(/^http:\/\//i, 'https://')
   }
 
-  return `/storage/${qr.replace(/^https?:\/\/127\.0\.0\.1:8000\/storage\//, '')}`
+  qr = qr.replace(/^https?:\/\/127\.0\.0\.1:8000\/storage\//, '')
+  return `/storage/${qr}`
 }
 
 // ✅ Handle broken logos
@@ -88,7 +91,7 @@ function handleImgError(e: Event) {
         <span class="block h-0.5 bg-gray-800 rounded"></span>
         <span class="block h-0.5 bg-gray-800 rounded"></span>
       </button>
-      <!-- ✅ App logo (not shop-specific) -->
+      <!-- ✅ App logo -->
       <img src="/logos/default-carwash.png" alt="App Logo" class="h-8 w-8 object-contain" />
     </div>
 
