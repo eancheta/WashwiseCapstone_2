@@ -16,7 +16,7 @@ interface Shop {
   logo?: string | null
   qr_code?: string | null
 }
-interface AuthUser { id: number; name: string; email: string; email_verified_at?: string | null; }
+interface AuthUser { id: number; name: string; email: string; email_verified_at?: string | null }
 interface Props { shops: Shop[]; districts: (string|number)[]; auth: { user: AuthUser | null } }
 
 const props = defineProps<Props>()
@@ -45,14 +45,16 @@ const filteredShops = computed(() => {
 // ✅ Compute safe logo URL
 function getLogoSrc(shop: Shop) {
   const defaultImg = '/logos/default-carwash.png'
-
   if (!shop?.logo) return defaultImg
+
   const logo = shop.logo.trim()
 
-  // If full URL (Cloudinary or any HTTPS) → use directly
-  if (/^https?:\/\//i.test(logo)) return logo
+  // If it's already a full URL → use it
+  if (/^https?:\/\//i.test(logo)) {
+    return logo.replace(/^http:\/\//i, 'https://') // force HTTPS if needed
+  }
 
-  // Otherwise → fallback to storage (no 127.0.0.1 prefix)
+  // Otherwise → treat it as a storage path
   return `/storage/${logo.replace(/^https?:\/\/127\.0\.0\.1:8000\/storage\//, '')}`
 }
 
@@ -61,7 +63,10 @@ function getQrCodeSrc(shop: Shop) {
   if (!shop?.qr_code) return ''
   const qr = shop.qr_code.trim()
 
-  if (/^https?:\/\//i.test(qr)) return qr
+  if (/^https?:\/\//i.test(qr)) {
+    return qr.replace(/^http:\/\//i, 'https://')
+  }
+
   return `/storage/${qr.replace(/^https?:\/\/127\.0\.0\.1:8000\/storage\//, '')}`
 }
 
@@ -83,7 +88,7 @@ function handleImgError(e: Event) {
         <span class="block h-0.5 bg-gray-800 rounded"></span>
         <span class="block h-0.5 bg-gray-800 rounded"></span>
       </button>
-      <!-- ✅ Show default app logo (no undefined shop) -->
+      <!-- ✅ App logo (not shop-specific) -->
       <img src="/logos/default-carwash.png" alt="App Logo" class="h-8 w-8 object-contain" />
     </div>
 
@@ -124,19 +129,30 @@ function handleImgError(e: Event) {
 
       <!-- Shops -->
       <div v-if="filteredShops.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-6">
-        <div v-for="shop in filteredShops" :key="shop.id" class="bg-white shadow-md rounded-xl p-6 flex flex-col items-center text-center border border-gray-200 hover:shadow-xl hover:-translate-y-1 transition">
+        <div
+          v-for="shop in filteredShops"
+          :key="shop.id"
+          class="bg-white shadow-md rounded-xl p-6 flex flex-col items-center text-center border border-gray-200 hover:shadow-xl hover:-translate-y-1 transition"
+        >
+          <!-- ✅ Logo -->
           <img
             :src="getLogoSrc(shop)"
             alt="Car Wash Logo"
             class="h-20 w-20 object-contain mb-4"
             @error="handleImgError"
           />
+
           <h3 class="text-lg font-semibold text-gray-800">{{ shop.name }}</h3>
           <p class="text-sm text-gray-500 mb-5">{{ shop.address }}</p>
-          <button @click.prevent="goToBooking(shop.id)" class="px-5 py-2 rounded-full bg-[#002B5C] text-white font-medium shadow hover:bg-[#FF2D2D] hover:scale-105 transition">Book Now</button>
-          <a :href="`/customer/feedback/${shop.id}`" class="mt-2 px-5 py-2 rounded-full bg-[#FF2D2D] text-white font-medium shadow hover:bg-[#002B5C] hover:scale-105 transition">Feedback</a>
 
-          <!-- QR code -->
+          <button @click.prevent="goToBooking(shop.id)" class="px-5 py-2 rounded-full bg-[#002B5C] text-white font-medium shadow hover:bg-[#FF2D2D] hover:scale-105 transition">
+            Book Now
+          </button>
+          <a :href="`/customer/feedback/${shop.id}`" class="mt-2 px-5 py-2 rounded-full bg-[#FF2D2D] text-white font-medium shadow hover:bg-[#002B5C] hover:scale-105 transition">
+            Feedback
+          </a>
+
+          <!-- ✅ QR Code -->
           <div v-if="shop.qr_code" class="mt-4">
             <img :src="getQrCodeSrc(shop)" alt="QR Code" class="w-24 h-24 object-contain" />
           </div>
