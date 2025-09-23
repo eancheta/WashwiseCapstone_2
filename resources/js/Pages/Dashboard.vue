@@ -39,7 +39,7 @@ const props = defineProps<Props>()
 const selectedDistrict = ref<string | number>('all')
 
 // Backend base URL
-const backendBaseUrl = import.meta.env.VITE_BACKEND_URL
+const backendBaseUrl = import.meta.env.VITE_BACKEND_URL.replace('http://', 'https://');
 
 // Logout
 const logout = () => {
