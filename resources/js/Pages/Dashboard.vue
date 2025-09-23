@@ -13,6 +13,7 @@ interface Shop {
   address: string
   district: string | number
   logo?: string | null
+  qr_code?: string | null
 }
 interface AuthUser { id: number; name: string; email: string; email_verified_at?: string | null; }
 interface Props { shops: Shop[]; districts: (string|number)[]; auth: { user: AuthUser | null } }
@@ -20,8 +21,8 @@ interface Props { shops: Shop[]; districts: (string|number)[]; auth: { user: Aut
 const props = defineProps<Props>()
 const selectedDistrict = ref<string | number>('all')
 
-// backendBaseUrl used only for local-storage fallback paths (ensure VITE_BACKEND_URL is set at build time)
-const backendBaseUrl = import.meta.env.VITE_BACKEND_URL || ''
+// backendBaseUrl for local-only paths (do not use in production for Cloudinary URLs)
+//const backendBaseUrl = import.meta.env.VITE_BACKEND_URL || ''
 
 const logout = () => {
   Inertia.post('/logout', {}, {
@@ -38,37 +39,38 @@ const filteredShops = computed(() => {
   return props.shops.filter((shop) => shop.district == selectedDistrict.value)
 })
 
-// ✅ FIX: Utility to compute safe image src for a shop
+// ✅ Utility: compute safe logo URL
 function getLogoSrc(shop: Shop) {
-  const defaultImg = `${backendBaseUrl}/logos/default-carwash.png`
+  const defaultImg = '/logos/default-carwash.png'
 
   if (!shop?.logo) return defaultImg
+  const logo = shop.logo.trim()
 
-  const logo = shop.logo as string
+  // If Cloudinary/external → return as is
+  if (/^https?:\/\//i.test(logo)) return logo
 
-  // If Cloudinary or any external image URL → use as is
-  if (logo.startsWith('http://') || logo.startsWith('https://')) {
-    return logo
-  }
-
-  // Otherwise → assume it’s a local stored path like "carwash_logos/xxx.jpg"
-  if (backendBaseUrl) return `${backendBaseUrl}/storage/${logo}`
-
+  // Else → assume local stored path like "carwash_logos/xxx.jpg"
   return `/storage/${logo}`
 }
 
+// ✅ Utility: compute safe QR code URL
+function getQrCodeSrc(shop: Shop) {
+  if (!shop?.qr_code) return ''
+  const qr = shop.qr_code.trim()
+
+  if (/^https?:\/\//i.test(qr)) return qr
+  return `/storage/${qr}`
+}
+
 function handleImgError(e: Event) {
-  try {
-    const target = e.target as HTMLImageElement | null
-    if (target) target.src = `${backendBaseUrl}/logos/default-carwash.png`
-  } catch {
-    // ignore
-  }
+  const target = e.target as HTMLImageElement | null
+  if (target) target.src = '/logos/default-carwash.png'
 }
 </script>
 
 <template>
   <Head title="Customer Dashboard" />
+
   <!-- Top navigation -->
   <div class="w-full bg-white flex items-center justify-between px-6 py-3 border-b border-gray-200 shadow-sm sticky top-0 z-40">
     <div class="flex items-center gap-4">
@@ -126,6 +128,11 @@ function handleImgError(e: Event) {
           <p class="text-sm text-gray-500 mb-5">{{ shop.address }}</p>
           <button @click.prevent="goToBooking(shop.id)" class="px-5 py-2 rounded-full bg-[#002B5C] text-white font-medium shadow hover:bg-[#FF2D2D] hover:scale-105 transition">Book Now</button>
           <a :href="`/customer/feedback/${shop.id}`" class="mt-2 px-5 py-2 rounded-full bg-[#FF2D2D] text-white font-medium shadow hover:bg-[#002B5C] hover:scale-105 transition">Feedback</a>
+
+          <!-- QR code -->
+          <div v-if="shop.qr_code" class="mt-4">
+            <img :src="getQrCodeSrc(shop)" alt="QR Code" class="w-24 h-24 object-contain" />
+          </div>
         </div>
       </div>
 
