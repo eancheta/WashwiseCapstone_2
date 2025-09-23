@@ -3,6 +3,7 @@ import { Head } from '@inertiajs/vue3'
 import { ref, computed } from 'vue'
 import { Inertia } from '@inertiajs/inertia'
 
+// Sidebar state
 const sidebarOpen = ref(false)
 function toggleSidebar() { sidebarOpen.value = !sidebarOpen.value }
 
@@ -21,51 +22,50 @@ interface Props { shops: Shop[]; districts: (string|number)[]; auth: { user: Aut
 const props = defineProps<Props>()
 const selectedDistrict = ref<string | number>('all')
 
-// backendBaseUrl for local-only paths (do not use in production for Cloudinary URLs)
-//const backendBaseUrl = import.meta.env.VITE_BACKEND_URL || ''
-
+// Logout
 const logout = () => {
   Inertia.post('/logout', {}, {
     onSuccess: () => Inertia.get('/login'),
     onError: (errors) => { console.error('Logout error:', errors); alert('Failed to log out.'); }
   })
 }
+
+// Booking
 const goToBooking = (shopId: number) => {
   if (!props.auth.user) { Inertia.get('/login'); return }
   Inertia.get(`/customer/book/${shopId}`)
 }
+
+// Filter by district
 const filteredShops = computed(() => {
   if (selectedDistrict.value === 'all') return props.shops
   return props.shops.filter((shop) => shop.district == selectedDistrict.value)
 })
 
-// ✅ Utility: compute safe logo URL
+// ✅ Compute safe logo URL
 function getLogoSrc(shop: Shop) {
   const defaultImg = '/logos/default-carwash.png'
 
   if (!shop?.logo) return defaultImg
+  const logo = shop.logo.trim()
 
-  const logo = shop.logo as string
+  // If full URL (Cloudinary or any HTTPS) → use directly
+  if (/^https?:\/\//i.test(logo)) return logo
 
-  // If it's already full URL (Cloudinary or any HTTPS) → use directly
-  if (logo.startsWith('http://') || logo.startsWith('https://')) {
-    return logo
-  }
-
-  // 🔴 Remove backendBaseUrl completely
-  // Only local /storage fallback in case old shops exist
-  return `/storage/${logo}`
+  // Otherwise → fallback to storage (no 127.0.0.1 prefix)
+  return `/storage/${logo.replace(/^https?:\/\/127\.0\.0\.1:8000\/storage\//, '')}`
 }
 
-// ✅ Utility: compute safe QR code URL
+// ✅ Compute safe QR code URL
 function getQrCodeSrc(shop: Shop) {
   if (!shop?.qr_code) return ''
   const qr = shop.qr_code.trim()
 
   if (/^https?:\/\//i.test(qr)) return qr
-  return `/storage/${qr}`
+  return `/storage/${qr.replace(/^https?:\/\/127\.0\.0\.1:8000\/storage\//, '')}`
 }
 
+// ✅ Handle broken logos
 function handleImgError(e: Event) {
   const target = e.target as HTMLImageElement | null
   if (target) target.src = '/logos/default-carwash.png'
@@ -83,7 +83,8 @@ function handleImgError(e: Event) {
         <span class="block h-0.5 bg-gray-800 rounded"></span>
         <span class="block h-0.5 bg-gray-800 rounded"></span>
       </button>
-      <img src="/images/washwiselogo2.png" alt="WashWise Logo" class="h-10 w-auto select-none" draggable="false" />
+      <!-- ✅ Show default app logo (no undefined shop) -->
+      <img src="/logos/default-carwash.png" alt="App Logo" class="h-8 w-8 object-contain" />
     </div>
 
     <div class="text-center">
@@ -112,6 +113,7 @@ function handleImgError(e: Event) {
     <main class="flex-1 p-8 bg-gradient-to-br from-white via-blue-50 to-[#002B5C]">
       <h1 class="text-3xl font-extrabold text-gray-900 text-center">Available Car Wash Services</h1>
 
+      <!-- District filter -->
       <div class="mt-6">
         <label for="district" class="block text-sm font-medium text-gray-900">Nearby</label>
         <select id="district" v-model="selectedDistrict" class="mt-2 w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm text-gray-900">
@@ -120,6 +122,7 @@ function handleImgError(e: Event) {
         </select>
       </div>
 
+      <!-- Shops -->
       <div v-if="filteredShops.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-6">
         <div v-for="shop in filteredShops" :key="shop.id" class="bg-white shadow-md rounded-xl p-6 flex flex-col items-center text-center border border-gray-200 hover:shadow-xl hover:-translate-y-1 transition">
           <img
