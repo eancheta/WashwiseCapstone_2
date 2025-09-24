@@ -42,19 +42,31 @@ const filteredShops = computed(() => {
     return props.shops.filter((shop) => shop.district == selectedDistrict.value)
 })
 
-// ✅ NEW: Compute safe logo URL by removing the bad prefix
+// ✅ FINAL FIX: Get the logo URL directly.
+// This function checks if the URL is a full URL. If not, it uses the default image.
 function getLogoSrc(shop: Shop) {
-    const defaultImg = '/images/default-carwash.png'
-    if (!shop?.logo) return defaultImg
-    const cleanedUrl = shop.logo.replace('http://127.0.0.1:8000/storage/', '')
-    return cleanedUrl.replace(/^http:\/\//i, 'https://')
+    if (!shop.logo) {
+        return '/images/default-carwash.png';
+    }
+    // Check if the URL is absolute (starts with http or https)
+    if (shop.logo.startsWith('http')) {
+        return shop.logo;
+    }
+    // Fallback for local storage (unlikely but safe)
+    return `/storage/${shop.logo}`;
 }
 
-// ✅ NEW: Compute safe QR code URL by removing the bad prefix
+// ✅ FINAL FIX: Get the QR code URL directly.
 function getQrCodeSrc(shop: Shop) {
-    if (!shop?.qr_code) return ''
-    const cleanedUrl = shop.qr_code.replace('http://127.0.0.1:8000/storage/', '')
-    return cleanedUrl.replace(/^http:\/\//i, 'https://')
+    if (!shop.qr_code) {
+        return '';
+    }
+    // Check if the URL is absolute (starts with http or https)
+    if (shop.qr_code.startsWith('http')) {
+        return shop.qr_code;
+    }
+    // Fallback for local storage (unlikely but safe)
+    return `/storage/${shop.qr_code}`;
 }
 
 // ✅ Handle broken logos
