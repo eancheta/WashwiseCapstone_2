@@ -41,18 +41,16 @@ const filteredShops = computed(() => {
   return props.shops.filter((shop) => shop.district == selectedDistrict.value)
 })
 
-// ✅ FIX: Compute safe logo URL by directly using the provided URL
+// ✅ FIX: Use the logo URL directly from the database, as it is already a full, secure URL from Cloudinary.
 function getLogoSrc(shop: Shop) {
-  // If a logo URL exists, use it directly. The backend should be configured to provide a valid, secure URL.
   if (shop?.logo) {
     return shop.logo.trim()
   }
   return '/images/default-carwash.png'
 }
 
-// ✅ FIX: Compute safe QR code URL by directly using the provided URL
+// ✅ FIX: Use the QR code URL directly.
 function getQrCodeSrc(shop: Shop) {
-  // If a QR code URL exists, use it directly.
   if (shop?.qr_code) {
     return shop.qr_code.trim()
   }
@@ -159,3 +157,4 @@ function handleImgError(e: Event) {
 @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 .animate-fadeIn { animation: fadeIn 0.3s ease-out; }
 </style>
+
