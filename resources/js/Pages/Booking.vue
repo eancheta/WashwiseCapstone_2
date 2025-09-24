@@ -187,29 +187,26 @@ const submit = () => {
 const backendBaseUrl = window.location.origin;
 
 // Checks if the URL is a full URL. If not, it uses the default image.
+// ✅ Get the logo URL for a shop
 function getLogoSrc(shop: Shop) {
     if (!shop.logo) {
-        return `${backendBaseUrl}/images/default-carwash.png`;
+        return '/images/default-carwash.png';
     }
-    // Check if the URL is absolute (starts with http or https)
     if (shop.logo.startsWith('http')) {
         return shop.logo;
     }
-    // Fallback for local storage (assumes a symbolic link)
-    return `${backendBaseUrl}/storage/${shop.logo}`;
+    return `/storage/${shop.logo}`;
 }
 
-// Gets the QR code URL.
+// ✅ Get the QR code URL for a shop
 function getQrCodeSrc(shop: Shop) {
     if (!shop.qr_code) {
-        return `${backendBaseUrl}/images/default-qr.png`;
+        return '';
     }
-    // Check if the URL is absolute (starts with http or https)
     if (shop.qr_code.startsWith('http')) {
         return shop.qr_code;
     }
-    // Fallback for local storage (assumes a symbolic link)
-    return `${backendBaseUrl}/storage/${shop.qr_code}`;
+    return `/storage/${shop.qr_code}`;
 }
 
 // Handles broken logos by showing a default image.
@@ -341,7 +338,12 @@ watch(() => props.shop, (newShop) => {
             <div class="space-y-5">
                 <h2 class="text-xl font-semibold text-[#002B5C] mb-4">Shop Details</h2>
                 <div class="flex justify-center">
-                    <img :src="getLogoSrc(shop)" @error="handleImgError" alt="Shop Logo" class="h-24 w-24 object-contain rounded-lg border border-gray-200" />
+                    <img
+    :src="getLogoSrc(shop)"
+    alt="Car Wash Logo"
+    class="h-20 w-20 object-contain mb-4"
+    @error="handleImgError"
+/>
                 </div>
                 <div>
                     <h3 class="text-sm font-semibold text-gray-700">Name</h3>
@@ -365,7 +367,12 @@ watch(() => props.shop, (newShop) => {
                 </div>
                 <div>
                     <h3 class="text-sm font-semibold text-gray-700">QR Code</h3>
-                    <img :src="getQrCodeSrc(shop)" @error="handleImgError" alt="Shop QR Code" class="h-32 w-32 object-contain rounded-lg border border-gray-200" />
+                    <img
+    :src="getQrCodeSrc(shop)"
+    alt="QR Code"
+    class="h-20 w-20 object-contain mb-4"
+    @error="handleImgError"
+/>
                 </div>
             </div>
         </div>
