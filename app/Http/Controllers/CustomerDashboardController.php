@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\CarWashShop;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
-use Illuminate\Support\Str;
 
 class CustomerDashboardController extends Controller
 {
@@ -23,14 +22,15 @@ class CustomerDashboardController extends Controller
             )
             ->get();
 
-        // ✅ FINAL FIX: Clean URLs defensively before passing to the view.
-        // We use str_replace which is more fundamental than Str::after.
+        // ✅ FINAL FIX: Clean URLs before passing to the view.
+        // This is a direct fix for the corrupted URL string.
         $shops->transform(function ($shop) {
-            // Remove the bad local storage prefix if it exists.
             if ($shop->logo) {
+                // Remove the bad local storage prefix if it exists.
                 $shop->logo = str_replace('http://127.0.0.1:8000/storage/', '', $shop->logo);
             }
             if ($shop->qr_code) {
+                // Remove the bad local storage prefix if it exists.
                 $shop->qr_code = str_replace('http://127.0.0.1:8000/storage/', '', $shop->qr_code);
             }
             return $shop;
