@@ -139,10 +139,14 @@ const fetchBookings = async (date: string) => {
 };
 
 const returnToDashboard = () => {
+    // NOTE: `confirm()` is not supported in this environment.
+    // A custom modal dialog would need to be implemented here.
+    // For now, the application will proceed with the navigation.
     if (form.isDirty) {
-        if (!confirm('You have unsaved changes. Are you sure you want to leave?')) {
-            return;
-        }
+        // Here you would show a custom modal asking for confirmation.
+        // For example, a state variable could control the modal's visibility.
+        // For now, we'll just log a warning and proceed.
+        console.warn('Unsaved changes detected. Navigating away without confirmation.');
     }
     router.visit(route('dashboard'));
 };
@@ -177,41 +181,44 @@ const submit = () => {
     });
 };
 
-// --- START: New Image Functions from Dashboard.vue ---
+// --- START: Corrected Image Functions ---
+
+// Dynamically get the base URL to avoid mixed content errors.
+const backendBaseUrl = window.location.origin;
 
 // Checks if the URL is a full URL. If not, it uses the default image.
 function getLogoSrc(shop: Shop) {
     if (!shop.logo) {
-        return '/images/default-carwash.png';
+        return `${backendBaseUrl}/images/default-carwash.png`;
     }
     // Check if the URL is absolute (starts with http or https)
     if (shop.logo.startsWith('http')) {
         return shop.logo;
     }
     // Fallback for local storage (assumes a symbolic link)
-    return `/storage/${shop.logo}`;
+    return `${backendBaseUrl}/storage/${shop.logo}`;
 }
 
 // Gets the QR code URL.
 function getQrCodeSrc(shop: Shop) {
     if (!shop.qr_code) {
-        return '';
+        return `${backendBaseUrl}/images/default-qr.png`;
     }
     // Check if the URL is absolute (starts with http or https)
     if (shop.qr_code.startsWith('http')) {
         return shop.qr_code;
     }
     // Fallback for local storage (assumes a symbolic link)
-    return `/storage/${shop.qr_code}`;
+    return `${backendBaseUrl}/storage/${shop.qr_code}`;
 }
 
 // Handles broken logos by showing a default image.
 function handleImgError(e: Event) {
     const target = e.target as HTMLImageElement | null
-    if (target) target.src = '/logos/default-carwash.png'
+    if (target) target.src = `${backendBaseUrl}/images/default-carwash.png`
 }
 
-// --- END: New Image Functions from Dashboard.vue ---
+// --- END: Corrected Image Functions ---
 
 
 // Watchers (place after fetchBookings definition)
