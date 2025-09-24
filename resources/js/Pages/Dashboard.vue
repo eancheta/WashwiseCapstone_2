@@ -43,6 +43,7 @@ const filteredShops = computed(() => {
 })
 
 // ✅ Compute safe logo URL
+// ✅ Compute safe logo URL
 function getLogoSrc(shop: Shop) {
   const defaultImg = '/images/default-carwash.png'
   if (!shop?.logo) return defaultImg
@@ -54,7 +55,7 @@ function getLogoSrc(shop: Shop) {
     return logo.replace(/^http:\/\//i, 'https://')
   }
 
-  // Otherwise fallback to Laravel storage (no 127.0.0.1)
+  // Otherwise fallback to Laravel storage
   return `/storage/${logo}`
 }
 
@@ -69,7 +70,6 @@ function getQrCodeSrc(shop: Shop) {
 
   return `/storage/${qr}`
 }
-
 // ✅ Handle broken logos
 function handleImgError(e: Event) {
   const target = e.target as HTMLImageElement | null
