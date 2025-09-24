@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { Head } from '@inertiajs/vue3'
+import { Head, router } from '@inertiajs/vue3'
 import { ref, computed } from 'vue'
-import { Inertia } from '@inertiajs/inertia'
 
 // Sidebar state
 const sidebarOpen = ref(false)
@@ -24,16 +23,16 @@ const selectedDistrict = ref<string | number>('all')
 
 // Logout
 const logout = () => {
-  Inertia.post('/logout', {}, {
-    onSuccess: () => Inertia.get('/login'),
+  router.post('/logout', {}, {
+    onSuccess: () => router.get('/login'),
     onError: (errors) => { console.error('Logout error:', errors); alert('Failed to log out.'); }
   })
 }
 
 // Booking
 const goToBooking = (shopId: number) => {
-  if (!props.auth.user) { Inertia.get('/login'); return }
-  Inertia.get(`/customer/book/${shopId}`)
+  if (!props.auth.user) { router.get('/login'); return }
+  router.get(`/customer/book/${shopId}`)
 }
 
 // Filter by district
@@ -42,34 +41,24 @@ const filteredShops = computed(() => {
   return props.shops.filter((shop) => shop.district == selectedDistrict.value)
 })
 
-// ✅ Compute safe logo URL
-// ✅ Compute safe logo URL
+// ✅ FIX: Compute safe logo URL by directly using the provided URL
 function getLogoSrc(shop: Shop) {
-  const defaultImg = '/images/default-carwash.png'
-  if (!shop?.logo) return defaultImg
-
-  const logo = shop.logo.trim()
-
-  // If already a full URL (Cloudinary, HTTPS), use it directly
-  if (/^https?:\/\//i.test(logo)) {
-    return logo.replace(/^http:\/\//i, 'https://')
+  // If a logo URL exists, use it directly. The backend should be configured to provide a valid, secure URL.
+  if (shop?.logo) {
+    return shop.logo.trim()
   }
-
-  // Otherwise fallback to Laravel storage
-  return `/storage/${logo}`
+  return '/images/default-carwash.png'
 }
 
-// ✅ Compute safe QR code URL
+// ✅ FIX: Compute safe QR code URL by directly using the provided URL
 function getQrCodeSrc(shop: Shop) {
-  if (!shop?.qr_code) return ''
-  const qr = shop.qr_code.trim()
-
-  if (/^https?:\/\//i.test(qr)) {
-    return qr.replace(/^http:\/\//i, 'https://')
+  // If a QR code URL exists, use it directly.
+  if (shop?.qr_code) {
+    return shop.qr_code.trim()
   }
-
-  return `/storage/${qr}`
+  return ''
 }
+
 // ✅ Handle broken logos
 function handleImgError(e: Event) {
   const target = e.target as HTMLImageElement | null
@@ -107,9 +96,9 @@ function handleImgError(e: Event) {
         <button @click="toggleSidebar" class="text-gray-400 hover:text-red-500 text-2xl">&times;</button>
       </div>
       <nav class="space-y-3 p-4">
-        <button @click.prevent="Inertia.get('/settings/profile')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 transition text-gray-900 font-bold">⚙️ Edit Profile</button>
-        <button @click.prevent="Inertia.get('/settings/password')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 transition text-gray-900 font-bold">🔒 Password</button>
-        <button @click.prevent="Inertia.get('/settings/appearance')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 transition text-gray-900 font-bold">💳 Transaction History</button>
+        <button @click.prevent="router.get('/settings/profile')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 transition text-gray-900 font-bold">⚙️ Edit Profile</button>
+        <button @click.prevent="router.get('/settings/password')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 transition text-gray-900 font-bold">🔒 Password</button>
+        <button @click.prevent="router.get('/settings/appearance')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 transition text-gray-900 font-bold">💳 Transaction History</button>
         <button @click="logout" class="w-full text-left px-3 py-2 rounded-lg text-red-600 hover:bg-red-50 transition font-bold">🚪 Log Out</button>
       </nav>
     </aside>
@@ -135,12 +124,12 @@ function handleImgError(e: Event) {
           class="bg-white shadow-md rounded-xl p-6 flex flex-col items-center text-center border border-gray-200 hover:shadow-xl hover:-translate-y-1 transition"
         >
           <!-- ✅ Logo -->
-<img
-  :src="getLogoSrc(shop)"
-  alt="Car Wash Logo"
-  class="h-20 w-20 object-contain mb-4"
-  @error="handleImgError"
-/>
+          <img
+            :src="getLogoSrc(shop)"
+            alt="Car Wash Logo"
+            class="h-20 w-20 object-contain mb-4"
+            @error="handleImgError"
+          />
 
 
           <h3 class="text-lg font-semibold text-gray-800">{{ shop.name }}</h3>
