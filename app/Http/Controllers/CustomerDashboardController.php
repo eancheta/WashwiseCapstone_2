@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\CarWashShop;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
-use Illuminate\Support\Str; // ✅ New: Import the Str facade
+use Illuminate\Support\Str;
 
 class CustomerDashboardController extends Controller
 {
@@ -23,28 +23,16 @@ class CustomerDashboardController extends Controller
             )
             ->get();
 
-        // ✅ IMPORTANT: Manually clean the URLs before passing to the view
+        // ✅ FINAL FIX: Clean URLs defensively before passing to the view.
+        // We use str_replace which is more fundamental than Str::after.
         $shops->transform(function ($shop) {
-            // Fix the logo URL
-            if ($shop->logo && !str_starts_with($shop->logo, 'http')) {
-                // If it's a relative path, prepend the storage URL
-                $shop->logo = url('storage/' . $shop->logo);
+            // Remove the bad local storage prefix if it exists.
+            if ($shop->logo) {
+                $shop->logo = str_replace('http://127.0.0.1:8000/storage/', '', $shop->logo);
             }
-
-            // Fix the QR code URL
-            if ($shop->qr_code && !str_starts_with($shop->qr_code, 'http')) {
-                $shop->qr_code = url('storage/' . $shop->qr_code);
+            if ($shop->qr_code) {
+                $shop->qr_code = str_replace('http://127.0.0.1:8000/storage/', '', $shop->qr_code);
             }
-
-            // If the URL contains the local storage prefix + https, correct it
-            // ✅ Replaced str_after with Str::after
-            if ($shop->logo && Str::contains($shop->logo, 'storage/https')) {
-                $shop->logo = Str::after($shop->logo, 'storage/');
-            }
-            if ($shop->qr_code && Str::contains($shop->qr_code, 'storage/https')) {
-                $shop->qr_code = Str::after($shop->qr_code, 'storage/');
-            }
-
             return $shop;
         });
 
