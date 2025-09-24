@@ -12,10 +12,12 @@ use Inertia\Inertia;
 
 class ShopBookingController extends Controller
 {
+    private string $cloudBase = 'https://res.cloudinary.com/YOUR_CLOUD_NAME/image/upload/';
+
     /**
      * Check for overlapping bookings within a 3-hour window
      */
-    private function checkForOverlap(string $table, string $date, string $time, int $slotNumber, int $shopId): ?string
+    private function checkForOverlap(string $table, string $date, string $time, int $slotNumber): ?string
     {
         try {
             $newStart = Carbon::parse("$date $time");
@@ -46,35 +48,16 @@ class ShopBookingController extends Controller
     }
 
     /**
-     * Ensure shop has full Cloudinary URLs for logo and QR code
-     */
-    private function formatShopCloudinaryUrls(CarWashShop $shop): CarWashShop
-    {
-        $cloudBase = 'https://res.cloudinary.com/YOUR_CLOUD_NAME/image/upload/';
-
-        $shop->logo = $shop->logo
-            ? (str_starts_with($shop->logo, 'http') ? $shop->logo : $cloudBase . $shop->logo)
-            : null;
-
-        $shop->qr_code = $shop->qr_code
-            ? (str_starts_with($shop->qr_code, 'http') ? $shop->qr_code : $cloudBase . $shop->qr_code)
-            : null;
-
-        return $shop;
-    }
-
-    /**
-     * GET /shops/{shop}/availability?date=YYYY-MM-DD
+     * GET /shops/{shop}/availability
      */
     public function availability(Request $request, int $shopId)
     {
         $request->validate(['date' => 'required|date']);
         $shop = CarWashShop::findOrFail($shopId);
-        $shop = $this->formatShopCloudinaryUrls($shop);
-
         $table = "bookings_shop_{$shop->id}";
+
         if (!Schema::hasTable($table)) {
-            return response()->json(['bookings' => [], 'shop' => $shop]);
+            return response()->json(['bookings' => []]);
         }
 
         $date = Carbon::parse($request->date)->format('Y-m-d');
@@ -101,51 +84,7 @@ class ShopBookingController extends Controller
                 ];
             });
 
-        return response()->json(['bookings' => $bookings, 'shop' => $shop]);
-    }
-
-    /**
-     * POST /shops/{shop}/book
-     */
-    public function store(Request $request, int $shopId)
-    {
-        $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'size_of_the_car' => 'required|in:HatchBack,Sedan,MPV,SUV,Pickup,Van,Motorcycle',
-            'contact_no' => 'required|string|max:20',
-            'date_of_booking' => 'required|date_format:Y-m-d',
-            'time_of_booking' => ['required', 'date_format:H:i', 'regex:/^[0-2][0-3]:[0-5][0-9]$/'],
-            'slot_number' => 'required|integer|min:1|max:4',
-            'email' => 'nullable|email|max:255',
-        ]);
-
-        $shop = CarWashShop::findOrFail($shopId);
-        $shop = $this->formatShopCloudinaryUrls($shop);
-
-        $table = "bookings_shop_{$shop->id}";
-        OwnerShopController::ensureBookingTableExists($shop->id);
-
-        $data['date_of_booking'] = trim($data['date_of_booking']);
-        $data['time_of_booking'] = trim($data['time_of_booking']);
-
-        // Check for overlaps
-        if ($error = $this->checkForOverlap($table, $data['date_of_booking'], $data['time_of_booking'], $data['slot_number'], $shop->id)) {
-            return back()->withErrors(['time_of_booking' => $error])->withInput();
-        }
-
-        DB::table($table)->insert([
-            'name' => $data['name'],
-            'email' => $data['email'] ?? null,
-            'size_of_the_car' => $data['size_of_the_car'],
-            'contact_no' => $data['contact_no'],
-            'time_of_booking' => $data['time_of_booking'],
-            'date_of_booking' => $data['date_of_booking'],
-            'slot_number' => $data['slot_number'],
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        return back()->with('success', "Booked on slot #{$data['slot_number']} at {$shop->name}.");
+        return response()->json(['bookings' => $bookings]);
     }
 
     /**
@@ -153,8 +92,7 @@ class ShopBookingController extends Controller
      */
     public function showPaymentPage(int $shopId)
     {
-        $shop = CarWashShop::findOrFail($shopId);
-        $shop = $this->formatShopCloudinaryUrls($shop);
+        $shop = $this->getShopWithCloudinaryImages($shopId);
 
         return Inertia::render('Public/PaymentPage', [
             'shop' => $shop,
@@ -175,23 +113,16 @@ class ShopBookingController extends Controller
             'contact_no' => 'required|string|max:20',
             'email' => 'required|email|max:255',
             'date_of_booking' => 'required|date_format:Y-m-d',
-            'time_of_booking' => ['required', 'date_format:H:i', 'regex:/^[0-2][0-3]:[0-5][0-9]$/'],
+            'time_of_booking' => ['required','date_format:H:i','regex:/^[0-2][0-3]:[0-5][0-9]$/'],
             'slot_number' => 'required|integer|min:1|max:4',
         ]);
 
-        $shop = CarWashShop::findOrFail($shopId);
-        $shop = $this->formatShopCloudinaryUrls($shop);
+        $shop = $this->getShopWithCloudinaryImages($shopId);
 
+        // Check overlaps
         $table = "bookings_shop_{$shop->id}";
-        OwnerShopController::ensureBookingTableExists($shop->id);
-
-        $data['date_of_booking'] = trim($data['date_of_booking']);
-        $data['time_of_booking'] = trim($data['time_of_booking']);
-
-        // Check for overlaps
-        if ($error = $this->checkForOverlap($table, $data['date_of_booking'], $data['time_of_booking'], $data['slot_number'], $shop->id)) {
-            return back()->withErrors(['time_of_booking' => $error])->withInput();
-        }
+        $error = $this->checkForOverlap($table, $data['date_of_booking'], $data['time_of_booking'], $data['slot_number']);
+        if ($error) return back()->withErrors(['time_of_booking' => $error])->withInput();
 
         return Inertia::render('Public/PaymentPage', [
             'shop' => $shop,
@@ -211,28 +142,20 @@ class ShopBookingController extends Controller
             'contact_no' => 'required|string|max:20',
             'email' => 'required|email|max:255',
             'date_of_booking' => 'required|date_format:Y-m-d',
-            'time_of_booking' => ['required', 'date_format:H:i', 'regex:/^[0-2][0-3]:[0-5][0-9]$/'],
+            'time_of_booking' => ['required','date_format:H:i','regex:/^[0-2][0-3]:[0-5][0-9]$/'],
             'slot_number' => 'required|integer|min:1|max:4',
             'payment_amount' => 'required|numeric|in:50',
-            'payment_proof' => 'required|string|max:1000', // now just Cloudinary URL
+            'payment_proof' => 'required|image|mimes:jpg,jpeg,png|max:5120',
         ]);
 
-        $shop = CarWashShop::findOrFail($shopId);
-        $shop = $this->formatShopCloudinaryUrls($shop);
-
+        $shop = $this->getShopWithCloudinaryImages($shopId);
         $table = "bookings_shop_{$shop->id}";
-        OwnerShopController::ensureBookingTableExists($shop->id);
 
-        $data['date_of_booking'] = trim($data['date_of_booking']);
-        $data['time_of_booking'] = trim($data['time_of_booking']);
+        $error = $this->checkForOverlap($table, $data['date_of_booking'], $data['time_of_booking'], $data['slot_number']);
+        if ($error) return back()->withErrors(['time_of_booking' => $error])->withInput();
 
-        // Check for overlaps
-        if ($error = $this->checkForOverlap($table, $data['date_of_booking'], $data['time_of_booking'], $data['slot_number'], $shop->id)) {
-            return back()->withErrors(['time_of_booking' => $error])->withInput();
-        }
-
+        $paymentProofPath = $request->file('payment_proof')->store('payment_proofs', 'public');
         $now = now();
-        $paymentProofUrl = $data['payment_proof']; // Cloudinary URL directly
 
         $query = DB::table($table)
             ->where('name', $data['name'])
@@ -246,7 +169,7 @@ class ShopBookingController extends Controller
         if ($existingBooking) {
             $query->update([
                 'payment_amount' => $data['payment_amount'],
-                'payment_proof' => $paymentProofUrl,
+                'payment_proof' => $paymentProofPath,
                 'payment_status' => 'paid',
                 'user_id' => Auth::id(),
                 'updated_at' => $now,
@@ -262,7 +185,7 @@ class ShopBookingController extends Controller
                 'date_of_booking' => $data['date_of_booking'],
                 'slot_number' => $data['slot_number'],
                 'payment_amount' => $data['payment_amount'],
-                'payment_proof' => $paymentProofUrl,
+                'payment_proof' => $paymentProofPath,
                 'payment_status' => 'paid',
                 'created_at' => $now,
                 'updated_at' => $now,
@@ -271,5 +194,23 @@ class ShopBookingController extends Controller
 
         return redirect()->route('dashboard')
             ->with('success', "Booked on slot #{$data['slot_number']} at {$shop->name}. Payment proof saved.");
+    }
+
+    /**
+     * Helper: Get shop with Cloudinary images
+     */
+    private function getShopWithCloudinaryImages(int $shopId)
+    {
+        $shop = CarWashShop::findOrFail($shopId);
+
+        if ($shop->logo && !str_starts_with($shop->logo, 'http')) {
+            $shop->logo = $this->cloudBase . $shop->logo;
+        }
+
+        if ($shop->qr_code && !str_starts_with($shop->qr_code, 'http')) {
+            $shop->qr_code = $this->cloudBase . $shop->qr_code;
+        }
+
+        return $shop;
     }
 }
