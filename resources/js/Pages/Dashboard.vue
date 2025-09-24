@@ -44,17 +44,17 @@ const filteredShops = computed(() => {
 
 // ✅ Compute safe logo URL
 function getLogoSrc(shop: Shop) {
-  const defaultImg = '/logos/default-carwash.png'
+  const defaultImg = '/images/default-carwash.png'
   if (!shop?.logo) return defaultImg
 
   const logo = shop.logo.trim()
 
-  // If it's already a full URL → use it
+  // If already a full URL (Cloudinary, HTTPS), use it directly
   if (/^https?:\/\//i.test(logo)) {
-    return logo.replace(/^http:\/\//i, 'https://') // force HTTPS if needed
+    return logo.replace(/^http:\/\//i, 'https://')
   }
 
-  // Otherwise → treat it as a storage path
+  // Otherwise fallback to Laravel storage (no 127.0.0.1)
   return `/storage/${logo}`
 }
 
@@ -135,12 +135,13 @@ function handleImgError(e: Event) {
           class="bg-white shadow-md rounded-xl p-6 flex flex-col items-center text-center border border-gray-200 hover:shadow-xl hover:-translate-y-1 transition"
         >
           <!-- ✅ Logo -->
-          <img
-            :src="getLogoSrc(shop)"
-            alt="Car Wash Logo"
-            class="h-20 w-20 object-contain mb-4"
-            @error="handleImgError"
-          />
+<img
+  :src="getLogoSrc(shop)"
+  alt="Car Wash Logo"
+  class="h-20 w-20 object-contain mb-4"
+  @error="handleImgError"
+/>
+
 
           <h3 class="text-lg font-semibold text-gray-800">{{ shop.name }}</h3>
           <p class="text-sm text-gray-500 mb-5">{{ shop.address }}</p>
