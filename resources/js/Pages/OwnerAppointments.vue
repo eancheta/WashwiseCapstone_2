@@ -67,14 +67,15 @@
 
                 <!-- Payment Proof -->
                 <td class="px-4 py-3 text-center">
-<img
-  v-if="appt.payment_proof"
-  :src="getPaymentProofSrc(appt.payment_proof)"
-  alt="Payment Proof"
-  class="h-16 w-16 object-cover rounded border mx-auto"
-  @error="handleImageError"
-/>
-<span v-else class="text-gray-400 italic">Walk_IN</span>
+                    <img
+                        v-if="appt.payment_proof"
+                        :src="getPaymentProofSrc(appt)!"
+                        alt="Payment Proof"
+                        class="h-16 w-16 object-cover rounded border mx-auto"
+                        @error="handleImageError"
+                    />
+
+                  <span v-else class="text-gray-400 italic">Walk_IN</span>
                 </td>
 
                 <td class="px-4 py-3">{{ appt.payment_amount ?? '-' }}</td>
@@ -160,19 +161,10 @@ interface Appointment {
   payment_amount?: number | null
 }
 
-
 const props = defineProps<{ appointments: Appointment[] }>()
 
 // ✅ Cloudinary base path
-const cloudBase = "https://res.cloudinary.com/dqfyjxaw2/image/upload/v1758645874/"
-
-function getPaymentProofSrc(payment_proof?: string | null): string {
-  if (!payment_proof) return ""
-  if (payment_proof.startsWith("http")) {
-    return payment_proof
-  }
-  return cloudBase + payment_proof
-}
+const cloudBase = 'https://res.cloudinary.com/dqfyjxaw2/image/upload/v1758645874/'
 
 // --- Status actions ---
 function approve(id: number) {
@@ -183,6 +175,13 @@ function decline(id: number) {
 }
 
 // ✅ Payment proof source
+function getPaymentProofSrc(appt: Appointment) {
+  if (!appt.payment_proof) return null
+  if (appt.payment_proof.startsWith('http')) {
+    return appt.payment_proof
+  }
+  return cloudBase + appt.payment_proof
+}
 
 // ✅ On broken image
 function handleImageError(event: Event) {
