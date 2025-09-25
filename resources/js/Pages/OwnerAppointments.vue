@@ -67,15 +67,24 @@
 
                 <!-- Payment Proof -->
                 <td class="px-4 py-3 text-center">
+                  <!-- if proof exists: load it and use handleImageError to fallback to real image -->
                   <img
-  v-if="appt.payment_proof"
-  :src="getPaymentProofSrc(appt)!"
-  alt="Payment Proof"
-  class="h-16 w-16 object-cover rounded border mx-auto"
-  @error="handleImageError"
-/>
+                    v-if="appt.payment_proof"
+                    :src="getPaymentProofSrc(appt)!"
+                    alt="Payment Proof"
+                    class="h-16 w-16 object-cover rounded border mx-auto"
+                    @error="handleImageError"
+                  />
 
-                  <span v-else class="text-gray-400 italic">Walk_IN</span>
+                  <!-- if no proof: intentionally render an image that doesn't exist
+                       so the browser displays the broken-image icon -->
+                  <img
+                    v-else
+                    src="/images/NO_PROOF_DOES_NOT_EXIST.png"
+                    alt="No proof"
+                    class="h-16 w-16 object-cover rounded border mx-auto"
+                    @error="handleBrokenImageError"
+                  />
                 </td>
 
                 <td class="px-4 py-3">{{ appt.payment_amount ?? '-' }}</td>
@@ -174,19 +183,34 @@ function decline(id: number) {
   router.post(`/owner/appointments/${id}/decline`)
 }
 
-// ✅ Payment proof source
-function getPaymentProofSrc(appt: Appointment) {
-  if (!appt.payment_proof) return null
+// ✅ Payment proof source (returns string | undefined for TS)
+function getPaymentProofSrc(appt: Appointment): string | undefined {
+  if (!appt.payment_proof) return undefined
   if (appt.payment_proof.startsWith('http')) {
     return appt.payment_proof
   }
   return cloudBase + appt.payment_proof
 }
 
-// ✅ On broken image
+// ✅ On broken image for real images: replace with actual fallback asset
 function handleImageError(event: Event) {
-  const target = event.target as HTMLImageElement
-  target.outerHTML = '<span class="text-gray-600">No proof</span>'
+  const target = event.target as HTMLImageElement | null
+  if (!target) return
+  // avoid infinite loop if fallback missing
+  target.onerror = null
+  // use a real fallback image that exists in your public folder
+  target.src = '/images/no-proof.png'
+}
+
+// ✅ For the intentionally "missing" image (we want the browser broken icon),
+// do not replace the src — just update alt or add a class. This keeps the broken icon visible.
+function handleBrokenImageError(event: Event) {
+  const target = event.target as HTMLImageElement | null
+  if (!target) return
+  // don't change src; optionally update alt text for accessibility
+  target.alt = 'No proof available'
+  // optionally add an opacity or CSS class
+  target.classList.add('opacity-60')
 }
 
 // --- Date filtering ---
