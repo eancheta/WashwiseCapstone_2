@@ -178,9 +178,18 @@ function decline(id: number) {
 // ✅ Payment proof source (only prepend when needed)
 function getPaymentProofSrc(appt: Appointment): string {
   if (!appt.payment_proof) return '/images/no-proof.png'
+
+  // Already a full URL
   if (appt.payment_proof.startsWith('http')) {
     return appt.payment_proof
   }
+
+  // Already prefixed with /storage/
+  if (appt.payment_proof.startsWith('/storage/')) {
+    return appt.payment_proof
+  }
+
+  // Fallback for local storage files
   return `/storage/${appt.payment_proof}`
 }
 
