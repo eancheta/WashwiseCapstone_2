@@ -17,54 +17,58 @@ class OwnerAppointmentController extends Controller
     /**
      * Show all appointments for the logged-in owner's shop.
      */
-    public function index()
-    {
-        $ownerId = Auth::guard('carwashowner')->id();
-        if (!$ownerId) {
-            return redirect()->route('owner.login.show');
-        }
+public function index()
+{
+    $ownerId = Auth::guard('carwashowner')->id();
+    if (!$ownerId) {
+        return redirect()->route('owner.login.show');
+    }
 
-        $shopId = CarWashShop::where('owner_id', $ownerId)->value('id');
-        if (!$shopId) {
-            return redirect()->route('owner.shop.create');
-        }
+    $shopId = CarWashShop::where('owner_id', $ownerId)->value('id');
+    if (!$shopId) {
+        return redirect()->route('owner.shop.create');
+    }
 
-        $tableName = "bookings_shop_{$shopId}";
+    $tableName = "bookings_shop_{$shopId}";
 
-        if (!DB::getSchemaBuilder()->hasTable($tableName)) {
-            Log::warning('No bookings table found for shop ID: ' . $shopId);
-            return Inertia::render('OwnerAppointments', ['appointments' => []]);
-        }
+    if (!DB::getSchemaBuilder()->hasTable($tableName)) {
+        Log::warning('No bookings table found for shop ID: ' . $shopId);
+        return Inertia::render('OwnerAppointments', ['appointments' => []]);
+    }
 
-        $appointments = DB::table($tableName)
-            ->select(
-                'id',
-                'name',
-                'size_of_the_car',
-                'contact_no',
-                'email',
-                'time_of_booking',
-                'date_of_booking',
-                'slot_number',
-                'created_at',
-                'status',
-                'payment_proof',
-                'payment_amount'
-            )
-            ->orderBy('date_of_booking', 'desc')
-            ->orderBy('time_of_booking', 'desc')
-            ->get()
-            ->map(function ($appointment) {
-                if ($appointment->payment_proof) {
+    $appointments = DB::table($tableName)
+        ->select(
+            'id',
+            'name',
+            'size_of_the_car',
+            'contact_no',
+            'email',
+            'time_of_booking',
+            'date_of_booking',
+            'slot_number',
+            'created_at',
+            'status',
+            'payment_proof',
+            'payment_amount'
+        )
+        ->orderBy('date_of_booking', 'desc')
+        ->orderBy('time_of_booking', 'desc')
+        ->get()
+        ->map(function ($appointment) {
+            if ($appointment->payment_proof) {
+                // ✅ Only prepend storage URL if it's not already a full URL
+                if (!str_starts_with($appointment->payment_proof, 'http')) {
                     $appointment->payment_proof = Storage::url($appointment->payment_proof);
                 }
-                return $appointment;
-            });
+            }
+            return $appointment;
+        });
 
-        return Inertia::render('OwnerAppointments', [
-            'appointments' => $appointments
-        ]);
-    }
+    return Inertia::render('OwnerAppointments', [
+        'appointments' => $appointments
+    ]);
+}
+
 
     /**
      * Show Walk-in form.
