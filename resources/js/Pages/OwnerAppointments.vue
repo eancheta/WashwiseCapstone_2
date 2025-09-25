@@ -65,20 +65,13 @@
                 <td class="px-4 py-3">{{ appt.date_of_booking }}</td>
                 <td class="px-4 py-3">{{ appt.slot_number }}</td>
 
-                <!-- Payment Proof -->
+                <!-- Payment Proof (always one <img>) -->
                 <td class="px-4 py-3 text-center">
                   <img
-                    v-if="appt.payment_proof"
                     :src="getPaymentProofSrc(appt)"
                     alt="Payment Proof"
                     class="h-16 w-16 object-cover rounded border mx-auto"
                     @error="handleImageError"
-                  />
-                  <img
-                    v-else
-                    src="/images/no-proof.png"
-                    alt="No Proof"
-                    class="h-16 w-16 object-cover rounded border mx-auto"
                   />
                 </td>
 
@@ -175,21 +168,11 @@ function decline(id: number) {
   router.post(`/owner/appointments/${id}/decline`)
 }
 
-// ✅ Payment proof source (only prepend when needed)
+// ✅ Always return one <img> source
 function getPaymentProofSrc(appt: Appointment): string {
   if (!appt.payment_proof) return '/images/no-proof.png'
-
-  // Already a full URL
-  if (appt.payment_proof.startsWith('http')) {
-    return appt.payment_proof
-  }
-
-  // Already prefixed with /storage/
-  if (appt.payment_proof.startsWith('/storage/')) {
-    return appt.payment_proof
-  }
-
-  // Fallback for local storage files
+  if (appt.payment_proof.startsWith('http')) return appt.payment_proof
+  if (appt.payment_proof.startsWith('/storage/')) return appt.payment_proof
   return `/storage/${appt.payment_proof}`
 }
 
