@@ -109,22 +109,14 @@
                 </td>
 
                 <!-- Actions -->
-                <td class="px-4 py-3 text-center space-x-2">
-                  <button
-                    v-if="appt.status === 'pending'"
-                    @click="approve(appt.id)"
-                    class="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700"
-                  >
-                    Approve
-                  </button>
-                  <button
-                    v-if="appt.status === 'pending'"
-                    @click="decline(appt.id)"
-                    class="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
-                  >
-                    Decline
-                  </button>
-                </td>
+              <td class="px-4 py-3 text-center flex justify-center gap-3">
+                <button @click="approve(appt.id)" class="px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 shadow-md transition transform hover:-translate-y-0.5">
+                  Approve
+                </button>
+                <button @click="decline(appt.id)" class="px-4 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 shadow-md transition transform hover:-translate-y-0.5">
+                  Decline
+                </button>
+              </td>
               </tr>
               <tr v-if="filteredAppointments.length === 0">
                 <td colspan="11" class="px-4 py-3 text-center text-gray-500 italic">
