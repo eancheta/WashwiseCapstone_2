@@ -50,6 +50,7 @@ const E = { class: "min-h-screen bg-gradient-to-br from-gray-100 via-white to-gr
       it = ["onClick"],
       dt = ["onClick"];
 
+// Cloudinary base for filenames
 const cloudBase = "https://res.cloudinary.com/dqfyjxaw2/image/upload/v1758645874/carwash_payments/";
 
 const pt = defineComponent({
@@ -64,12 +65,23 @@ const pt = defineComponent({
     function D(l) {
       router.post(`/owner/appointments/${l}/decline`);
     }
-    function k(l) {
-      const o = l.target;
-      o.outerHTML = '<span class="text-gray-600">No proof</span>';
+
+    // ---- Updated error handler: set fallback image (no removing <img>) ----
+    function k(event) {
+      try {
+        const img = event && event.target;
+        if (img && img.tagName === "IMG") {
+          // set fallback image path (ensure this file exists in your public folder)
+          img.src = "/images/no-proof.png";
+          // remove the onerror to avoid infinite loop if fallback is missing
+          img.onerror = null;
+        }
+      } catch (err) {
+        // fail silently
+      }
     }
 
-    // ✅ Build Cloudinary URL
+    // Build Cloudinary URL (if stored as filename)
     function getPaymentProofSrc(appt) {
       if (!appt.payment_proof) return null;
       if (appt.payment_proof.startsWith("http")) return appt.payment_proof;
