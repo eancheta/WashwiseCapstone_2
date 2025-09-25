@@ -9,7 +9,7 @@ import {
   u as F,
   m as M,
   e as g,
-  g as x,
+  g as xfunc,
   h as S,
   i as T,
   v as h,
@@ -50,8 +50,8 @@ const E = { class: "min-h-screen bg-gradient-to-br from-gray-100 via-white to-gr
       it = ["onClick"],
       dt = ["onClick"];
 
-// Cloudinary base for filenames
-const cloudBase = "https://res.cloudinary.com/dqfyjxaw2/image/upload/v1758645874/carwash_payments/";
+// Use same base as Dashboard so rendering matches exactly
+const baseURL = "http://127.0.0.1:8000";
 
 const pt = defineComponent({
   __name: "OwnerAppointments",
@@ -59,90 +59,105 @@ const pt = defineComponent({
   setup(b) {
     const v = b;
 
-    function w(l) {
-      router.post(`/owner/appointments/${l}/approve`);
+    function approve(id) {
+      router.post(`/owner/appointments/${id}/approve`);
     }
-    function D(l) {
-      router.post(`/owner/appointments/${l}/decline`);
+    function decline(id) {
+      router.post(`/owner/appointments/${id}/decline`);
     }
 
-    // ---- Updated error handler: set fallback image (no removing <img>) ----
-    function k(event) {
+    // error handler: swap to fallback asset under same base
+    function handleImgError(event) {
       try {
         const img = event && event.target;
         if (img && img.tagName === "IMG") {
-          // set fallback image path (ensure this file exists in your public folder)
-          img.src = "/images/no-proof.png";
-          // remove the onerror to avoid infinite loop if fallback is missing
-          img.onerror = null;
+          img.onerror = null; // avoid infinite loop
+          img.src = `${baseURL}/images/no-proof.png`;
         }
-      } catch (err) {
-        // fail silently
+      } catch (e) {
+        // silent
       }
     }
 
-    // Build Cloudinary URL (if stored as filename)
+    // Build src to mimic Dashboard rendering: use baseURL + /storage/<file>
     function getPaymentProofSrc(appt) {
       if (!appt.payment_proof) return null;
-      if (appt.payment_proof.startsWith("http")) return appt.payment_proof;
-      return cloudBase + appt.payment_proof;
+      // if already a full url, return it
+      if (appt.payment_proof.startsWith("http")) {
+        return appt.payment_proof;
+      }
+      // otherwise assume it's stored in /storage/ (like Dashboard)
+      return `${baseURL}/storage/${appt.payment_proof}`;
     }
 
-    const i = ref("all"),
-          c = ref(""),
-          p = ref(""),
-          f = computed(() => {
-            let l = [...v.appointments];
-            const o = new Date;
-            let e = null, s = null;
-            if (i.value === "today") e = new Date(o.toDateString()), s = new Date(e), s.setDate(s.getDate() + 1);
-            else if (i.value === "week") {
-              const d = o.getDate() - o.getDay();
-              e = new Date(o.setDate(d)), s = new Date(o.setDate(d + 7));
-            } else if (i.value === "month") e = new Date(o.getFullYear(), o.getMonth(), 1), s = new Date(o.getFullYear(), o.getMonth() + 1, 1);
-            else i.value === "custom" && c.value && p.value && (e = new Date(c.value), s = new Date(p.value), s.setDate(s.getDate() + 1));
-            return e && s && (l = l.filter(d => {
-              const y = new Date(d.date_of_booking);
-              return y >= e && y < s;
-            })), l;
+    const dateRange = ref("all"),
+          fromDate = ref(""),
+          toDate = ref(""),
+          filtered = computed(() => {
+            let list = [...v.appointments];
+            const today = new Date();
+            let start = null, end = null;
+
+            if (dateRange.value === "today") {
+              start = new Date(today.toDateString());
+              end = new Date(start); end.setDate(end.getDate() + 1);
+            } else if (dateRange.value === "week") {
+              const firstDay = today.getDate() - today.getDay();
+              start = new Date(today.setDate(firstDay));
+              end = new Date(today.setDate(firstDay + 7));
+            } else if (dateRange.value === "month") {
+              start = new Date(today.getFullYear(), today.getMonth(), 1);
+              end = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+            } else if (dateRange.value === "custom" && fromDate.value && toDate.value) {
+              start = new Date(fromDate.value);
+              end = new Date(toDate.value); end.setDate(end.getDate() + 1);
+            }
+
+            if (start && end) {
+              list = list.filter(a => {
+                const d = new Date(a.date_of_booking);
+                return d >= start && d < end;
+              });
+            }
+            return list;
           });
 
-    function C() {
+    function goBack() {
       router.visit("/owner/dashboard");
     }
 
-    return (l, o) => (
+    return (ctx, cache) => (
       a(),
       n(_, null, [
         A(F(M), { title: "Owner Appointments" }),
         t("div", E, [
           t("div", I, [
-            o[8] || (o[8] = t("div", { class: "text-center mb-8" }, [
+            cache[8] || (cache[8] = t("div", { class: "text-center mb-8" }, [
               t("h1", { class: "text-3xl sm:text-4xl font-extrabold text-[#002B5C] mb-2" }, " Customer Appointments "),
               t("p", { class: "text-gray-500" }, "Manage and monitor all customer bookings efficiently")
             ], -1)),
             t("div", { class: "mb-6 flex justify-start" }, [
-              t("button", { onClick: C, class: "px-6 py-3 bg-[#002B5C] text-white font-semibold rounded-xl shadow-md hover:bg-[#FF2D2D] transition transform hover:-translate-y-0.5" }, " ← Return to Dashboard ")
+              t("button", { onClick: goBack, class: "px-6 py-3 bg-[#002B5C] text-white font-semibold rounded-xl shadow-md hover:bg-[#FF2D2D] transition transform hover:-translate-y-0.5" }, " ← Return to Dashboard ")
             ]),
             t("div", P, [
               t("div", null, [
-                o[4] || (o[4] = t("label", { class: "block text-sm font-semibold text-gray-600 mb-1" }, "Date Range", -1)),
-                x(t("select", { "onUpdate:modelValue": o[0] || (o[0] = e => i.value = e), class: "w-full px-4 py-3 font-semibold text-[#182235] border rounded-lg focus:ring-2 focus:ring-[#002B5C] focus:outline-none" }, [
-                  ...o[3] || (o[3] = [T('<option value="all">All</option><option value="today">Today</option><option value="week">This Week</option><option value="month">This Month</option><option value="custom">Custom</option>', 5)])
-                ], 512), [[S, i.value]])
+                cache[4] || (cache[4] = t("label", { class: "block text-sm font-semibold text-gray-600 mb-1" }, "Date Range", -1)),
+                xfunc(t("select", { "onUpdate:modelValue": cache[0] || (cache[0] = v => dateRange.value = v), class: "w-full px-4 py-3 font-semibold text-[#182235] border rounded-lg focus:ring-2 focus:ring-[#002B5C] focus:outline-none" }, [
+                  T('<option value="all">All</option><option value="today">Today</option><option value="week">This Week</option><option value="month">This Month</option><option value="custom">Custom</option>', 5)
+                ], 512), [[S, dateRange.value]])
               ]),
-              i.value === "custom" ? (a(), n("div", j, [
-                o[5] || (o[5] = t("label", { class: "block text-sm font-semibold text-gray-600 mb-1" }, "From", -1)),
-                x(t("input", { type: "date", "onUpdate:modelValue": o[1] || (o[1] = e => c.value = e), class: "w-full px-4 py-3 font-semibold text-[#182235] border rounded-lg focus:ring-2 focus:ring-[#002B5C] focus:outline-none" }, null, 512), [[h, c.value]])
+              dateRange.value === "custom" ? (a(), n("div", j, [
+                cache[5] || (cache[5] = t("label", { class: "block text-sm font-semibold text-gray-600 mb-1" }, "From", -1)),
+                xfunc(t("input", { type: "date", "onUpdate:modelValue": cache[1] || (cache[1] = v => fromDate.value = v), class: "w-full px-4 py-3 font-semibold text-[#182235] border rounded-lg focus:ring-2 focus:ring-[#002B5C] focus:outline-none" }, null, 512), [[h, fromDate.value]])
               ])) : g("", !0),
-              i.value === "custom" ? (a(), n("div", $, [
-                o[6] || (o[6] = t("label", { class: "block text-sm font-semibold text-gray-600 mb-1" }, "To", -1)),
-                x(t("input", { type: "date", "onUpdate:modelValue": o[2] || (o[2] = e => p.value = e), class: "w-full px-4 py-3 font-semibold text-[#182235] border rounded-lg focus:ring-2 focus:ring-[#002B5C] focus:outline-none" }, null, 512), [[h, p.value]])
+              dateRange.value === "custom" ? (a(), n("div", $, [
+                cache[6] || (cache[6] = t("label", { class: "block text-sm font-semibold text-gray-600 mb-1" }, "To", -1)),
+                xfunc(t("input", { type: "date", "onUpdate:modelValue": cache[2] || (cache[2] = v => toDate.value = v), class: "w-full px-4 py-3 font-semibold text-[#182235] border rounded-lg focus:ring-2 focus:ring-[#002B5C] focus:outline-none" }, null, 512), [[h, toDate.value]])
               ])) : g("", !0)
             ]),
-            f.value.length === 0 ? (a(), n("div", z, " No appointments found. ")) : (a(), n("div", R, [
+            filtered.value.length === 0 ? (a(), n("div", z, " No appointments found. ")) : (a(), n("div", R, [
               t("table", U, [
-                o[7] || (o[7] = t("thead", { class: "bg-gradient-to-r from-[#002B5C] to-[#00509E] text-white" }, [
+                cache[7] || (cache[7] = t("thead", { class: "bg-gradient-to-r from-[#002B5C] to-[#00509E] text-white" }, [
                   t("tr", null, [
                     t("th", { class: "px-4 py-3 text-left" }, "Date"),
                     t("th", { class: "px-4 py-3 text-left" }, "Time"),
@@ -160,7 +175,7 @@ const pt = defineComponent({
                   ])
                 ], -1)),
                 t("tbody", L, [
-                  (a(!0), n(_, null, V(f.value, (e, s) => (
+                  (a(!0), n(_, null, V(filtered.value, (e, s) => (
                     a(),
                     n("tr", { key: e.id, class: W(s % 2 === 0 ? "bg-white hover:bg-gray-50" : "bg-gray-50 hover:bg-gray-100 transition") }, [
                       t("td", O, r(e.date_of_booking), 1),
@@ -188,18 +203,18 @@ const pt = defineComponent({
                               src: getPaymentProofSrc(e),
                               alt: "Payment Proof",
                               class: "h-16 w-16 object-cover rounded border mx-auto",
-                              onError: k
+                              onError: handleImgError
                             }, null, 40, nt))
                           : (a(), n("span", at, "Walk_IN"))
                       ]),
                       t("td", lt, r(e.payment_amount ?? "Walk_IN"), 1),
                       t("td", rt, [
                         t("button", {
-                          onClick: d => w(e.id),
+                          onClick: d => approve(e.id),
                           class: "px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 shadow-md transition transform hover:-translate-y-0.5"
                         }, " Approve ", 8, it),
                         t("button", {
-                          onClick: d => D(e.id),
+                          onClick: d => decline(e.id),
                           class: "px-4 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 shadow-md transition transform hover:-translate-y-0.5"
                         }, " Decline ", 8, dt)
                       ])
