@@ -56,19 +56,6 @@ function getLogoSrc(shop: Shop) {
     return `/storage/${shop.logo}`;
 }
 
-// ✅ FINAL FIX: Get the QR code URL directly.
-function getQrCodeSrc(shop: Shop) {
-    if (!shop.qr_code) {
-        return '';
-    }
-    // Check if the URL is absolute (starts with http or https)
-    if (shop.qr_code.startsWith('http')) {
-        return shop.qr_code;
-    }
-    // Fallback for local storage (unlikely but safe)
-    return `/storage/${shop.qr_code}`;
-}
-
 // ✅ Handle broken logos
 function handleImgError(e: Event) {
     const target = e.target as HTMLImageElement | null
@@ -151,11 +138,6 @@ function handleImgError(e: Event) {
                     <a :href="`/customer/feedback/${shop.id}`" class="mt-2 px-5 py-2 rounded-full bg-[#FF2D2D] text-white font-medium shadow hover:bg-[#002B5C] hover:scale-105 transition">
                         Feedback
                     </a>
-
-                    <!-- ✅ QR Code -->
-                    <div v-if="shop.qr_code" class="mt-4">
-                        <img :src="getQrCodeSrc(shop)" alt="QR Code" class="w-24 h-24 object-contain" />
-                    </div>
                 </div>
             </div>
 
