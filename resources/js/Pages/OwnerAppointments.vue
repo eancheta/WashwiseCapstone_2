@@ -73,17 +73,11 @@
                     :src="getPaymentProofSrc(appt)!"
                     alt="Payment Proof"
                     class="h-16 w-16 object-cover rounded border mx-auto"
-                    @error="handleImageError"
                   />
-
-                  <!-- if no proof: intentionally render an image that doesn't exist
-                       so the browser displays the broken-image icon -->
                   <img
                     v-else
                     src="/images/NO_PROOF_DOES_NOT_EXIST.png"
-                    alt="No proof"
                     class="h-16 w-16 object-cover rounded border mx-auto"
-                    @error="handleBrokenImageError"
                   />
                 </td>
 
@@ -192,28 +186,6 @@ function getPaymentProofSrc(appt: Appointment): string | undefined {
   return cloudBase + appt.payment_proof
 }
 
-// ✅ On broken image for real images: replace with actual fallback asset
-function handleImageError(event: Event) {
-  const target = event.target as HTMLImageElement | null
-  if (!target) return
-  // avoid infinite loop if fallback missing
-  target.onerror = null
-  // use a real fallback image that exists in your public folder
-  target.src = '/images/no-proof.png'
-}
-
-// ✅ For the intentionally "missing" image (we want the browser broken icon),
-// do not replace the src — just update alt or add a class. This keeps the broken icon visible.
-function handleBrokenImageError(event: Event) {
-  const target = event.target as HTMLImageElement | null
-  if (!target) return
-  // don't change src; optionally update alt text for accessibility
-  target.alt = 'No proof available'
-  // optionally add an opacity or CSS class
-  target.classList.add('opacity-60')
-}
-
-// --- Date filtering ---
 const dateRange = ref<string>('all')
 const fromDate = ref<string>('')
 const toDate = ref<string>('')
