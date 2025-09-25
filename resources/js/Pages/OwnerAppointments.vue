@@ -67,16 +67,17 @@
 
                 <!-- Payment Proof -->
                 <td class="px-4 py-3 text-center">
-                  <!-- if proof exists: load it and use handleImageError to fallback to real image -->
                   <img
                     v-if="appt.payment_proof"
-                    :src="getPaymentProofSrc(appt)!"
+                    :src="getPaymentProofSrc(appt)"
                     alt="Payment Proof"
                     class="h-16 w-16 object-cover rounded border mx-auto"
+                    @error="handleImageError"
                   />
                   <img
                     v-else
-                    src="/images/NO_PROOF_DOES_NOT_EXIST.png"
+                    src="/images/no-proof.png"
+                    alt="No Proof"
                     class="h-16 w-16 object-cover rounded border mx-auto"
                   />
                 </td>
@@ -166,9 +167,6 @@ interface Appointment {
 
 const props = defineProps<{ appointments: Appointment[] }>()
 
-// ✅ Cloudinary base path
-const cloudBase = 'https://res.cloudinary.com/dqfyjxaw2/image/upload/v1758645874/'
-
 // --- Status actions ---
 function approve(id: number) {
   router.post(`/owner/appointments/${id}/approve`)
@@ -177,13 +175,19 @@ function decline(id: number) {
   router.post(`/owner/appointments/${id}/decline`)
 }
 
-// ✅ Payment proof source (returns string | undefined for TS)
-function getPaymentProofSrc(appt: Appointment): string | undefined {
-  if (!appt.payment_proof) return undefined
+// ✅ Payment proof source (only prepend when needed)
+function getPaymentProofSrc(appt: Appointment): string {
+  if (!appt.payment_proof) return '/images/no-proof.png'
   if (appt.payment_proof.startsWith('http')) {
     return appt.payment_proof
   }
-  return cloudBase + appt.payment_proof
+  return `/storage/${appt.payment_proof}`
+}
+
+// ✅ On broken image → replace with fallback
+function handleImageError(event: Event) {
+  const target = event.target as HTMLImageElement
+  target.src = '/images/no-proof.png'
 }
 
 const dateRange = ref<string>('all')
