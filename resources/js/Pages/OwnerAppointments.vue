@@ -4,7 +4,9 @@
   <div class="min-h-screen bg-gray-100">
     <!-- Header -->
     <div class="bg-white shadow">
-      <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+      <div
+        class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex justify-between items-center"
+      >
         <h1 class="text-3xl font-bold text-gray-900">Appointments</h1>
         <button
           @click="goBack"
@@ -38,17 +40,39 @@
           <table class="min-w-full bg-white border rounded-lg shadow">
             <thead>
               <tr class="bg-gray-50 border-b">
-                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Name</th>
-                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Car Size</th>
-                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Contact</th>
-                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Email</th>
-                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Booking Time</th>
-                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Booking Date</th>
-                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Slot</th>
-                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Payment Proof</th>
-                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Amount</th>
-                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Status</th>
-                <th class="px-4 py-3 text-center text-sm font-medium text-gray-600">Actions</th>
+                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">
+                  Name
+                </th>
+                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">
+                  Car Size
+                </th>
+                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">
+                  Contact
+                </th>
+                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">
+                  Email
+                </th>
+                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">
+                  Booking Time
+                </th>
+                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">
+                  Booking Date
+                </th>
+                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">
+                  Slot
+                </th>
+                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">
+                  Payment Proof
+                </th>
+                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">
+                  Amount
+                </th>
+                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">
+                  Status
+                </th>
+                <th class="px-4 py-3 text-center text-sm font-medium text-gray-600">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -103,23 +127,39 @@
                   >
                     Paid
                   </span>
-                  <span v-else class="px-2 py-1 text-xs font-semibold text-gray-800 bg-gray-100 rounded-full">
+                  <span
+                    v-else
+                    class="px-2 py-1 text-xs font-semibold text-gray-800 bg-gray-100 rounded-full"
+                  >
                     {{ appt.status }}
                   </span>
                 </td>
 
                 <!-- Actions -->
-              <td class="px-4 py-3 text-center flex justify-center gap-3">
-                <button @click="approve(appt.id)" class="px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 shadow-md transition transform hover:-translate-y-0.5">
-                  Approve
-                </button>
-                <button @click="decline(appt.id)" class="px-4 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 shadow-md transition transform hover:-translate-y-0.5">
-                  Decline
-                </button>
-              </td>
+                <td class="px-4 py-3 text-center">
+                  <div class="flex justify-center gap-3">
+                    <button
+                      v-if="appt.status === 'pending'"
+                      @click="approve(appt.id)"
+                      class="px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 shadow-md transition transform hover:-translate-y-0.5"
+                    >
+                      Approve
+                    </button>
+                    <button
+                      v-if="appt.status === 'pending'"
+                      @click="decline(appt.id)"
+                      class="px-4 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 shadow-md transition transform hover:-translate-y-0.5"
+                    >
+                      Decline
+                    </button>
+                  </div>
+                </td>
               </tr>
               <tr v-if="filteredAppointments.length === 0">
-                <td colspan="11" class="px-4 py-3 text-center text-gray-500 italic">
+                <td
+                  colspan="11"
+                  class="px-4 py-3 text-center text-gray-500 italic"
+                >
                   No appointments found
                 </td>
               </tr>
@@ -186,7 +226,8 @@ const filteredAppointments = computed(() => {
 
   if (dateRange.value === 'today') {
     start = new Date(today.toDateString())
-    end = new Date(start); end.setDate(end.getDate() + 1)
+    end = new Date(start)
+    end.setDate(end.getDate() + 1)
   } else if (dateRange.value === 'week') {
     const firstDay = today.getDate() - today.getDay()
     start = new Date(today.setDate(firstDay))
@@ -196,7 +237,8 @@ const filteredAppointments = computed(() => {
     end = new Date(today.getFullYear(), today.getMonth() + 1, 1)
   } else if (dateRange.value === 'custom' && fromDate.value && toDate.value) {
     start = new Date(fromDate.value)
-    end = new Date(toDate.value); end.setDate(end.getDate() + 1)
+    end = new Date(toDate.value)
+    end.setDate(end.getDate() + 1)
   }
 
   if (start && end) {
