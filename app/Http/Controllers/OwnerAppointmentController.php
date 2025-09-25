@@ -145,14 +145,14 @@ public function approve($id)
     if ($booking->email) {
         $shop = CarWashShop::findOrFail($shopId);
 
-        $emailData = [
-            'customer_name'   => $booking->name,
-            'service_name'    => $booking->size_of_the_car . ' Wash',
-            'date_time'       => $booking->date_of_booking . ' ' . $booking->time_of_booking,
-            'car_wash_name'   => $shop->name,
-            'car_wash_address'=> $shop->address,
-            'amount_paid'     => $booking->payment_amount,
-        ];
+            $emailData = [
+                'customer_name' => $booking->name,
+                'service_name' => $booking->size_of_the_car . ' Wash',
+                'date_time' => $booking->date_of_booking . ' ' . $booking->time_of_booking,
+                'car_wash_name' => $shop->name,
+                'car_wash_address' => $shop->address,
+                'amount_paid' => $booking->payment_amount,
+            ];
 
         try {
             // ✅ Use Brevo API directly
