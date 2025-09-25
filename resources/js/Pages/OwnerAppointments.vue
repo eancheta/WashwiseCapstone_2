@@ -149,6 +149,7 @@ function goBack() {
               <th class="px-4 py-3 text-center">Actions</th>
             </tr>
           </thead>
+
           <tbody class="text-[#182235] font-medium">
             <tr v-for="(appt, idx) in filteredAppointments" :key="appt.id"
                 :class="idx % 2 === 0 ? 'bg-white hover:bg-gray-50' : 'bg-gray-50 hover:bg-gray-100 transition'">
