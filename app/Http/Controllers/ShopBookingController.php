@@ -186,7 +186,7 @@ public function confirmBooking(Request $request, int $shopId)
         $query->update([
             'payment_amount' => $data['payment_amount'],
             'payment_proof' => $paymentProofUrl,
-            'status' => 'paid',
+            'status' => 'pending',
             'user_id' => Auth::id(),
             'updated_at' => $now,
         ]);
@@ -202,7 +202,7 @@ public function confirmBooking(Request $request, int $shopId)
             'slot_number' => $data['slot_number'],
             'payment_amount' => $data['payment_amount'],
             'payment_proof' => $paymentProofUrl,
-            'status' => 'paid',
+            'status' => 'pending',
             'created_at' => $now,
             'updated_at' => $now,
         ]);
