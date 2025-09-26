@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\View;
-use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
+use Cloudinary\Cloudinary;
 
 class OwnerAuthController extends Controller
 {
@@ -20,6 +20,7 @@ class OwnerAuthController extends Controller
 
     public function store(Request $request)
     {
+        // (Optional) extend execution time
         ini_set('max_execution_time', 3600);
 
         $data = $request->validate([
@@ -33,42 +34,67 @@ class OwnerAuthController extends Controller
             'photo3'    => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
         ]);
 
-        // ✅ Upload to Cloudinary
-        $data['photo1'] = $request->hasFile('photo1')
-            ? Cloudinary::upload(
-                $request->file('photo1')->getRealPath(),
-                ['folder' => 'carwash_photo1']
-            )->getSecurePath()
-            : null;
-
-        $data['photo2'] = $request->hasFile('photo2')
-            ? Cloudinary::upload(
-                $request->file('photo2')->getRealPath(),
-                ['folder' => 'carwash_photo2']
-            )->getSecurePath()
-            : null;
-
-        $data['photo3'] = $request->hasFile('photo3')
-            ? Cloudinary::upload(
-                $request->file('photo3')->getRealPath(),
-                ['folder' => 'carwash_photo3']
-            )->getSecurePath()
-            : null;
-
+        // 🔑 Hash password
         $data['password'] = Hash::make($data['password']);
 
-        // generate verification code
-        $code = (string) rand(100000, 999999);
-        $data['verification_code'] = $code;
+        // 🔑 Verification code
+        $data['verification_code'] = (string) rand(100000, 999999);
 
-        // create owner
+        // ✅ Cloudinary client (same as OwnerShopController)
+        $cloudinary = new Cloudinary([
+            'cloud' => [
+                'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
+                'api_key'    => env('CLOUDINARY_API_KEY'),
+                'api_secret' => env('CLOUDINARY_API_SECRET'),
+            ],
+            'url' => ['secure' => true],
+        ]);
+
+        // ✅ Upload photo1 (required)
+        if ($request->hasFile('photo1')) {
+            $file = $request->file('photo1');
+            $response = $cloudinary->uploadApi()->upload($file->getRealPath(), [
+                'folder' => 'carwash_owners',
+                'resource_type' => 'image',
+                'overwrite' => true,
+            ]);
+            $data['photo1'] = $response['secure_url'];
+        }
+
+        // ✅ Upload photo2 (optional)
+        if ($request->hasFile('photo2')) {
+            $file = $request->file('photo2');
+            $response = $cloudinary->uploadApi()->upload($file->getRealPath(), [
+                'folder' => 'carwash_owners',
+                'resource_type' => 'image',
+                'overwrite' => true,
+            ]);
+            $data['photo2'] = $response['secure_url'];
+        } else {
+            $data['photo2'] = null;
+        }
+
+        // ✅ Upload photo3 (optional)
+        if ($request->hasFile('photo3')) {
+            $file = $request->file('photo3');
+            $response = $cloudinary->uploadApi()->upload($file->getRealPath(), [
+                'folder' => 'carwash_owners',
+                'resource_type' => 'image',
+                'overwrite' => true,
+            ]);
+            $data['photo3'] = $response['secure_url'];
+        } else {
+            $data['photo3'] = null;
+        }
+
+        // ✅ Create owner in DB
         $owner = CarWashOwner::create($data);
 
-        // attempt to send verification via Brevo API
+        // ⚡️ Attempt to send verification via Brevo API
         try {
-            $apiResponse = $this->sendVerificationCode($owner->email, $owner->name, $code);
+            $apiResponse = $this->sendVerificationCode($owner->email, $owner->name, $data['verification_code']);
 
-            if ($apiResponse['ok']) {
+            if (isset($apiResponse['ok']) && $apiResponse['ok']) {
                 Log::info('Verification email sent via Brevo', [
                     'email' => $owner->email,
                     'response' => $apiResponse['body'] ?? null,
@@ -87,7 +113,6 @@ class OwnerAuthController extends Controller
         // store email for verification page
         session(['owner_verification_email' => $owner->email]);
 
-        // redirect to verify page
         return redirect()->route('owner.verify.show')->with('email', $owner->email);
     }
 
@@ -131,13 +156,16 @@ class OwnerAuthController extends Controller
      */
     public function sendVerificationCode($toEmail, $toName, $code)
     {
+        // Render your Blade template into HTML
         $htmlContent = View::make('emails.owner-verification-code', [
             'name' => $toName,
             'code' => $code,
         ])->render();
 
+        // Create fallback text-only version
         $textContent = "Hello {$toName},\nYour WashWise verification code is: {$code}\n\nThanks,\nWashWise";
 
+        // Build payload for Brevo API
         $payload = [
             'sender' => [
                 'name'  => env('MAIL_FROM_NAME', 'WashWise'),
@@ -151,6 +179,7 @@ class OwnerAuthController extends Controller
             'textContent' => $textContent,
         ];
 
+        // Send to Brevo API
         $response = Http::withHeaders([
             'api-key' => env('SENDINBLUE_API_KEY'),
             'Content-Type' => 'application/json',
