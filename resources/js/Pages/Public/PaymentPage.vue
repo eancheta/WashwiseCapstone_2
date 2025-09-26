@@ -126,7 +126,13 @@ interface Props {
 const props = defineProps<Props>()
 
 const backendBaseUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost/Washwise'
-const qrSrc = ref(props.shop.qr_code ? `${backendBaseUrl}/storage/${props.shop.qr_code}` : `${backendBaseUrl}/images/default-qr.png`)
+const qrSrc = ref(
+  props.shop.qr_code
+    ? (props.shop.qr_code.startsWith('http')
+        ? props.shop.qr_code
+        : `${backendBaseUrl}/storage/${props.shop.qr_code}`)
+    : `${backendBaseUrl}/images/default-qr.png`
+)
 
 const form = useForm({
   name: props.booking?.name ?? '',
