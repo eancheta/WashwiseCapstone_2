@@ -23,11 +23,12 @@
       <div v-if="booking" class="space-y-4 mb-6">
         <div class="mb-6 text-center">
           <h2 class="text-base font-bold text-[#182235] mb-2">Scan to Pay <span class="font-normal text-gray-500">(QR Code)</span></h2>
-                    <img
-    :src="getQrCodeSrc(shop)"
-    alt="QR Code"
-    class="h-20 w-20 object-contain mb-4"
-/>
+          <img
+            :src="qrSrc"
+            @error="handleImageError"
+            alt="Shop QR Code"
+            class="mx-auto h-40 w-40 object-contain rounded-lg border border-gray-200 bg-white"
+          />
           <p class="text-sm text-gray-500 mt-2">Scan this QR with your payment app, then upload a screenshot as proof of payment.</p>
         </div>
 
@@ -96,6 +97,7 @@
 
 <script setup lang="ts">
 import { useForm } from '@inertiajs/vue3'
+import { ref } from 'vue'
 import { Inertia } from '@inertiajs/inertia'
 
 interface Shop {
@@ -123,6 +125,8 @@ interface Props {
 
 const props = defineProps<Props>()
 
+const backendBaseUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost/Washwise'
+const qrSrc = ref(props.shop.qr_code ? `${backendBaseUrl}/storage/${props.shop.qr_code}` : `${backendBaseUrl}/images/default-qr.png`)
 
 const form = useForm({
   name: props.booking?.name ?? '',
@@ -135,6 +139,13 @@ const form = useForm({
   payment_amount: 50,
   payment_proof: null as File | null,
 })
+
+const handleImageError = (e: Event) => {
+  const target = e.target as HTMLImageElement | null
+  if (target) {
+    target.src = `${backendBaseUrl}/images/default-qr.png`
+  }
+}
 
 const handleFile = (e: Event) => {
   const input = e.target as HTMLInputElement | null
@@ -154,16 +165,5 @@ const confirm = () => {
     onSuccess: () => Inertia.visit('/settings/appearance'),
     onError: (errors) => console.error('Payment submission error:', errors),
   })
-}
-
-// ✅ Get the QR code URL for a shop
-function getQrCodeSrc(shop: Shop) {
-    if (!shop.qr_code) {
-        return '';
-    }
-    if (shop.qr_code.startsWith('http')) {
-        return shop.qr_code;
-    }
-    return `/storage/${shop.qr_code}`;
 }
 </script>
