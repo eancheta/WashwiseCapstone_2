@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\View;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class OwnerAuthController extends Controller
 {
@@ -19,7 +20,6 @@ class OwnerAuthController extends Controller
 
     public function store(Request $request)
     {
-        // (Optional) extend execution time just for safety; not ideal but harmless here.
         ini_set('max_execution_time', 3600);
 
         $data = $request->validate([
@@ -33,10 +33,27 @@ class OwnerAuthController extends Controller
             'photo3'    => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
         ]);
 
-        // store files
-        $data['photo1'] = $request->file('photo1')->store('carwash_owners', 'public');
-        $data['photo2'] = $request->hasFile('photo2') ? $request->file('photo2')->store('carwash_owners', 'public') : null;
-        $data['photo3'] = $request->hasFile('photo3') ? $request->file('photo3')->store('carwash_owners', 'public') : null;
+        // ✅ Upload to Cloudinary
+        $data['photo1'] = $request->hasFile('photo1')
+            ? Cloudinary::upload(
+                $request->file('photo1')->getRealPath(),
+                ['folder' => 'carwash_photo1']
+            )->getSecurePath()
+            : null;
+
+        $data['photo2'] = $request->hasFile('photo2')
+            ? Cloudinary::upload(
+                $request->file('photo2')->getRealPath(),
+                ['folder' => 'carwash_photo2']
+            )->getSecurePath()
+            : null;
+
+        $data['photo3'] = $request->hasFile('photo3')
+            ? Cloudinary::upload(
+                $request->file('photo3')->getRealPath(),
+                ['folder' => 'carwash_photo3']
+            )->getSecurePath()
+            : null;
 
         $data['password'] = Hash::make($data['password']);
 
@@ -57,7 +74,6 @@ class OwnerAuthController extends Controller
                     'response' => $apiResponse['body'] ?? null,
                 ]);
             } else {
-                // Save details for debugging and fallback
                 Log::error('Brevo send failed', [
                     'email' => $owner->email,
                     'status' => $apiResponse['status'] ?? null,
@@ -97,7 +113,7 @@ class OwnerAuthController extends Controller
             return back()->withErrors(['email' => 'Your account is pending approval by the admin.'])->withInput();
         }
 
-        if (! $owner->email_verified_at) {
+        if (!$owner->email_verified_at) {
             return back()->withErrors(['email' => 'Please verify your email before logging in.'])->withInput();
         }
 
@@ -113,37 +129,33 @@ class OwnerAuthController extends Controller
      * Send verification email using Brevo (Sendinblue) transactional API.
      * Returns array ['ok' => bool, 'status' => int|null, 'body' => mixed|null]
      */
-public function sendVerificationCode($toEmail, $toName, $code)
-{
-    // Render your Blade template into HTML
-    $htmlContent = View::make('emails.owner-verification-code', [
-        'name' => $toName,
-        'code' => $code,
-    ])->render();
+    public function sendVerificationCode($toEmail, $toName, $code)
+    {
+        $htmlContent = View::make('emails.owner-verification-code', [
+            'name' => $toName,
+            'code' => $code,
+        ])->render();
 
-    // Create fallback text-only version
-    $textContent = "Hello {$toName},\nYour WashWise verification code is: {$code}\n\nThanks,\nWashWise";
+        $textContent = "Hello {$toName},\nYour WashWise verification code is: {$code}\n\nThanks,\nWashWise";
 
-    // Build payload for Brevo API
-    $payload = [
-        'sender' => [
-            'name'  => env('MAIL_FROM_NAME', 'WashWise'),
-            'email' => env('MAIL_FROM_ADDRESS', 'noreply@example.com'),
-        ],
-        'to' => [
-            ['email' => $toEmail, 'name' => $toName],
-        ],
-        'subject' => 'WashWise — Your verification code',
-        'htmlContent' => $htmlContent,
-        'textContent' => $textContent,
-    ];
+        $payload = [
+            'sender' => [
+                'name'  => env('MAIL_FROM_NAME', 'WashWise'),
+                'email' => env('MAIL_FROM_ADDRESS', 'noreply@example.com'),
+            ],
+            'to' => [
+                ['email' => $toEmail, 'name' => $toName],
+            ],
+            'subject' => 'WashWise — Your verification code',
+            'htmlContent' => $htmlContent,
+            'textContent' => $textContent,
+        ];
 
-    // Send to Brevo API
-    $response = Http::withHeaders([
-        'api-key' => env('SENDINBLUE_API_KEY'),
-        'Content-Type' => 'application/json',
-    ])->post('https://api.sendinblue.com/v3/smtp/email', $payload);
+        $response = Http::withHeaders([
+            'api-key' => env('SENDINBLUE_API_KEY'),
+            'Content-Type' => 'application/json',
+        ])->post('https://api.sendinblue.com/v3/smtp/email', $payload);
 
-    return $response->json();
-}
+        return $response->json();
+    }
 }
