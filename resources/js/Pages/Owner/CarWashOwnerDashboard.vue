@@ -10,12 +10,12 @@ function toggleSidebar() {
   sidebarOpen.value = !sidebarOpen.value
 }
 
-// ✅ Strong typing for Inertia props
+// Inertia props
 const page = usePage<AppPageProps>()
 const user = computed<User | null>(() => page.props.auth?.user ?? null)
 const shop = computed<Shop | null>(() => page.props.shop ?? null)
 
-// Shop actions (call Laravel routes)
+// Shop actions
 function closeShop(id: number) {
   router.post(route('owner.shop.close', { id }))
 }
@@ -64,14 +64,10 @@ function openShop(id: number) {
   >
     <div class="flex justify-between items-center p-4 border-b border-gray-700">
       <h2 class="text-lg font-bold">Menu</h2>
-      <button
-        @click="toggleSidebar"
-        class="text-gray-400 hover:text-red-500 text-2xl"
-      >&times;</button>
+      <button @click="toggleSidebar" class="text-gray-400 hover:text-red-500 text-2xl">&times;</button>
     </div>
 
     <nav class="flex-1 mt-6 px-4 space-y-2">
-      <!-- Appointments -->
       <Link
         :href="route('owner.appointments')"
         class="block px-4 py-3 rounded-xl font-medium transition-all duration-300"
@@ -82,7 +78,6 @@ function openShop(id: number) {
         Appointments
       </Link>
 
-      <!-- Reviews -->
       <Link
         :href="route('owner.reviews')"
         class="block px-4 py-3 rounded-xl font-medium transition-all duration-300"
@@ -93,7 +88,6 @@ function openShop(id: number) {
         Reviews
       </Link>
 
-      <!-- Walk-in -->
       <Link
         :href="route('owner.walkin')"
         class="block px-4 py-3 rounded-xl font-medium transition-all duration-300"
@@ -104,33 +98,6 @@ function openShop(id: number) {
         Walk-in
       </Link>
 
-      <!-- ✅ Plain Shop Open/Close Buttons -->
-      <div v-if="shop" class="mt-6 px-4">
-        <p class="text-sm mb-2">
-          Shop Status:
-          <span :class="shop.status === 'open' ? 'text-green-400' : 'text-red-400'">
-            {{ shop.status }}
-          </span>
-        </p>
-
-        <button
-          v-if="shop.status === 'open'"
-          @click="closeShop(shop.id)"
-          class="w-full bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
-        >
-          Close Shop
-        </button>
-
-        <button
-          v-else
-          @click="openShop(shop.id)"
-          class="w-full bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
-        >
-          Open Shop
-        </button>
-      </div>
-
-      <!-- Log Out -->
       <Link
         href="/logout"
         method="post"
@@ -172,9 +139,34 @@ function openShop(id: number) {
         Your dashboard is ready and waiting. Let’s make today productive—review
         appointments, check feedback, and keep your business running smoothly.
       </div>
+
+      <!-- ✅ Shop Open/Close Buttons moved here -->
+      <div v-if="shop" class="mt-4 flex flex-col items-center space-y-3">
+        <p class="text-sm text-white">
+          Shop Status:
+          <span :class="shop.status === 'open' ? 'text-green-400' : 'text-red-400'">
+            {{ shop.status }}
+          </span>
+        </p>
+        <button
+          v-if="shop.status === 'open'"
+          @click="closeShop(shop.id)"
+          class="px-8 py-3 rounded-full bg-red-600 text-white font-bold text-lg shadow hover:bg-red-700 transition"
+        >
+          Close Shop
+        </button>
+        <button
+          v-else
+          @click="openShop(shop.id)"
+          class="px-8 py-3 rounded-full bg-green-600 text-white font-bold text-lg shadow hover:bg-green-700 transition"
+        >
+          Open Shop
+        </button>
+      </div>
+
       <Link
         :href="route('owner.walkin')"
-        class="px-8 py-3 rounded-full bg-[#FF2D2D] text-white font-bold text-lg shadow hover:bg-[#d72626] transition"
+        class="mt-6 px-8 py-3 rounded-full bg-[#FF2D2D] text-white font-bold text-lg shadow hover:bg-[#d72626] transition"
       >
         Walk-in
       </Link>
