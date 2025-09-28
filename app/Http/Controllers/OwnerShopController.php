@@ -66,9 +66,6 @@ class OwnerShopController extends Controller
         ]);
     }
 
-    /**
-     * Store a new shop for the authenticated owner.
-     */
     public function store(Request $request)
     {
         $ownerId = Auth::guard('carwashowner')->id();
@@ -104,7 +101,6 @@ class OwnerShopController extends Controller
             'url' => ['secure' => true],
         ]);
 
-        // Upload logo only to Cloudinary
         if ($request->hasFile('logo')) {
             $file = $request->file('logo');
             $response = $cloudinary->uploadApi()->upload($file->getRealPath(), [
@@ -112,10 +108,9 @@ class OwnerShopController extends Controller
                 'resource_type' => 'image',
                 'overwrite' => true,
             ]);
-            $shopData['logo'] = $response['secure_url']; // ✅ always HTTPS
+            $shopData['logo'] = $response['secure_url'];
         }
 
-        // Upload QR code only to Cloudinary
         if ($request->hasFile('qr_code')) {
             $file = $request->file('qr_code');
             $response = $cloudinary->uploadApi()->upload($file->getRealPath(), [
@@ -134,9 +129,6 @@ class OwnerShopController extends Controller
             ->with('success', 'Shop created successfully!');
     }
 
-    /**
-     * Display the owner's shop details.
-     */
     public function index()
     {
         $ownerId = Auth::guard('carwashowner')->id();
@@ -152,9 +144,6 @@ class OwnerShopController extends Controller
         ]);
     }
 
-    /**
-     * Temporarily close the shop.
-     */
     public function closeShop($id)
     {
         $shop = CarWashShop::findOrFail($id);
@@ -169,9 +158,6 @@ class OwnerShopController extends Controller
         return back()->with('success', 'Shop has been closed temporarily.');
     }
 
-    /**
-     * Re-open the shop.
-     */
     public function openShop($id)
     {
         $shop = CarWashShop::findOrFail($id);

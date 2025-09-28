@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { Head, Link, usePage, router } from '@inertiajs/vue3'
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { route } from 'ziggy-js'
-import type { AppPageProps, Shop, User } from '@/types'
+
+// Use any to avoid strict PageProps mismatch errors in TS dev environment
+const page = usePage<any>()
 
 // Sidebar toggle
 const sidebarOpen = ref(false)
@@ -10,16 +12,30 @@ function toggleSidebar() {
   sidebarOpen.value = !sidebarOpen.value
 }
 
-// Inertia props
-const page = usePage<AppPageProps>()
-const user = computed<User | null>(() => page.props.auth?.user ?? null)
-const shop = computed<Shop | null>(() => page.props.shop ?? null)
+// Read user and shop from Inertia props (shop may be null)
+const user = computed(() => page.props?.auth?.user ?? null)
+const shop = computed(() => page.props?.shop ?? null)
+
+// Debug: prints page.props to browser console so you can confirm shape
+onMounted(() => {
+  console.log('Inertia page.props:', page.props)
+})
 
 // Shop actions
-function closeShop(id: number) {
+function closeShop(id?: number | null) {
+  if (!id) {
+    console.warn('closeShop called without id')
+    return
+  }
+  // call the named Ziggy route; router.post accepts a URL string
   router.post(route('owner.shop.close', { id }))
 }
-function openShop(id: number) {
+
+function openShop(id?: number | null) {
+  if (!id) {
+    console.warn('openShop called without id')
+    return
+  }
   router.post(route('owner.shop.open', { id }))
 }
 </script>
@@ -32,26 +48,16 @@ function openShop(id: number) {
     class="w-full bg-white flex items-center justify-between px-6 py-3 border-b border-gray-200 shadow-sm sticky top-0 z-40"
   >
     <div class="flex items-center gap-4">
-      <button
-        @click="toggleSidebar"
-        class="flex flex-col justify-between w-6 h-5 focus:outline-none hover:opacity-80 transition"
-      >
+      <button @click="toggleSidebar" class="flex flex-col justify-between w-6 h-5 focus:outline-none hover:opacity-80 transition">
         <span class="block h-0.5 bg-gray-800 rounded"></span>
         <span class="block h-0.5 bg-gray-800 rounded"></span>
         <span class="block h-0.5 bg-gray-800 rounded"></span>
       </button>
-      <img
-        src="/images/washwiselogo2.png"
-        alt="WashWise Logo"
-        class="h-10 w-auto select-none"
-        draggable="false"
-      />
+      <img src="/images/washwiselogo2.png" alt="WashWise Logo" class="h-10 w-auto select-none" draggable="false" />
     </div>
 
     <div class="flex items-center space-x-2 px-3 py-2 rounded-lg">
-      <span class="text-gray-700 font-medium">
-        {{ user ? user.name : 'Owner' }}
-      </span>
+      <span class="text-gray-700 font-medium">{{ user ? user.name : 'Owner' }}</span>
     </div>
   </div>
 
@@ -71,9 +77,7 @@ function openShop(id: number) {
       <Link
         :href="route('owner.appointments')"
         class="block px-4 py-3 rounded-xl font-medium transition-all duration-300"
-        :class="route().current('owner.appointments')
-          ? 'bg-white text-[#182235] shadow-lg'
-          : 'bg-[#1F3A5F] text-white hover:bg-white hover:text-[#182235] hover:shadow-md'"
+        :class="route().current('owner.appointments') ? 'bg-white text-[#182235] shadow-lg' : 'bg-[#1F3A5F] text-white hover:bg-white hover:text-[#182235] hover:shadow-md'"
       >
         Appointments
       </Link>
@@ -81,9 +85,7 @@ function openShop(id: number) {
       <Link
         :href="route('owner.reviews')"
         class="block px-4 py-3 rounded-xl font-medium transition-all duration-300"
-        :class="route().current('owner.reviews')
-          ? 'bg-white text-[#182235] shadow-lg'
-          : 'bg-[#1F3A5F] text-white hover:bg-white hover:text-[#182235] hover:shadow-md'"
+        :class="route().current('owner.reviews') ? 'bg-white text-[#182235] shadow-lg' : 'bg-[#1F3A5F] text-white hover:bg-white hover:text-[#182235] hover:shadow-md'"
       >
         Reviews
       </Link>
@@ -91,56 +93,34 @@ function openShop(id: number) {
       <Link
         :href="route('owner.walkin')"
         class="block px-4 py-3 rounded-xl font-medium transition-all duration-300"
-        :class="route().current('owner.walkin')
-          ? 'bg-white text-[#182235] shadow-lg'
-          : 'bg-[#1F3A5F] text-white hover:bg-white hover:text-[#182235] hover:shadow-md'"
+        :class="route().current('owner.walkin') ? 'bg-white text-[#182235] shadow-lg' : 'bg-[#1F3A5F] text-white hover:bg-white hover:text-[#182235] hover:shadow-md'"
       >
         Walk-in
       </Link>
 
-      <Link
-        href="/logout"
-        method="post"
-        as="button"
-        class="block w-full text-left px-4 py-3 rounded-xl font-medium transition-all duration-300 bg-[#1F3A5F] text-white hover:bg-white hover:text-[#182235] hover:shadow-md"
-      >
+      <Link href="/logout" method="post" as="button"
+        class="block w-full text-left px-4 py-3 rounded-xl font-medium transition-all duration-300 bg-[#1F3A5F] text-white hover:bg-white hover:text-[#182235] hover:shadow-md">
         Log Out
       </Link>
     </nav>
   </aside>
 
   <!-- Hero Section -->
-  <section
-    class="relative flex items-center justify-center min-h-screen bg-cover bg-center"
-    style="background-image: url('/images/hero-carwash.jpg');"
-  >
+  <section class="relative flex items-center justify-center min-h-screen bg-cover bg-center" style="background-image: url('/images/hero-carwash.jpg');">
     <div class="absolute inset-0 bg-black/60"></div>
-    <div
-      class="relative z-10 flex flex-col items-center justify-center w-full px-4 py-20"
-    >
-      <div
-        class="uppercase tracking-widest text-sm text-[#FF2D2D] font-bold mb-4"
-      >
-        Book Online
-      </div>
-      <h1
-        class="text-4xl md:text-6xl font-extrabold text-white text-center mb-4 leading-tight drop-shadow"
-      >
-        Welcome,
-        <span
-          class="text-4xl md:text-6xl font-extrabold text-white leading-tight drop-shadow"
-        >
-          {{ user ? user.name : 'Owner' }}
-        </span>!
+
+    <div class="relative z-10 flex flex-col items-center justify-center w-full px-4 py-20">
+      <div class="uppercase tracking-widest text-sm text-[#FF2D2D] font-bold mb-4">Book Online</div>
+
+      <h1 class="text-4xl md:text-6xl font-extrabold text-white text-center mb-4 leading-tight drop-shadow">
+        Welcome, <span class="text-white">{{ user ? user.name : 'Owner' }}</span>!
       </h1>
-      <div
-        class="text-base md:text-lg text-gray-100 text-center mb-8 max-w-2xl"
-      >
-        Your dashboard is ready and waiting. Let’s make today productive—review
-        appointments, check feedback, and keep your business running smoothly.
+
+      <div class="text-base md:text-lg text-gray-100 text-center mb-8 max-w-2xl">
+        Your dashboard is ready — manage appointments and shop status below.
       </div>
 
-      <!-- ✅ Shop Open/Close Buttons moved here -->
+      <!-- Shop status + Open/Close (visible in hero so it won't be hidden) -->
       <div v-if="shop" class="mt-4 flex flex-col items-center space-y-3">
         <p class="text-sm text-white">
           Shop Status:
@@ -148,6 +128,7 @@ function openShop(id: number) {
             {{ shop.status }}
           </span>
         </p>
+
         <button
           v-if="shop.status === 'open'"
           @click="closeShop(shop.id)"
@@ -155,6 +136,7 @@ function openShop(id: number) {
         >
           Close Shop
         </button>
+
         <button
           v-else
           @click="openShop(shop.id)"
@@ -164,28 +146,25 @@ function openShop(id: number) {
         </button>
       </div>
 
-      <Link
-        :href="route('owner.walkin')"
-        class="mt-6 px-8 py-3 rounded-full bg-[#FF2D2D] text-white font-bold text-lg shadow hover:bg-[#d72626] transition"
-      >
+      <Link :href="route('owner.walkin')" class="mt-6 px-8 py-3 rounded-full bg-[#FF2D2D] text-white font-bold text-lg shadow hover:bg-[#d72626] transition">
         Walk-in
       </Link>
+
+      <!-- Optional debug (remove in production) -->
+      <div class="mt-6 text-xs text-white/80 max-w-xl w-full">
+        <details class="bg-white/5 p-3 rounded-md">
+          <summary class="cursor-pointer">Debug: page.props (click)</summary>
+          <pre class="text-xs mt-2 break-words">{{ JSON.stringify(page.props, null, 2) }}</pre>
+        </details>
+      </div>
     </div>
   </section>
 </template>
 
-<style>
+<style scoped>
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-5px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
 }
-.animate-fadeIn {
-  animation: fadeIn 0.15s ease-out;
-}
+.animate-fadeIn { animation: fadeIn 0.15s ease-out; }
 </style>
