@@ -162,7 +162,7 @@ function openShop(id?: number | null) {
       </h1>
 
       <div class="text-base md:text-lg text-gray-100 text-center mb-8 max-w-2xl">
-        Your dashboard is ready — manage appointments and shop status below.
+        Your dashboard is ready and waiting. Let’s make today productive—review appointments, check feedback, and keep your business running smoothly.
       </div>
 
       <!-- Shop status + Open/Close -->
@@ -201,14 +201,6 @@ function openShop(id?: number | null) {
       >
         Walk-in
       </Link>
-
-      <!-- Optional debug (remove in production) -->
-      <div class="mt-6 text-xs text-white/80 max-w-xl w-full">
-        <details class="bg-white/5 p-3 rounded-md">
-          <summary class="cursor-pointer">Debug: page.props (click)</summary>
-          <pre class="text-xs mt-2 break-words">{{ JSON.stringify(page.props, null, 2) }}</pre>
-        </details>
-      </div>
     </div>
   </section>
 </template>
