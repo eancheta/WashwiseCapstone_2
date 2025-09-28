@@ -10,17 +10,17 @@ function toggleSidebar() {
   sidebarOpen.value = !sidebarOpen.value
 }
 
-// ✅ Strong typing for page props
+// ✅ Strong typing for Inertia props
 const page = usePage<AppPageProps>()
 const user = computed<User | null>(() => page.props.auth?.user ?? null)
 const shop = computed<Shop | null>(() => page.props.shop ?? null)
 
 // Shop actions
 function closeShop(id: number) {
-  router.post(`/owner/shop/${id}/close`)
+  router.post(route('owner.shop.close', { id }))
 }
 function openShop(id: number) {
-  router.post(`/owner/shop/${id}/open`)
+  router.post(route('owner.shop.open', { id }))
 }
 </script>
 
@@ -28,26 +28,15 @@ function openShop(id: number) {
   <Head title="Owner Dashboard" />
 
   <!-- Top Navigation -->
-  <div
-    class="w-full bg-white flex items-center justify-between px-6 py-3 border-b border-gray-200 shadow-sm sticky top-0 z-40"
-  >
+  <div class="w-full bg-white flex items-center justify-between px-6 py-3 border-b border-gray-200 shadow-sm sticky top-0 z-40">
     <!-- Left: Hamburger + Logo -->
     <div class="flex items-center gap-4">
-      <button
-        @click="toggleSidebar"
-        class="flex flex-col justify-between w-6 h-5 focus:outline-none hover:opacity-80 transition"
-      >
+      <button @click="toggleSidebar" class="flex flex-col justify-between w-6 h-5 focus:outline-none hover:opacity-80 transition">
         <span class="block h-0.5 bg-gray-800 rounded"></span>
         <span class="block h-0.5 bg-gray-800 rounded"></span>
         <span class="block h-0.5 bg-gray-800 rounded"></span>
       </button>
-
-      <img
-        src="/images/washwiselogo2.png"
-        alt="WashWise Logo"
-        class="h-10 w-auto select-none"
-        draggable="false"
-      />
+      <img src="/images/washwiselogo2.png" alt="WashWise Logo" class="h-10 w-auto select-none" draggable="false" />
     </div>
 
     <!-- Right: Owner Name -->
@@ -62,7 +51,7 @@ function openShop(id: number) {
   <aside
     :class="[
       'fixed top-0 left-0 h-full w-64 bg-gradient-to-b from-[#182235] to-[#0f172a] text-white shadow-lg z-50 transform transition-transform duration-300',
-      sidebarOpen ? 'translate-x-0' : '-translate-x-full',
+      sidebarOpen ? 'translate-x-0' : '-translate-x-full'
     ]"
   >
     <div class="flex justify-between items-center p-4 border-b border-gray-700">
@@ -72,6 +61,7 @@ function openShop(id: number) {
 
     <!-- Sidebar Menu -->
     <nav class="flex-1 mt-6 px-4 space-y-2">
+      <!-- Appointments -->
       <Link
         :href="route('owner.appointments')"
         class="group flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-300"
@@ -85,6 +75,7 @@ function openShop(id: number) {
         Appointments
       </Link>
 
+      <!-- Reviews -->
       <Link
         :href="route('owner.reviews')"
         class="group flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-300"
@@ -98,6 +89,7 @@ function openShop(id: number) {
         Reviews
       </Link>
 
+      <!-- Walk-in -->
       <Link
         :href="route('owner.walkin')"
         class="group flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-300"
@@ -113,10 +105,9 @@ function openShop(id: number) {
 
       <!-- ✅ Shop Open/Close toggle -->
       <div v-if="shop" class="mt-6 px-4">
-        <p class="text-sm mb-2">Shop Status:
-          <span :class="shop.status === 'open' ? 'text-green-400' : 'text-red-400'">
-            {{ shop.status }}
-          </span>
+        <p class="text-sm mb-2">
+          Shop Status:
+          <span :class="shop.status === 'open' ? 'text-green-400' : 'text-red-400'">{{ shop.status }}</span>
         </p>
         <button
           v-if="shop.status === 'open'"
@@ -134,6 +125,7 @@ function openShop(id: number) {
         </button>
       </div>
 
+      <!-- Log Out -->
       <Link
         href="/logout"
         method="post"
@@ -149,10 +141,7 @@ function openShop(id: number) {
   </aside>
 
   <!-- Hero Section -->
-  <section
-    class="relative flex items-center justify-center min-h-screen bg-cover bg-center"
-    style="background-image: url('/images/hero-carwash.jpg');"
-  >
+  <section class="relative flex items-center justify-center min-h-screen bg-cover bg-center" style="background-image: url('/images/hero-carwash.jpg');">
     <div class="absolute inset-0 bg-black/60"></div>
     <div class="relative z-10 flex flex-col items-center justify-center w-full px-4 py-20">
       <div class="uppercase tracking-widest text-sm text-[#FF2D2D] font-bold mb-4">Book Online</div>
