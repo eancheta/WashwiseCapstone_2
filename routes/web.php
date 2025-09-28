@@ -82,6 +82,9 @@ Route::prefix('owner')->group(function () {
         Route::get('/shop/create', [OwnerShopController::class, 'create'])->name('owner.shop.create');
         Route::post('/shop', [OwnerShopController::class, 'store'])->name('owner.shop.store');
         Route::get('/reviews', [ReviewController::class, 'index'])->name('owner.reviews');
+
+        Route::post('/shop/{id}/close', [OwnerShopController::class, 'closeShop'])->name('owner.shop.close');
+        Route::post('/shop/{id}/open', [OwnerShopController::class, 'openShop'])->name('owner.shop.open');
     });
 });
 
