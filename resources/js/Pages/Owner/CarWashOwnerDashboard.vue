@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head, Link, usePage, router } from '@inertiajs/vue3'
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import { route } from 'ziggy-js'
 
 // Use any to avoid strict PageProps mismatch errors in TS dev environment
@@ -21,9 +21,6 @@ const closing = ref(false)
 const opening = ref(false)
 
 // Debug: prints page.props to browser console so you can confirm shape
-onMounted(() => {
-  console.log('Inertia page.props:', page.props)
-})
 
 // Shop actions with loading and basic error handling
 function closeShop(id?: number | null) {
