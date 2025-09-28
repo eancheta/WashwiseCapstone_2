@@ -19,10 +19,9 @@ class CustomerDashboardController extends Controller
                 'car_wash_shops.district',
                 'car_wash_shops.logo',
                 'car_wash_shops.qr_code',
-                'car_wash_shops.status' // ✅ include status
+                'car_wash_shops.status'
             )
             ->get();
-
         // Normalize logos/qr and status
         $shops->transform(function ($shop) {
             if ($shop->logo) {
