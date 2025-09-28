@@ -18,21 +18,23 @@ class CustomerDashboardController extends Controller
                 'car_wash_shops.address',
                 'car_wash_shops.district',
                 'car_wash_shops.logo',
-                'car_wash_shops.qr_code'
+                'car_wash_shops.qr_code',
+                'car_wash_shops.status' // ✅ include status
             )
             ->get();
 
-        // ✅ FINAL FIX: Clean URLs before passing to the view.
-        // This is a direct fix for the corrupted URL string.
+        // Normalize logos/qr and status
         $shops->transform(function ($shop) {
             if ($shop->logo) {
-                // Remove the bad local storage prefix if it exists.
                 $shop->logo = str_replace('http://127.0.0.1:8000/storage/', '', $shop->logo);
             }
             if ($shop->qr_code) {
-                // Remove the bad local storage prefix if it exists.
                 $shop->qr_code = str_replace('http://127.0.0.1:8000/storage/', '', $shop->qr_code);
             }
+
+            // normalize status (lowercase, trimmed)
+            $shop->status = strtolower(trim((string) $shop->status));
+
             return $shop;
         });
 
@@ -43,7 +45,7 @@ class CustomerDashboardController extends Controller
             'districts' => $districts,
             'auth' => [
                 'user' => Auth::user(),
-            ]
+            ],
         ]);
     }
 }
