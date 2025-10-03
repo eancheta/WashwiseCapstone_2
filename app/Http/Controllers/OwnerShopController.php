@@ -12,11 +12,80 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Cloudinary\Cloudinary;
 
+
+
 class OwnerShopController extends Controller
 {
     /**
      * Ensure the bookings table for a specific shop exists.
      */
+
+
+    public function edit($id)
+{
+    $shop = CarWashShop::findOrFail($id);
+
+    if ($shop->owner_id !== Auth::guard('carwashowner')->id()) {
+        abort(403, 'Unauthorized action.');
+    }
+
+    return view('owner.edit-shop', compact('shop'));
+}
+
+public function update(Request $request, $id)
+{
+    $shop = CarWashShop::findOrFail($id);
+
+    if ($shop->owner_id !== Auth::guard('carwashowner')->id()) {
+        abort(403, 'Unauthorized action.');
+    }
+
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'address' => 'required|string|max:255',
+        'district' => 'nullable|string|max:100',
+        'description' => 'nullable|string',
+        'services_offered' => 'nullable|string',
+        'logo' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
+        'qr_code' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
+    ]);
+
+    // Handle Cloudinary uploads like before
+    $cloudinary = new Cloudinary([
+        'cloud' => [
+            'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
+            'api_key'    => env('CLOUDINARY_API_KEY'),
+            'api_secret' => env('CLOUDINARY_API_SECRET'),
+        ],
+        'url' => ['secure' => true],
+    ]);
+
+    if ($request->hasFile('logo')) {
+        $file = $request->file('logo');
+        $response = $cloudinary->uploadApi()->upload($file->getRealPath(), [
+            'folder' => 'carwash_logos',
+            'resource_type' => 'image',
+            'overwrite' => true,
+        ]);
+        $validated['logo'] = $response['secure_url'];
+    }
+
+    if ($request->hasFile('qr_code')) {
+        $file = $request->file('qr_code');
+        $response = $cloudinary->uploadApi()->upload($file->getRealPath(), [
+            'folder' => 'carwash_qrcodes',
+            'resource_type' => 'image',
+            'overwrite' => true,
+        ]);
+        $validated['qr_code'] = $response['secure_url'];
+    }
+
+    $shop->update($validated);
+
+    return back()->with('success', 'Shop details updated successfully.');
+}
+
+
     public static function ensureBookingTableExists($shopId)
     {
         $tableName = "bookings_shop_{$shopId}";

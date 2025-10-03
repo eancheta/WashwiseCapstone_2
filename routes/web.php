@@ -22,8 +22,21 @@ use App\Http\Controllers\OwnerAppointmentController;
 use App\Http\Controllers\Owner\WalkinController;
 use App\Http\Controllers\Customer\FeedbackController;
 use App\Http\Controllers\Owner\ReviewController;
-
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
+
+
+// Change password page + update
+Route::get('/owner/change-password', [OwnerAuthController::class, 'edit'])
+    ->name('owner.password.edit');
+Route::post('/owner/change-password', [OwnerAuthController::class, 'update'])
+    ->name('owner.password.update');
+
+// Edit shop page + update
+Route::get('/owner/edit-shop', [OwnerShopController::class, 'edit'])
+    ->name('owner.shop.edit');
+Route::post('/owner/edit-shop', [OwnerShopController::class, 'update'])
+    ->name('owner.shop.update');
+
 
 Route::get('/test-cloudinary', function () {
     $filePath = public_path('apple-touch-icon.png');

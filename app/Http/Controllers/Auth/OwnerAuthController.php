@@ -10,9 +10,35 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\View;
 use Cloudinary\Cloudinary;
+use Illuminate\Support\Facades\Auth;
 
 class OwnerAuthController extends Controller
 {
+
+    public function showChangePassword()
+{
+    return view('owner.change-password');
+}
+
+public function updatePassword(Request $request)
+{
+    $owner = Auth::guard('carwashowner')->user();
+
+    $request->validate([
+        'current_password' => 'required',
+        'new_password' => 'required|string|min:6|confirmed',
+    ]);
+
+    if (!Hash::check($request->current_password, $owner->password)) {
+        return back()->withErrors(['current_password' => 'Current password is incorrect.']);
+    }
+
+    $owner->password = Hash::make($request->new_password);
+    $owner->save();
+
+    return back()->with('success', 'Password updated successfully.');
+}
+
     public function create()
     {
         return inertia('Owner/Register');
