@@ -21,24 +21,18 @@ class OwnerShopController extends Controller
      */
 
 
-    public function edit($id)
+public function edit()
 {
-    $shop = CarWashShop::findOrFail($id);
-
-    if ($shop->owner_id !== Auth::guard('carwashowner')->id()) {
-        abort(403, 'Unauthorized action.');
-    }
+    $owner = Auth::guard('carwashowner')->user();
+    $shop = CarWashShop::where('owner_id', $owner->id)->firstOrFail();
 
     return view('owner.edit-shop', compact('shop'));
 }
 
-public function update(Request $request, $id)
+public function update(Request $request)
 {
-    $shop = CarWashShop::findOrFail($id);
-
-    if ($shop->owner_id !== Auth::guard('carwashowner')->id()) {
-        abort(403, 'Unauthorized action.');
-    }
+    $owner = Auth::guard('carwashowner')->user();
+    $shop = CarWashShop::where('owner_id', $owner->id)->firstOrFail();
 
     $validated = $request->validate([
         'name' => 'required|string|max:255',
@@ -50,7 +44,7 @@ public function update(Request $request, $id)
         'qr_code' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
     ]);
 
-    // Handle Cloudinary uploads like before
+    // Handle Cloudinary uploads
     $cloudinary = new Cloudinary([
         'cloud' => [
             'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),

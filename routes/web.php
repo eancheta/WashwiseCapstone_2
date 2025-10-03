@@ -34,6 +34,7 @@ Route::post('/owner/change-password', [OwnerAuthController::class, 'update'])
 // Edit shop page + update
 Route::get('/owner/edit-shop', [OwnerShopController::class, 'edit'])
     ->name('owner.shop.edit');
+
 Route::post('/owner/edit-shop', [OwnerShopController::class, 'update'])
     ->name('owner.shop.update');
 
