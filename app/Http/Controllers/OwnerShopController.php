@@ -26,7 +26,10 @@ public function edit()
     $owner = Auth::guard('carwashowner')->user();
     $shop = CarWashShop::where('owner_id', $owner->id)->firstOrFail();
 
-    return view('owner.edit-shop', compact('shop'));
+    return view('owner.edit-shop', [
+    'shop' => $shop,
+    'pageTitle' => 'Edit Shop',
+]);
 }
 
 public function update(Request $request)
