@@ -24,7 +24,7 @@ class ShopBookingController extends Controller
 
         $districts = CarWashShop::distinct()->pluck('district');
 
-        return Inertia::render('Customer/Dashboard', [
+        return Inertia::render('Dashboard', [
             'shops' => $shops,
             'districts' => $districts,
             'auth' => ['user' => Auth::user()],
@@ -135,7 +135,8 @@ class ShopBookingController extends Controller
             'contact_no' => 'required|string|max:20',
             'email' => 'required|email|max:255',
             'date_of_booking' => 'required|date_format:Y-m-d',
-            'time_of_booking' => ['required','date_format:H:i','regex:/^[0-2][0-3]:[0-5][0-9]$/'],
+            // ✅ Accepts 24h or 12h with AM/PM
+            'time_of_booking' => 'required|date_format:H:i|date_format:h:i A',
             'slot_number' => 'required|integer|min:1|max:4',
         ]);
 
@@ -169,7 +170,8 @@ class ShopBookingController extends Controller
             'contact_no' => 'required|string|max:20',
             'email' => 'required|email|max:255',
             'date_of_booking' => 'required|date_format:Y-m-d',
-            'time_of_booking' => ['required','date_format:H:i','regex:/^[0-2][0-3]:[0-5][0-9]$/'],
+            // ✅ Accepts 24h or 12h with AM/PM
+            'time_of_booking' => 'required|date_format:H:i|date_format:h:i A',
             'slot_number' => 'required|integer|min:1|max:4',
             'payment_amount' => 'required|numeric|in:50',
             'payment_proof' => 'required|image|mimes:jpg,jpeg,png|max:5120',
