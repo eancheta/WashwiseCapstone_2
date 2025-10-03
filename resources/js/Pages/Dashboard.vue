@@ -13,7 +13,7 @@ interface Shop {
   district: string | number
   logo?: string | null
   qr_code?: string | null
-  status: string // ✅ include status
+  status: string
 }
 interface AuthUser { id: number; name: string; email: string; email_verified_at?: string | null }
 interface Props { shops: Shop[]; districts: (string|number)[]; auth: { user: AuthUser | null } }
@@ -28,13 +28,30 @@ const logout = () => {
   })
 }
 
-const goToBooking = (shop: Shop) => {
+// Modal state
+const reminderOpen = ref(false)
+const selectedShop = ref<Shop | null>(null)
+
+const openReminder = (shop: Shop) => {
   if (shop.status === 'closed') {
     alert('🚫 Sorry, this shop is currently closed.')
     return
   }
   if (!props.auth.user) { Inertia.get('/login'); return }
-  Inertia.get(`/customer/book/${shop.id}`)
+  selectedShop.value = shop
+  reminderOpen.value = true
+}
+
+const confirmBooking = () => {
+  if (selectedShop.value) {
+    Inertia.get(`/customer/book/${selectedShop.value.id}`)
+    reminderOpen.value = false
+  }
+}
+
+const cancelReminder = () => {
+  reminderOpen.value = false
+  selectedShop.value = null
 }
 
 const filteredShops = computed(() => {
@@ -109,7 +126,7 @@ function handleImgError(e: Event) {
             {{ shop.status === 'open' ? '🟢 Open' : '🔴 Closed' }}
           </p>
 
-          <button v-if="shop.status === 'open'" @click.prevent="goToBooking(shop)" class="px-5 py-2 rounded-full bg-[#002B5C] text-white font-medium shadow hover:bg-[#FF2D2D] hover:scale-105 transition">
+          <button v-if="shop.status === 'open'" @click.prevent="openReminder(shop)" class="px-5 py-2 rounded-full bg-[#002B5C] text-white font-medium shadow hover:bg-[#FF2D2D] hover:scale-105 transition">
             Book Now
           </button>
           <button v-else disabled class="px-5 py-2 rounded-full bg-gray-400 text-white font-medium shadow cursor-not-allowed">
@@ -124,5 +141,22 @@ function handleImgError(e: Event) {
 
       <p v-else class="text-gray-500 text-center mt-10">No approved shops available.</p>
     </main>
+  </div>
+
+  <!-- ✅ Reminder Modal -->
+  <div v-if="reminderOpen" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-xl shadow-lg max-w-md w-full p-6">
+      <h2 class="text-lg font-bold text-gray-800 mb-4">Booking Reminder Notice</h2>
+      <ul class="list-disc list-inside text-sm text-gray-700 space-y-2 mb-4">
+        <li>Please make sure to arrive on time for your selected schedule to secure your slot.</li>
+        <li>If you are unable to come, kindly note that the reservation/down payment is non-refundable.</li>
+        <li>If you arrive late, accommodation will depend on the availability of the car wash staff and schedule.</li>
+      </ul>
+      <p class="text-sm text-gray-700 font-semibold mb-4">✅ By clicking “Confirm Booking”, you agree to these conditions.</p>
+      <div class="flex justify-end gap-3">
+        <button @click="cancelReminder" class="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400">Cancel</button>
+        <button @click="confirmBooking" class="px-4 py-2 bg-[#002B5C] text-white rounded-lg hover:bg-[#FF2D2D]">Confirm Booking</button>
+      </div>
+    </div>
   </div>
 </template>
