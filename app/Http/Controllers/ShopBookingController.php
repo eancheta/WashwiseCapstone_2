@@ -135,10 +135,16 @@ class ShopBookingController extends Controller
             'contact_no' => 'required|string|max:20',
             'email' => 'required|email|max:255',
             'date_of_booking' => 'required|date_format:Y-m-d',
-            // ✅ Accepts 24h or 12h with AM/PM
-            'time_of_booking' => 'required|date_format:H:i|date_format:h:i A',
+            // ✅ Accepts both 24h and 12h AM/PM
+            'time_of_booking' => [
+                'required',
+                'regex:/^([01]\d|2[0-3]):([0-5]\d)$|^(0?[1-9]|1[0-2]):([0-5]\d)\s?(AM|PM)$/i'
+            ],
             'slot_number' => 'required|integer|min:1|max:4',
         ]);
+
+        // Normalize time to 24h format
+        $data['time_of_booking'] = Carbon::parse($data['time_of_booking'])->format('H:i');
 
         $shop = $this->getShopWithCloudinaryImages($shopId);
 
@@ -170,12 +176,17 @@ class ShopBookingController extends Controller
             'contact_no' => 'required|string|max:20',
             'email' => 'required|email|max:255',
             'date_of_booking' => 'required|date_format:Y-m-d',
-            // ✅ Accepts 24h or 12h with AM/PM
-            'time_of_booking' => 'required|date_format:H:i|date_format:h:i A',
+            'time_of_booking' => [
+                'required',
+                'regex:/^([01]\d|2[0-3]):([0-5]\d)$|^(0?[1-9]|1[0-2]):([0-5]\d)\s?(AM|PM)$/i'
+            ],
             'slot_number' => 'required|integer|min:1|max:4',
             'payment_amount' => 'required|numeric|in:50',
             'payment_proof' => 'required|image|mimes:jpg,jpeg,png|max:5120',
         ]);
+
+        // Normalize time to 24h format
+        $data['time_of_booking'] = Carbon::parse($data['time_of_booking'])->format('H:i');
 
         $shop = $this->getShopWithCloudinaryImages($shopId);
 
@@ -205,7 +216,6 @@ class ShopBookingController extends Controller
         );
 
         $paymentProofUrl = $uploadResponse['secure_url'];
-
         $now = now();
 
         $query = DB::table($table)
