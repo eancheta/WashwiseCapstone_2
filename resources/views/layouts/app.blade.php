@@ -4,9 +4,15 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-   <title>
-    {{ $page['props']['title'] ?? $pageTitle ?? 'WashWise' }}
-</title>
+    <title>
+        @if(isset($page) && isset($page['props']['title']))
+            {{ $page['props']['title'] }}
+        @elseif(isset($pageTitle))
+            {{ $pageTitle }}
+        @else
+            WashWise
+        @endif
+    </title>
 
     @php
         $manifestPath = public_path('build/manifest.json');
@@ -15,25 +21,31 @@
     @endphp
 
     @if ($manifest && isset($manifest[$entryName]))
-        {{-- JS --}}
         <script type="module" src="{{ asset('build/' . $manifest[$entryName]['file']) }}"></script>
 
-        {{-- CSS --}}
         @if (!empty($manifest[$entryName]['css']))
             @foreach ($manifest[$entryName]['css'] as $cssFile)
                 <link rel="stylesheet" href="{{ asset('build/' . $cssFile) }}">
             @endforeach
         @endif
     @else
-        {{-- Fallback --}}
         <link rel="stylesheet" href="{{ asset('build/assets/app-DnjuimWl.css') }}">
         <script type="module" src="{{ asset('build/assets/app-p4oQ-QsI.js') }}"></script>
     @endif
 
     @routes
-    @inertiaHead
+    {{-- Only include Inertia head if Inertia is used --}}
+    @if (isset($page))
+        @inertiaHead
+    @endif
 </head>
 <body class="font-sans antialiased">
-    @inertia
+    @if (isset($page))
+        {{-- Inertia SPA root --}}
+        @inertia
+    @else
+        {{-- Traditional Blade content --}}
+        @yield('content')
+    @endif
 </body>
 </html>

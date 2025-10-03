@@ -32,11 +32,15 @@ Route::post('/owner/change-password', [OwnerAuthController::class, 'update'])
     ->name('owner.password.update');
 
 // Edit shop page + update
-Route::get('/owner/edit-shop', [OwnerShopController::class, 'edit'])
-    ->name('owner.shop.edit');
+Route::middleware(['web', 'auth:carwashowner'])->group(function () {
+    // Show edit page (owner edits their own shop)
+    Route::get('/owner/edit-shop', [OwnerShopController::class, 'edit'])
+        ->name('owner.shop.edit');
 
-Route::post('/owner/edit-shop', [OwnerShopController::class, 'update'])
-    ->name('owner.shop.update');
+    // Handle update (POST to keep it simple; you can change to PUT if you prefer)
+    Route::post('/owner/edit-shop', [OwnerShopController::class, 'update'])
+        ->name('owner.shop.update');
+});
 
 
 Route::get('/test-cloudinary', function () {
