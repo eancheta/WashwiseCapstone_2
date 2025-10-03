@@ -114,6 +114,26 @@ function openShop(id?: number | null) {
       </Link>
 
       <Link
+  :href="route('owner.password.edit')"
+  class="group flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-300"
+  :class="route().current('owner.password.edit')
+    ? 'bg-white text-[#182235] shadow-lg'
+    : 'bg-gradient-to-r from-[#1F3A5F] to-[#162B4A] text-white hover:bg-white hover:text-[#182235] hover:shadow-md'"
+>
+  Change Password
+</Link>
+
+<Link
+  :href="route('owner.shop.edit')"
+  class="group flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-300"
+  :class="route().current('owner.shop.edit')
+    ? 'bg-white text-[#182235] shadow-lg'
+    : 'bg-gradient-to-r from-[#1F3A5F] to-[#162B4A] text-white hover:bg-white hover:text-[#182235] hover:shadow-md'"
+>
+  Edit Shop
+</Link>
+
+      <Link
         :href="route('owner.reviews')"
         class="group flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-300"
         :class="route().current('owner.reviews')
