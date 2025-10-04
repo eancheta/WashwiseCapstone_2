@@ -74,66 +74,69 @@ function handleImgError(e: Event) {
 <template>
   <Head title="Customer Dashboard" />
 
-  <!-- Top bar -->
-  <div class="w-full bg-white flex flex-col sm:flex-row items-center justify-between px-4 sm:px-6 py-3 border-b border-gray-200 shadow-sm gap-2 sticky top-0 z-40">
-    <div class="flex items-center gap-4">
-      <button @click="toggleSidebar" class="flex flex-col justify-between w-6 h-5 focus:outline-none hover:opacity-80 transition">
-        <span class="block h-0.5 bg-gray-800 rounded"></span>
-        <span class="block h-0.5 bg-gray-800 rounded"></span>
-        <span class="block h-0.5 bg-gray-800 rounded"></span>
-      </button>
-      <img src="/logos/default-carwash.png" alt="App Logo" class="h-8 w-8 object-contain" />
-    </div>
-    <div class="text-center">
-      <h2 class="text-lg font-semibold text-gray-800">{{ props.auth.user?.name || 'Guest' }}</h2>
-    </div>
-  </div>
+  <!-- 🌟 Top bar -->
+  <header class="w-full bg-white flex items-center justify-between px-4 py-3 shadow-md sticky top-0 z-40">
+    <button @click="toggleSidebar" class="flex flex-col justify-between w-6 h-5 focus:outline-none hover:opacity-80 transition">
+      <span class="block h-0.5 bg-gray-800 rounded"></span>
+      <span class="block h-0.5 bg-gray-800 rounded"></span>
+      <span class="block h-0.5 bg-gray-800 rounded"></span>
+    </button>
 
-  <div class="flex min-h-screen">
+    <div class="flex items-center gap-2">
+      <img src="/images/washwiselogo2.png" alt="WashWise Logo" class="h-8 w-auto object-contain" />
+      <h1 class="text-lg font-bold text-[#FF2D2D] tracking-tight">WashWise</h1>
+    </div>
+
+    <span class="hidden sm:block text-sm font-semibold text-gray-800">{{ props.auth.user?.name || 'Guest' }}</span>
+  </header>
+
+  <div class="flex min-h-screen bg-gradient-to-br from-white via-blue-50 to-[#002B5C]">
+
     <!-- Overlay for mobile sidebar -->
     <div v-if="sidebarOpen" @click="toggleSidebar" class="fixed inset-0 bg-black bg-opacity-40 z-40 sm:hidden"></div>
 
-    <!-- Sidebar -->
+    <!-- 🧭 Sidebar -->
     <aside :class="['fixed top-0 left-0 h-full w-64 bg-gradient-to-b from-[#182235] to-[#0f172a] text-white shadow-lg z-50 transform transition-transform duration-300', sidebarOpen ? 'translate-x-0' : '-translate-x-full']">
       <div class="flex justify-between items-center p-4 border-b border-gray-700">
         <h2 class="text-lg font-bold">Menu</h2>
         <button @click="toggleSidebar" class="text-gray-400 hover:text-red-500 text-2xl">&times;</button>
       </div>
       <nav class="space-y-3 p-4">
-        <button @click.prevent="Inertia.get('/settings/profile')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 transition text-white-900 font-bold">⚙️ Edit Profile</button>
-        <button @click.prevent="Inertia.get('/settings/password')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 transition text-white-900 font-bold">🔒 Password</button>
-        <button @click.prevent="Inertia.get('/settings/appearance')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 transition text-white-900 font-bold">💳 Transaction History</button>
-        <button @click="logout" class="w-full text-left px-3 py-2 rounded-lg text-red-600 hover:bg-red-50 transition font-bold">🚪 Log Out</button>
+        <button @click.prevent="Inertia.get('/settings/profile')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 transition font-bold">⚙️ Edit Profile</button>
+        <button @click.prevent="Inertia.get('/settings/password')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 transition font-bold">🔒 Password</button>
+        <button @click.prevent="Inertia.get('/settings/appearance')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 transition font-bold">💳 Transaction History</button>
+        <button @click="logout" class="w-full text-left px-3 py-2 rounded-lg text-red-500 hover:bg-red-500/10 transition font-bold">🚪 Log Out</button>
       </nav>
     </aside>
 
-    <!-- Main content -->
-    <main class="flex-1 p-4 sm:p-8 bg-gradient-to-br from-white via-blue-50 to-[#002B5C]">
+    <!-- 🌊 Main content -->
+    <main class="flex-1 p-4 sm:p-8">
       <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-900 text-center">Available Car Wash Services</h1>
 
-<div class="mt-4 sm:mt-6">
-  <label for="district" class="block text-sm font-medium text-gray-900 mb-1">Nearby</label>
-  <div class="relative">
-    <select
-      id="district"
-      v-model="selectedDistrict"
-      class="block w-full appearance-none rounded-xl border border-gray-300 bg-gradient-to-r from-white via-gray-50 to-white px-4 py-2 pr-10 text-gray-900 shadow-md focus:border-[#FF2D2D] focus:ring-2 focus:ring-[#FF2D2D] sm:text-sm transition"
-    >
-      <option value="all">All Districts</option>
-      <option v-for="d in props.districts" :key="d" :value="d">District {{ d }}</option>
-    </select>
-    <!-- Arrow Icon -->
-    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-      <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-      </svg>
-    </div>
-  </div>
-</div>
+      <!-- 📍 District Selector -->
+      <div class="mt-6 bg-white/80 backdrop-blur-lg rounded-xl shadow-md p-4 border border-gray-100">
+        <label for="district" class="block text-sm font-medium text-gray-900 mb-1">Nearby</label>
+        <div class="relative">
+          <select
+            id="district"
+            v-model="selectedDistrict"
+            class="block w-full appearance-none rounded-xl border border-gray-300 bg-gradient-to-r from-white via-gray-50 to-white px-4 py-2 pr-10 text-gray-900 shadow focus:border-[#FF2D2D] focus:ring-2 focus:ring-[#FF2D2D] text-sm transition"
+          >
+            <option value="all">All Districts</option>
+            <option v-for="d in props.districts" :key="d" :value="d">District {{ d }}</option>
+          </select>
+          <!-- Arrow Icon -->
+          <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+            <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+        </div>
+      </div>
 
-      <!-- Shops -->
+      <!-- 🧽 Shops List -->
       <div v-if="filteredShops.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-        <div v-for="shop in filteredShops" :key="shop.id" class="bg-white shadow-md rounded-xl p-4 sm:p-6 flex flex-col items-center text-center border border-gray-200 hover:shadow-xl hover:-translate-y-1 transition">
+        <div v-for="shop in filteredShops" :key="shop.id" class="bg-white shadow-md rounded-xl p-4 flex flex-col items-center text-center border border-gray-200 hover:shadow-xl hover:-translate-y-1 transition">
           <img :src="getLogoSrc(shop)" alt="Car Wash Logo" class="h-20 w-20 object-contain mb-4" @error="handleImgError" />
           <h3 class="text-lg font-semibold text-gray-800">{{ shop.name }}</h3>
           <p class="text-sm text-gray-500 mb-2">{{ shop.address }}</p>
@@ -154,18 +157,18 @@ function handleImgError(e: Event) {
         </div>
       </div>
 
-      <p v-else class="text-gray-500 text-center mt-6 sm:mt-10">No approved shops available.</p>
+      <p v-else class="text-gray-500 text-center mt-8">No approved shops available.</p>
     </main>
   </div>
 
-  <!-- ✅ Reminder Modal -->
+  <!-- 💬 Booking Reminder Modal -->
   <div v-if="reminderOpen" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
-    <div class="bg-white rounded-xl shadow-lg max-w-md w-full sm:w-11/12 p-6 overflow-auto">
+    <div class="bg-white rounded-xl shadow-lg max-w-md w-full p-6">
       <h2 class="text-lg font-bold text-gray-800 mb-4">Booking Reminder Notice</h2>
       <ul class="list-disc list-inside text-sm text-gray-700 space-y-2 mb-4">
         <li>Please make sure to arrive on time for your selected schedule to secure your slot.</li>
         <li>If you are unable to come, kindly note that the reservation/down payment is non-refundable.</li>
-        <li>If you arrive late, accommodation will depend on the availability of the car wash staff and schedule.</li>
+        <li>If you arrive late, accommodation will depend on staff availability.</li>
       </ul>
       <p class="text-sm text-gray-700 font-semibold mb-4">✅ By clicking “Confirm Booking”, you agree to these conditions.</p>
       <div class="flex flex-col sm:flex-row justify-end gap-3">
