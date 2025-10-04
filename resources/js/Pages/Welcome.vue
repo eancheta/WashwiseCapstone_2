@@ -41,8 +41,6 @@ function closeModals() {
     <!-- Desktop Links -->
     <ul class="hidden sm:flex gap-8 items-center flex-1">
       <li><Link href="/" class="text-[#FF2D2D]">Home</Link></li>
-      <li><Link href="/about-us">About</Link></li>
-      <li><Link href="/services">Service</Link></li>
     </ul>
 
     <!-- Mobile Hamburger -->
@@ -64,8 +62,6 @@ function closeModals() {
   <!-- Mobile Menu -->
   <div v-if="showMobileMenu" class="sm:hidden bg-[#182235] text-white flex flex-col gap-4 px-4 py-4">
     <Link href="/" class="hover:text-[#FF2D2D]">Home</Link>
-    <Link href="/about-us" class="hover:text-[#FF2D2D]">About</Link>
-    <Link href="/services" class="hover:text-[#FF2D2D]">Service</Link>
   </div>
 
   <!-- Login Modal -->
