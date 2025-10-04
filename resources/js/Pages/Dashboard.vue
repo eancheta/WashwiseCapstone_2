@@ -111,13 +111,25 @@ function handleImgError(e: Event) {
     <main class="flex-1 p-4 sm:p-8 bg-gradient-to-br from-white via-blue-50 to-[#002B5C]">
       <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-900 text-center">Available Car Wash Services</h1>
 
-      <div class="mt-4 sm:mt-6">
-        <label for="district" class="block text-sm font-medium text-gray-900">Nearby</label>
-        <select id="district" v-model="selectedDistrict" class="mt-2 w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm text-gray-900">
-          <option value="all">All Districts</option>
-          <option v-for="d in props.districts" :key="d" :value="d">District {{ d }}</option>
-        </select>
-      </div>
+<div class="mt-4 sm:mt-6">
+  <label for="district" class="block text-sm font-medium text-gray-900 mb-1">Nearby</label>
+  <div class="relative">
+    <select
+      id="district"
+      v-model="selectedDistrict"
+      class="block w-full appearance-none rounded-xl border border-gray-300 bg-gradient-to-r from-white via-gray-50 to-white px-4 py-2 pr-10 text-gray-900 shadow-md focus:border-[#FF2D2D] focus:ring-2 focus:ring-[#FF2D2D] sm:text-sm transition"
+    >
+      <option value="all">All Districts</option>
+      <option v-for="d in props.districts" :key="d" :value="d">District {{ d }}</option>
+    </select>
+    <!-- Arrow Icon -->
+    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+      <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+      </svg>
+    </div>
+  </div>
+</div>
 
       <!-- Shops -->
       <div v-if="filteredShops.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
