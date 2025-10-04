@@ -20,20 +20,20 @@
         $entryName = 'resources/js/app.ts';
     @endphp
 
-    @if ($manifest && isset($manifest[$entryName]))
-        <script type="module" src="{{ asset('build/' . $manifest[$entryName]['file']) }}"></script>
+    {{-- Load CSS from manifest --}}
+    @if ($manifest && isset($manifest[$entryName]) && !empty($manifest[$entryName]['css']))
+        @foreach ($manifest[$entryName]['css'] as $cssFile)
+            <link rel="stylesheet" href="{{ asset('build/' . $cssFile) }}">
+        @endforeach
+    @endif
 
-        @if (!empty($manifest[$entryName]['css']))
-            @foreach ($manifest[$entryName]['css'] as $cssFile)
-                <link rel="stylesheet" href="{{ asset('build/' . $cssFile) }}">
-            @endforeach
-        @endif
-    @else
-        <link rel="stylesheet" href="{{ asset('build/assets/app-DnjuimWl.css') }}">
-        <script type="module" src="{{ asset('build/assets/app-p4oQ-QsI.js') }}"></script>
+    {{-- Load JS only on Inertia pages --}}
+    @if (isset($page) && $manifest && isset($manifest[$entryName]))
+        <script type="module" src="{{ asset('build/' . $manifest[$entryName]['file']) }}"></script>
     @endif
 
     @routes
+
     {{-- Only include Inertia head if Inertia is used --}}
     @if (isset($page))
         @inertiaHead
