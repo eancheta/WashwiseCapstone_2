@@ -1,71 +1,140 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container py-6">
-    <h2 class="mb-4 text-2xl font-semibold">Edit Shop Details</h2>
+<div class="flex justify-center items-center min-h-screen bg-gray-50">
+  <div class="bg-white shadow-lg rounded-2xl p-8 w-full max-w-lg">
+    <h2 class="text-2xl font-bold text-center text-[#182235] mb-6">
+      Edit Car Wash Shop
+    </h2>
 
-    {{-- Success message --}}
-    @if(session('success'))
-        <div class="alert alert-success mb-4">{{ session('success') }}</div>
+    @if (session('success'))
+      <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded mb-4">
+        {{ session('success') }}
+      </div>
     @endif
 
-    {{-- Validation errors --}}
-    @if($errors->any())
-        <div class="alert alert-danger mb-4">
-            <ul class="mb-0">
-                @foreach($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
+    @if ($errors->any())
+      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4">
+        <ul class="list-disc list-inside text-sm">
+          @foreach ($errors->all() as $error)
+            <li>{{ $error }}</li>
+          @endforeach
+        </ul>
+      </div>
     @endif
 
-    <form method="POST" action="{{ route('owner.shop.update') }}" enctype="multipart/form-data">
-        @csrf
+    <form action="{{ route('owner.shop.update', $shop->id) }}" method="POST" enctype="multipart/form-data">
+      @csrf
+      @method('PUT')
 
-        <div class="mb-3">
-            <label class="form-label">Name of Car Wash</label>
-            <input type="text" class="form-control" name="name" value="{{ old('name', $shop->name) }}" required>
+      {{-- Name --}}
+      <div class="mb-4">
+        <label for="name" class="block text-sm font-semibold text-gray-700 mb-2">Name</label>
+        <input
+          type="text"
+          id="name"
+          name="name"
+          value="{{ old('name', $shop->name) }}"
+          class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-red-500 focus:outline-none"
+          placeholder="Enter shop name"
+          required
+        >
+      </div>
+
+      {{-- Address --}}
+      <div class="mb-4">
+        <label for="address" class="block text-sm font-semibold text-gray-700 mb-2">Address</label>
+        <input
+          type="text"
+          id="address"
+          name="address"
+          value="{{ old('address', $shop->address) }}"
+          class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-red-500 focus:outline-none"
+          placeholder="Enter shop address"
+          required
+        >
+      </div>
+
+      {{-- District --}}
+      <div class="mb-4">
+        <label for="district" class="block text-sm font-semibold text-gray-700 mb-2">District</label>
+        <input
+          type="text"
+          id="district"
+          name="district"
+          value="{{ old('district', $shop->district) }}"
+          class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-red-500 focus:outline-none"
+          placeholder="1–6"
+          required
+        >
+      </div>
+
+      {{-- Logo --}}
+      <div class="mb-4">
+        <label for="logo" class="block text-sm font-semibold text-gray-700 mb-2">Logo</label>
+        <div class="flex items-center space-x-4">
+          <input
+            type="file"
+            id="logo"
+            name="logo"
+            class="block w-full text-sm text-gray-700 border border-gray-300 rounded-lg cursor-pointer focus:outline-none"
+          >
+          @if ($shop->logo)
+            <img src="{{ $shop->logo }}" alt="Shop Logo" class="h-12 w-12 rounded-lg object-cover border">
+          @endif
         </div>
+      </div>
 
-        <div class="mb-3">
-            <label class="form-label">Address</label>
-            <input type="text" class="form-control" name="address" value="{{ old('address', $shop->address) }}" required>
+      {{-- Description --}}
+      <div class="mb-4">
+        <label for="description" class="block text-sm font-semibold text-gray-700 mb-2">Description</label>
+        <textarea
+          id="description"
+          name="description"
+          class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-red-500 focus:outline-none"
+          rows="3"
+          placeholder="Write shop description"
+          required
+        >{{ old('description', $shop->description) }}</textarea>
+      </div>
+
+      {{-- Services Offered --}}
+      <div class="mb-4">
+        <label for="services_offered" class="block text-sm font-semibold text-gray-700 mb-2">Services Offered</label>
+        <textarea
+          id="services_offered"
+          name="services_offered"
+          class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-red-500 focus:outline-none"
+          rows="3"
+          placeholder="List services"
+          required
+        >{{ old('services_offered', $shop->services_offered) }}</textarea>
+      </div>
+
+      {{-- QR Code --}}
+      <div class="mb-6">
+        <label for="qr_code" class="block text-sm font-semibold text-gray-700 mb-2">QR Code</label>
+        <div class="flex items-center space-x-4">
+          <input
+            type="file"
+            id="qr_code"
+            name="qr_code"
+            class="block w-full text-sm text-gray-700 border border-gray-300 rounded-lg cursor-pointer focus:outline-none"
+          >
+          @if ($shop->qr_code)
+            <img src="{{ $shop->qr_code }}" alt="QR Code" class="h-12 w-12 rounded-lg object-cover border">
+          @endif
         </div>
+      </div>
 
-        <div class="mb-3">
-            <label class="form-label">District</label>
-            <input type="text" class="form-control" name="district" value="{{ old('district', $shop->district) }}">
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label">Description</label>
-            <textarea class="form-control" name="description" rows="4">{{ old('description', $shop->description) }}</textarea>
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label">Services Offered</label>
-            <input type="text" class="form-control" name="services_offered" value="{{ old('services_offered', $shop->services_offered) }}">
-            <small class="text-muted">Comma-separated (example: Wash, Vacuum, Wax)</small>
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label">Car Wash Logo</label><br>
-            @if(!empty($shop->logo))
-                <img src="{{ $shop->logo }}" alt="Shop Logo" width="120" style="display:block;margin-bottom:8px;">
-            @endif
-            <input type="file" name="logo" class="form-control">
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label">QR Code</label><br>
-            @if(!empty($shop->qr_code))
-                <img src="{{ $shop->qr_code }}" alt="Shop QR Code" width="120" style="display:block;margin-bottom:8px;">
-            @endif
-            <input type="file" name="qr_code" class="form-control">
-        </div>
-
-        <button type="submit" class="btn btn-primary">Update Shop</button>
+      {{-- Submit Button --}}
+      <button
+        type="submit"
+        class="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 rounded-lg transition-all duration-300 shadow-md"
+      >
+        Update Shop
+      </button>
     </form>
+  </div>
 </div>
 @endsection
