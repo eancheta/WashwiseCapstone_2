@@ -84,7 +84,6 @@ function handleImgError(e: Event) {
 
     <div class="flex items-center gap-2">
       <img src="/images/washwiselogo2.png" alt="WashWise Logo" class="h-8 w-auto object-contain" />
-      <h1 class="text-lg font-bold text-[#FF2D2D] tracking-tight">WashWise</h1>
     </div>
 
     <span class="hidden sm:block text-sm font-semibold text-gray-800">{{ props.auth.user?.name || 'Guest' }}</span>
