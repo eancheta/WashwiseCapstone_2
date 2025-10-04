@@ -25,7 +25,6 @@
 
     <form action="{{ route('owner.shop.update', $shop->id) }}" method="POST" enctype="multipart/form-data">
       @csrf
-      @method('PUT')
 
       {{-- Name --}}
       <div class="mb-4">
