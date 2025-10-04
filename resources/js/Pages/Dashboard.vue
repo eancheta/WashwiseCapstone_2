@@ -83,7 +83,7 @@ function handleImgError(e: Event) {
     </button>
 
     <div class="flex items-center gap-2">
-      <img src="/images/washwiselogo2.png" alt="WashWise Logo" class="h-8 w-auto object-contain" />
+      <img src="/images/washwiselogo2.png" alt="WashWise Logo" class="h-10 w-auto object-contain" />
     </div>
 
     <span class="hidden sm:block text-sm font-semibold text-gray-800">{{ props.auth.user?.name || 'Guest' }}</span>
