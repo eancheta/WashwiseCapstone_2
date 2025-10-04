@@ -59,11 +59,6 @@ function closeModals() {
     </div>
   </nav>
 
-  <!-- Mobile Menu -->
-  <div v-if="showMobileMenu" class="sm:hidden bg-[#182235] text-white flex flex-col gap-4 px-4 py-4">
-    <Link href="/" class="hover:text-[#FF2D2D]">Home</Link>
-  </div>
-
   <!-- Login Modal -->
   <div v-if="showLoginModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
     <div class="bg-white rounded-lg p-6 sm:p-8 w-full sm:max-w-xs md:max-w-sm shadow-lg relative">
