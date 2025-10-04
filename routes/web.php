@@ -24,6 +24,9 @@ use App\Http\Controllers\Customer\FeedbackController;
 use App\Http\Controllers\Owner\ReviewController;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
+// routes/web.php
+Route::get('/emailvcode', [EmailVerificationController::class, 'show'])
+    ->name('emailvcode'); // no auth middleware
 
 // Change password page + update
 Route::get('/owner/change-password', [OwnerAuthController::class, 'edit'])
