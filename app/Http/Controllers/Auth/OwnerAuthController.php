@@ -15,12 +15,14 @@ use Illuminate\Support\Facades\Auth;
 class OwnerAuthController extends Controller
 {
 
-    public function showChangePassword()
+public function edit()
 {
-    return view('owner.change-password');
+    return view('owner.change-password', [
+        'pageTitle' => 'Change Password',
+    ]);
 }
 
-public function updatePassword(Request $request)
+public function update(Request $request)
 {
     $owner = Auth::guard('carwashowner')->user();
 
