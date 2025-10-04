@@ -5,17 +5,12 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import TextLink from '@/components/TextLink.vue';
 
-const form = useForm({
-  code: '',
-});
-
+const form = useForm({ code: '' });
 const page = usePage();
 const email = (page.props.flash as { email?: string })?.email ?? '';
 
 function submit() {
-  form.post(route('verify.code'), {
-    preserveScroll: true,
-  })
+  form.post(route('verify.code'), { preserveScroll: true });
 }
 </script>
 
@@ -24,16 +19,11 @@ function submit() {
 
   <div class="min-h-screen flex flex-col bg-[#F8FAFC]">
     <!-- Top Bar -->
-    <div class="w-full bg-white flex flex-wrap items-center justify-between px-8 py-2 border-b border-gray-200 text-sm font-semibold">
+    <div class="w-full bg-white flex flex-col sm:flex-row items-center justify-between px-4 sm:px-8 py-2 border-b border-gray-200 text-sm font-semibold gap-2 sm:gap-8">
       <div class="flex items-center gap-2">
-        <img
-          src="/images/washwiselogo2.png"
-          alt="WashWise Logo"
-          class="h-14 w-auto mx-auto block"
-          draggable="false"
-        />
+        <img src="/images/washwiselogo2.png" alt="WashWise Logo" class="h-14 w-auto mx-auto block" draggable="false" />
       </div>
-      <div class="flex gap-8 items-center text-[#002B5C]">
+      <div class="flex flex-col sm:flex-row gap-2 sm:gap-8 text-[#002B5C] items-center">
         <div class="flex items-center gap-2">
           <span>📞</span> Call Us <span class="font-normal">+012 345 6789</span>
         </div>
@@ -44,38 +34,36 @@ function submit() {
     </div>
 
     <!-- Navbar -->
-    <nav class="w-full bg-[#182235] flex items-center px-8 py-2 text-white font-semibold shadow z-10">
-      <ul class="flex gap-8 items-center flex-1">
+    <nav class="w-full bg-[#182235] flex flex-col sm:flex-row sm:items-center px-4 sm:px-8 py-2 text-white font-semibold shadow z-10">
+      <ul class="flex flex-col sm:flex-row gap-4 sm:gap-8 items-center flex-1">
         <TextLink :href="route('home')" class="text-[#FF2D2D]">Home</TextLink>
-        <li><TextLink :href="'#'">About</TextLink></li>
-        <li><TextLink :href="'#'">Service</TextLink></li>
+        <li><TextLink href="#">About</TextLink></li>
+        <li><TextLink href="#">Service</TextLink></li>
       </ul>
-      <div class="flex items-center gap-4 ml-8">
+      <div class="flex items-center gap-4 mt-2 sm:mt-0">
         <TextLink
           :href="route('login')"
-          class="text-white font-semibold hover:text-[#FF2D2D] transition [text-decoration:none]"
-          style="font-size: 1.0rem; line-height: 1;"
+          class="text-white font-semibold hover:text-[#FF2D2D] transition text-sm sm:text-base"
         >
           Log in
         </TextLink>
         <TextLink
           :href="route('register')"
-          class="px-6 py-2 rounded-full border-2 font-semibold transition [text-decoration:none]"
-          style="border-color:#FF2D2D; color:#FF2D2D; font-size: 1.0rem; line-height: 1;"
+          class="px-4 sm:px-6 py-2 rounded-full border-2 font-semibold transition text-sm sm:text-base border-[#FF2D2D] text-[#FF2D2D]"
         >
           Register
         </TextLink>
       </div>
     </nav>
 
-    <!-- Email Verification Form -->
-    <div class="flex-grow flex items-center justify-center bg-[#F8FAFC]">
-            <form
+    <!-- Verification Form -->
+    <div class="flex-grow flex items-center justify-center px-4 py-8 sm:py-16">
+      <form
         @submit.prevent="submit"
-        class="flex flex-col gap-4 w-full max-w-sm mx-auto bg-white p-8 rounded-lg shadow-md"
+        class="flex flex-col gap-4 w-full max-w-md mx-auto bg-white p-6 sm:p-8 rounded-lg shadow-md"
       >
-        <h2 class="text-2xl font-bold text-center text-[#182235]">Verify Your Email</h2>
-        <p class="text-center text-gray-500 mb-4">
+        <h2 class="text-2xl sm:text-3xl font-bold text-center text-[#182235]">Verify Your Email</h2>
+        <p class="text-center text-gray-500 mb-4 text-sm sm:text-base">
           Please enter the verification code we sent to
           <span class="font-semibold text-[#002B5C]">{{ email }}</span>.
         </p>
@@ -102,21 +90,11 @@ function submit() {
             type="submit"
             class="mt-2 w-full"
             style="background:#FF2D2D; color:#fff; font-weight:600; padding-top:0.5rem; padding-bottom:0.5rem; border-radius:0.5rem;"
+            :disabled="form.processing"
           >
-            <span>Verify Email</span>
+            <span v-if="!form.processing">Verify Email</span>
+            <span v-else>Processing...</span>
           </Button>
-        </div>
-
-        <!-- Link to Resend Code -->
-        <div class="text-center text-sm mt-2">
-          <span class="text-gray-600">Didn't receive the code?</span>
-          <TextLink
-            :href="'#'"
-            class="text-base font-semibold ml-1 transition hover:text-[#FF2D2D] [text-decoration:none]"
-            style="color:#002366;"
-          >
-            Resend Code
-          </TextLink>
         </div>
       </form>
     </div>

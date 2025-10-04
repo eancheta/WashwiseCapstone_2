@@ -4,7 +4,6 @@ import { ref } from 'vue';
 
 const showLoginModal = ref(false);
 const showRegisterModal = ref(false);
-const showMobileMenu = ref(false);
 
 function openLoginModal() {
   showLoginModal.value = true;
@@ -42,12 +41,6 @@ function closeModals() {
     <ul class="hidden sm:flex gap-8 items-center flex-1">
       <li><Link href="/" class="text-[#FF2D2D]">Home</Link></li>
     </ul>
-
-    <!-- Mobile Hamburger -->
-    <div class="sm:hidden flex-1 flex justify-between items-center">
-      <span class="font-bold text-lg text-[#FF2D2D]">Menu</span>
-      <button @click="showMobileMenu = !showMobileMenu" class="text-white text-2xl">☰</button>
-    </div>
 
     <div class="flex items-center gap-4 ml-0 sm:ml-8">
       <button @click="openLoginModal" class="text-white font-semibold hover:text-[#FF2D2D] transition text-sm sm:text-base">
