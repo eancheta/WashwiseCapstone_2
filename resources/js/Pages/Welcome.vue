@@ -38,7 +38,7 @@ function closeModals() {
   <!-- Navigation Bar -->
   <nav class="w-full bg-[#182235] flex items-center px-4 sm:px-8 py-2 text-white font-semibold shadow z-10">
     <!-- Desktop Links -->
-    <ul class="hidden sm:flex gap-8 items-center flex-1">
+    <ul class="sm:flex gap-8 items-center flex-1">
       <li><Link href="/" class="text-[#FF2D2D]">Home</Link></li>
     </ul>
 
