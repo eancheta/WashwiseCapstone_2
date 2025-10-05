@@ -100,9 +100,6 @@
                 <button @click="approve(appt.id)" class="px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 shadow-md transition transform hover:-translate-y-0.5">
                   Approve
                 </button>
-                <button @click="decline(appt.id)" class="px-4 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 shadow-md transition transform hover:-translate-y-0.5">
-                  Decline
-                </button>
               </td>
             </tr>
           </tbody>
@@ -136,9 +133,6 @@ const props = defineProps<{ appointments: Appointment[] }>()
 // --- Status actions ---
 function approve(id: number) {
   router.post(`/owner/appointments/${id}/approve`)
-}
-function decline(id: number) {
-  router.post(`/owner/appointments/${id}/decline`)
 }
 
 // ✅ Always return one <img> source
