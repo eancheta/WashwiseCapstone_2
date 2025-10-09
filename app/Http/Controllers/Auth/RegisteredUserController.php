@@ -24,21 +24,21 @@ class RegisteredUserController extends Controller
     }
 
     /**
-     * Handle registration.
+     * Handle registration submission.
      */
     public function store(Request $request)
     {
-        // ✅ Validate input
+        // Validate user input
         $validated = $request->validate([
             'name'      => 'required|string|max:255',
             'email'     => 'required|email|unique:users,email',
             'password'  => 'required|string|min:8|confirmed',
         ]);
 
-        // ✅ Generate verification code
+        // Generate a random 6-digit verification code
         $verificationCode = (string) rand(100000, 999999);
 
-        // ✅ Create customer user
+        // Create a new user record
         $user = User::create([
             'name'              => $validated['name'],
             'email'             => $validated['email'],
@@ -46,50 +46,64 @@ class RegisteredUserController extends Controller
             'verification_code' => $verificationCode,
         ]);
 
-        // ✅ Send verification email via Brevo API
+        // Attempt to send verification email via Brevo
         try {
             $apiResponse = $this->sendVerificationCode($user->email, $user->name, $verificationCode);
 
-            if (isset($apiResponse['ok']) && $apiResponse['ok']) {
-                Log::info('Verification email sent via Brevo', ['email' => $user->email]);
-            } else {
-                Log::error('Failed to send verification email', [
+            if (isset($apiResponse['messageId'])) {
+                Log::info('✅ Customer verification email sent via Brevo', [
                     'email' => $user->email,
-                    'body'  => $apiResponse,
+                    'response' => $apiResponse,
+                ]);
+            } else {
+                Log::error('❌ Failed to send verification email (Brevo)', [
+                    'email' => $user->email,
+                    'response' => $apiResponse,
                 ]);
             }
         } catch (\Exception $e) {
-            Log::error('Brevo API call failed', ['message' => $e->getMessage()]);
+            Log::error('❌ Brevo API call exception (Customer)', [
+                'message' => $e->getMessage(),
+                'email' => $user->email,
+            ]);
         }
 
-        // ✅ Store email in session for verification
+        // Store email for the verification step
         session(['customer_verification_email' => $user->email]);
 
-        // ✅ Redirect to verification page
+        // Redirect to verification code input page
         return redirect()->route('emailvcode')->with('email', $user->email);
     }
 
     /**
-     * Send email verification via Brevo API.
+     * Send verification email using Brevo (Sendinblue).
      */
     private function sendVerificationCode($toEmail, $toName, $code)
     {
+        // Render Blade email template to HTML
         $htmlContent = View::make('emails.verify-code', [
             'name' => $toName,
             'code' => $code,
         ])->render();
 
+        // Plain text version (fallback)
+        $textContent = "Hello {$toName},\nYour WashWise verification code is: {$code}\n\nThanks,\nWashWise Team";
+
+        // Prepare API payload
         $payload = [
             'sender' => [
                 'name'  => env('MAIL_FROM_NAME', 'WashWise'),
                 'email' => env('MAIL_FROM_ADDRESS', 'noreply@example.com'),
             ],
-            'to' => [['email' => $toEmail, 'name' => $toName]],
-            'subject' => 'WashWise — Your verification code',
+            'to' => [
+                ['email' => $toEmail, 'name' => $toName],
+            ],
+            'subject' => 'WashWise — Verify your email',
             'htmlContent' => $htmlContent,
-            'textContent' => "Your verification code is: {$code}",
+            'textContent' => $textContent,
         ];
 
+        // Send via Brevo API
         $response = Http::withHeaders([
             'api-key' => env('SENDINBLUE_API_KEY'),
             'Content-Type' => 'application/json',
@@ -99,7 +113,40 @@ class RegisteredUserController extends Controller
     }
 
     /**
-     * Show login page.
+     * Show verification code page.
+     */
+    public function showVerificationPage(): Response
+    {
+        $email = session('customer_verification_email');
+        return Inertia::render('EmailVerificationCode', [
+            'email' => $email,
+        ]);
+    }
+
+    /**
+     * Verify the submitted code.
+     */
+    public function verifyCode(Request $request)
+    {
+        $request->validate(['code' => 'required|numeric']);
+
+        $email = session('customer_verification_email');
+        $user = User::where('email', $email)->first();
+
+        if (!$user || $user->verification_code !== $request->code) {
+            return back()->withErrors(['code' => 'Invalid verification code.']);
+        }
+
+        $user->update([
+            'email_verified_at' => now(),
+            'verification_code' => null,
+        ]);
+
+        return redirect()->route('login')->with('success', 'Email verified successfully. You can now log in.');
+    }
+
+    /**
+     * Show the login page.
      */
     public function showLogin(): Response
     {
@@ -107,7 +154,7 @@ class RegisteredUserController extends Controller
     }
 
     /**
-     * Handle login.
+     * Handle login request.
      */
     public function login(Request $request)
     {
@@ -132,38 +179,5 @@ class RegisteredUserController extends Controller
         }
 
         return back()->withErrors(['email' => 'Invalid credentials'])->withInput();
-    }
-
-    /**
-     * Show the email verification code input page.
-     */
-    public function showVerificationPage(): Response
-    {
-        $email = session('customer_verification_email');
-        return Inertia::render('EmailVerificationCode', [
-            'email' => $email,
-        ]);
-    }
-
-    /**
-     * Verify code submission.
-     */
-    public function verifyCode(Request $request)
-    {
-        $request->validate(['code' => 'required|numeric']);
-
-        $email = session('customer_verification_email');
-        $user = User::where('email', $email)->first();
-
-        if (!$user || $user->verification_code !== $request->code) {
-            return back()->withErrors(['code' => 'Invalid verification code.']);
-        }
-
-        $user->update([
-            'email_verified_at' => now(),
-            'verification_code' => null,
-        ]);
-
-        return redirect()->route('login')->with('success', 'Email verified successfully. You can now log in.');
     }
 }
