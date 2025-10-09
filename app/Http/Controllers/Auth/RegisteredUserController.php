@@ -205,7 +205,6 @@ public function verifyCode(Request $request)
 
     $email = session('customer_verification_email');
     $user = User::where('email', $email)->first();
-
     if (!$user) {
         return back()->withErrors(['code' => 'User not found.']);
     }
