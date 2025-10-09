@@ -2,9 +2,15 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
-use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Http;
+use Inertia\Inertia;
+
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
+
+// Controllers
 use App\Http\Controllers\Auth\StaticLoginController;
 use App\Http\Controllers\Auth\CustomerAuthController;
 use App\Http\Controllers\AdminController;
@@ -21,43 +27,53 @@ use App\Http\Controllers\OwnerAppointmentController;
 use App\Http\Controllers\Owner\WalkinController;
 use App\Http\Controllers\Customer\FeedbackController;
 use App\Http\Controllers\Owner\ReviewController;
-use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use App\Http\Controllers\Auth\RegisteredUserController;
 
+/*
+|--------------------------------------------------------------------------
+| CUSTOMER AUTH (Register → Verify → Login)
+|--------------------------------------------------------------------------
+*/
 
-// routes/web.php
-Route::get('/emailvcode', [RegisteredUserController::class, 'show'])
-    ->name('emailvcode'); // no auth middleware
+// Register new customer
+Route::get('/register', [RegisteredUserController::class, 'create'])->name('register');
+Route::post('/register', [RegisteredUserController::class, 'store'])->name('register.store');
 
-// Change password page + update
-Route::get('/owner/change-password', [OwnerAuthController::class, 'edit'])
-    ->name('owner.password.edit');
-Route::post('/owner/change-password', [OwnerAuthController::class, 'update'])
-    ->name('owner.password.update');
+// Customer verification (code input)
+Route::get('/emailvcode', [RegisteredUserController::class, 'showVerificationPage'])->name('emailvcode');
+Route::post('/verify-code', [RegisteredUserController::class, 'verifyCode'])->name('verify.code');
 
-// Edit shop page + update
-Route::middleware(['web', 'auth:carwashowner'])->group(function () {
-    // Show edit page (owner edits their own shop)
-    Route::get('/owner/edit-shop', [OwnerShopController::class, 'edit'])
-        ->name('owner.shop.edit');
+// Login / Logout
+Route::get('/login', [RegisteredUserController::class, 'showLogin'])->name('login');
+Route::post('/login', [RegisteredUserController::class, 'login'])->name('login.submit');
+Route::post('/logout', [CustomerAuthController::class, 'logout'])->name('logout');
 
-    // Handle update (POST to keep it simple; you can change to PUT if you prefer)
-    Route::post('/owner/edit-shop', [OwnerShopController::class, 'update'])
-        ->name('owner.shop.update');
-});
+/*
+|--------------------------------------------------------------------------
+| OWNER AUTH (Unchanged)
+|--------------------------------------------------------------------------
+*/
+Route::prefix('owner')->group(function () {
+    Route::get('/register', [OwnerAuthController::class, 'create'])->name('owner.register.show');
+    Route::post('/register', [OwnerAuthController::class, 'store'])->name('owner.register');
+    Route::get('/login', [OwnerAuthController::class, 'showLogin'])->name('owner.login.show');
+    Route::post('/login', [OwnerAuthController::class, 'login'])->name('owner.login');
+    Route::get('/verify', [OwnerVerificationController::class, 'show'])->name('owner.verify.show');
+    Route::post('/verify', [OwnerVerificationController::class, 'verify'])->name('owner.verify.submit');
+    Route::post('/verify/resend', [OwnerVerificationController::class, 'resend'])->name('owner.verify.resend');
 
+    Route::middleware(['auth:carwashowner'])->group(function () {
+        Route::get('/dashboard', [OwnerDashboardController::class, 'index'])->name('carwashownerdashboard');
+        Route::get('/appointments', [OwnerAppointmentController::class, 'index'])->name('owner.appointments');
+        Route::post('/appointments/{id}/approve', [OwnerAppointmentController::class, 'approve'])->name('owner.appointments.approve');
+        Route::post('/appointments/{id}/decline', [OwnerAppointmentController::class, 'decline'])->name('owner.appointments.decline');
+        Route::get('/shop/create', [OwnerShopController::class, 'create'])->name('owner.shop.create');
+        Route::post('/shop', [OwnerShopController::class, 'store'])->name('owner.shop.store');
+        Route::get('/reviews', [ReviewController::class, 'index'])->name('owner.reviews');
 
-Route::get('/test-cloudinary', function () {
-    $filePath = public_path('apple-touch-icon.png');
-
-    try {
-        $result = Cloudinary::upload($filePath, [
-            'folder' => 'test_uploads',
-        ]);
-        return $result->getSecurePath();
-    } catch (\Throwable $e) {
-        return "Upload failed: " . $e->getMessage();
-    }
+        Route::post('/shop/{id}/close', [OwnerShopController::class, 'closeShop'])->name('owner.shop.close');
+        Route::post('/shop/{id}/open', [OwnerShopController::class, 'openShop'])->name('owner.shop.open');
+    });
 });
 
 /*
@@ -84,47 +100,16 @@ Route::middleware(['auth'])->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| OWNER ROUTES
+| DASHBOARD
 |--------------------------------------------------------------------------
 */
-Route::prefix('owner')->group(function () {
-    Route::get('/register', [OwnerAuthController::class, 'create'])->name('owner.register.show');
-    Route::post('/register', [OwnerAuthController::class, 'store'])->name('owner.register');
-    Route::get('/login', [OwnerAuthController::class, 'showLogin'])->name('owner.login.show');
-    Route::post('/login', [OwnerAuthController::class, 'login'])->name('owner.login');
-    Route::get('/verify', [OwnerVerificationController::class, 'show'])->name('owner.verify.show');
-    Route::post('/verify', [OwnerVerificationController::class, 'verify'])->name('owner.verify.submit');
-    Route::post('/verify/resend', [OwnerVerificationController::class, 'resend'])->name('owner.verify.resend');
-
-    Route::middleware(['auth:carwashowner'])->group(function () {
-        Route::get('/dashboard', [OwnerDashboardController::class, 'index'])->name('carwashownerdashboard');
-        Route::get('/appointments', [OwnerAppointmentController::class, 'index'])->name('owner.appointments');
-        Route::post('/appointments/{id}/approve', [OwnerAppointmentController::class, 'approve'])->name('owner.appointments.approve');
-        Route::post('/appointments/{id}/decline', [OwnerAppointmentController::class, 'decline'])->name('owner.appointments.decline');
-        Route::get('/shop/create', [OwnerShopController::class, 'create'])->name('owner.shop.create');
-        Route::post('/shop', [OwnerShopController::class, 'store'])->name('owner.shop.store');
-        Route::get('/reviews', [ReviewController::class, 'index'])->name('owner.reviews');
-
-        Route::post('/owner/shop/{id}/close', [OwnerShopController::class, 'closeShop'])->name('owner.shop.close');
-        Route::post('/owner/shop/{id}/open',  [OwnerShopController::class, 'openShop'])->name('owner.shop.open');
-    });
-});
+Route::get('/dashboard', [CustomerDashboardController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 
 /*
 |--------------------------------------------------------------------------
-| CUSTOMER AUTH
-|--------------------------------------------------------------------------
-*/
-Route::get('/login', [CustomerAuthController::class, 'showLogin'])->name('login');
-Route::post('/login', [CustomerAuthController::class, 'login'])->name('login.submit');
-Route::post('/logout', [CustomerAuthController::class, 'logout'])->name('logout');
-Route::get('/register', fn () => Inertia::render('auth/Register'))->name('register');
-Route::get('/emailvcode', fn () => Inertia::render('EmailVerificationCode'))->middleware('auth')->name('emailvcode');
-Route::post('/verify-code', [RegisteredUserController::class, 'verify'])->middleware('auth')->name('verify.code');
-
-/*
-|--------------------------------------------------------------------------
-| ADMIN AUTH
+| ADMIN ROUTES
 |--------------------------------------------------------------------------
 */
 Route::get('/loginAdmin', [StaticLoginController::class, 'showLogin'])->name('loginAdmin');
@@ -138,29 +123,19 @@ Route::post('/admin/owners/{id}/decline', [AdminController::class, 'decline'])->
 | STATIC PAGES
 |--------------------------------------------------------------------------
 */
-Route::get('/about', fn () => Inertia::render('AboutUs'));
-Route::get('/about-us', fn () => Inertia::render('AboutUs'))->name('about');
-Route::get('/', fn () => Inertia::render('Welcome'))->name('home');
+Route::get('/about', fn() => Inertia::render('AboutUs'))->name('about');
+Route::get('/', fn() => Inertia::render('Welcome'))->name('home');
 
 /*
 |--------------------------------------------------------------------------
-| DASHBOARD
-|--------------------------------------------------------------------------
-*/
-Route::get('/dashboard', [CustomerDashboardController::class, 'index'])
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
-
-/*
-|--------------------------------------------------------------------------
-| DEBUG
+| DEBUG / TEST
 |--------------------------------------------------------------------------
 */
 Route::get('/test-auth', function () {
     return response()->json([
         'user' => Auth::user() ? Auth::user()->toArray() : null,
         'shops' => DB::table('car_wash_shops')->get()->toArray(),
-        'owners' => DB::table('car_wash_owners')->where('status', 'approved')->toArray(),
+        'owners' => DB::table('car_wash_owners')->where('status', 'approved')->get()->toArray(),
     ]);
 })->middleware('auth');
 
@@ -181,7 +156,11 @@ Route::get('/debug-send-mail', function () {
     return response()->json(['status' => $resp->status(), 'body' => $resp->body()]);
 });
 
-
+/*
+|--------------------------------------------------------------------------
+| OWNER WALK-IN + CUSTOMER FEEDBACK
+|--------------------------------------------------------------------------
+*/
 Route::middleware(['auth:carwashowner'])->prefix('owner')->name('owner.')->group(function () {
     Route::get('/walkin', [WalkinController::class, 'create'])->name('walkin');
     Route::post('/walkin', [WalkinController::class, 'store'])->name('walkin.store');
@@ -194,7 +173,7 @@ Route::prefix('customer')->name('customer.')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| Include Other Route Files
+| ADDITIONAL ROUTE FILES
 |--------------------------------------------------------------------------
 */
 require __DIR__ . '/settings.php';
