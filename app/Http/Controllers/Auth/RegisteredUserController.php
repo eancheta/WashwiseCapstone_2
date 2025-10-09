@@ -75,40 +75,72 @@ class RegisteredUserController extends Controller
      * Send verification email using Brevo (same as owner)
      */
     public function sendVerificationCode($toEmail, $toName, $code)
-    {
+{
+    try {
         $htmlContent = View::make('emails.verify-code', [
             'name' => $toName,
             'code' => $code,
         ])->render();
+    } catch (\Throwable $e) {
+        Log::error('Email view render failed', ['view' => 'emails.verify-code', 'error' => $e->getMessage()]);
+        // Return a structure similar to Brevo error so calling code logs it
+        return ['error' => 'view_render_failed', 'message' => $e->getMessage()];
+    }
 
-        $textContent = "Hello {$toName},\nYour WashWise verification code is: {$code}\n\nThanks,\nWashWise";
+    $textContent = "Hello {$toName},\nYour WashWise verification code is: {$code}\n\nThanks,\nWashWise";
 
-        $payload = [
-            'sender' => [
-                'name'  => env('MAIL_FROM_NAME', 'WashWise'),
-                'email' => env('MAIL_FROM_ADDRESS', 'noreply@example.com'),
-            ],
-            'to' => [
-                ['email' => $toEmail, 'name' => $toName],
-            ],
-            'subject' => 'WashWise — Your verification code',
-            'htmlContent' => $htmlContent,
-            'textContent' => $textContent,
-        ];
+    $payload = [
+        'sender' => [
+            'name'  => env('MAIL_FROM_NAME', 'WashWise'),
+            'email' => env('MAIL_FROM_ADDRESS', 'noreply@example.com'),
+        ],
+        'to' => [
+            ['email' => $toEmail, 'name' => $toName],
+        ],
+        'subject' => 'WashWise — Your verification code',
+        'htmlContent' => $htmlContent,
+        'textContent' => $textContent,
+    ];
 
+    Log::info('Brevo: sending payload', ['to' => $toEmail, 'payload' => $payload]);
+
+    try {
         $response = Http::withHeaders([
             'api-key' => env('SENDINBLUE_API_KEY'),
             'Content-Type' => 'application/json',
         ])->post('https://api.sendinblue.com/v3/smtp/email', $payload);
-
-        // Log the full response for debugging
-        Log::info('📨 Brevo customer response', [
-            'status' => $response->status(),
-            'body' => $response->json(),
-        ]);
-
-        return $response->json();
+    } catch (\Throwable $e) {
+        Log::error('Brevo HTTP request failed', ['error' => $e->getMessage()]);
+        return ['error' => 'http_exception', 'message' => $e->getMessage()];
     }
+
+    // Save everything to log so we can inspect it
+    $status = $response->status();
+    $body = null;
+    try {
+        $body = $response->json();
+    } catch (\Throwable $e) {
+        $body = $response->body();
+    }
+
+    Log::info('Brevo response', [
+        'status' => $status,
+        'body' => $body,
+        'headers' => $response->headers(),
+    ]);
+
+    // If non-2xx, log error explicitly
+    if ($status < 200 || $status >= 300) {
+        Log::error('Brevo returned non-2xx', [
+            'status' => $status,
+            'body' => $body,
+            'to' => $toEmail,
+        ]);
+    }
+
+    return is_array($body) ? $body : ['raw' => $body, 'status' => $status];
+}
+
 
     /**
      * Show login page

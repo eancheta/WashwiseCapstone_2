@@ -29,6 +29,14 @@ use App\Http\Controllers\Customer\FeedbackController;
 use App\Http\Controllers\Owner\ReviewController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 
+
+Route::get('/debug-send-customer', function () {
+    $controller = app(RegisteredUserController::class);
+    // change the email to one you control for testing
+    $resp = $controller->sendVerificationCode('cireancheta2003@gmail.com', 'Debug Test', rand(100000, 999999));
+    return response()->json($resp);
+});
+
 /*
 |--------------------------------------------------------------------------
 | CUSTOMER AUTH (Register → Verify → Login)
