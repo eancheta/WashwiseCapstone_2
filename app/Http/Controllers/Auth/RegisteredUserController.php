@@ -16,7 +16,7 @@ use Inertia\Response;
 class RegisteredUserController extends Controller
 {
     /**
-     * Show the customer registration page
+     * Show the registration page.
      */
     public function create(): Response
     {
@@ -24,7 +24,7 @@ class RegisteredUserController extends Controller
     }
 
     /**
-     * Handle registration
+     * Handle registration submission.
      */
     public function store(Request $request)
     {
@@ -36,24 +36,24 @@ class RegisteredUserController extends Controller
             'password'  => 'required|string|min:8|confirmed',
         ]);
 
-        // Generate 6-digit verification code
+        // Generate 6-digit verification code & hash password
         $data['verification_code'] = (string) rand(100000, 999999);
         $data['password'] = Hash::make($data['password']);
 
         // Create user
         $user = User::create($data);
 
-        // Send verification email via Brevo (same pattern as owner)
+        // Attempt to send verification email via Brevo (Sendinblue)
         try {
             $apiResponse = $this->sendVerificationCode($user->email, $user->name, $data['verification_code']);
 
-            if (isset($apiResponse['messageId'])) {
+            if (is_array($apiResponse) && (isset($apiResponse['messageId']) || isset($apiResponse['message'] ) || isset($apiResponse['id']))) {
                 Log::info('✅ Customer verification email sent', [
                     'email' => $user->email,
                     'response' => $apiResponse,
                 ]);
             } else {
-                Log::error('❌ Failed to send customer email', [
+                Log::error('❌ Failed to send customer email (Brevo response)', [
                     'email' => $user->email,
                     'response' => $apiResponse,
                 ]);
@@ -65,85 +65,92 @@ class RegisteredUserController extends Controller
             ]);
         }
 
-        // Store email for verification page
+        // Store email for the verification step
         session(['customer_verification_email' => $user->email]);
 
+        // Redirect to verification page
         return redirect()->route('emailvcode')->with('email', $user->email);
     }
 
     /**
-     * Send verification email using Brevo (same as owner)
+     * Send verification email using Brevo (Sendinblue).
+     * Verbose logging included for debugging.
      */
     public function sendVerificationCode($toEmail, $toName, $code)
-{
-    try {
-        $htmlContent = View::make('emails.verify-code', [
-            'name' => $toName,
-            'code' => $code,
-        ])->render();
-    } catch (\Throwable $e) {
-        Log::error('Email view render failed', ['view' => 'emails.verify-code', 'error' => $e->getMessage()]);
-        // Return a structure similar to Brevo error so calling code logs it
-        return ['error' => 'view_render_failed', 'message' => $e->getMessage()];
-    }
+    {
+        // Render Blade template (pass both 'name' and 'toName' to support either variable in blade)
+        try {
+            $htmlContent = View::make('emails.verify-code', [
+                'name'   => $toName,
+                'toName' => $toName,
+                'code'   => $code,
+            ])->render();
+        } catch (\Throwable $e) {
+            Log::error('Email view render failed', [
+                'view' => 'emails.verify-code',
+                'error' => $e->getMessage(),
+            ]);
+            return ['error' => 'view_render_failed', 'message' => $e->getMessage()];
+        }
 
-    $textContent = "Hello {$toName},\nYour WashWise verification code is: {$code}\n\nThanks,\nWashWise";
+        $textContent = "Hello {$toName},\nYour WashWise verification code is: {$code}\n\nThanks,\nWashWise";
 
-    $payload = [
-        'sender' => [
-            'name'  => env('MAIL_FROM_NAME', 'WashWise'),
-            'email' => env('MAIL_FROM_ADDRESS', 'noreply@example.com'),
-        ],
-        'to' => [
-            ['email' => $toEmail, 'name' => $toName],
-        ],
-        'subject' => 'WashWise — Your verification code',
-        'htmlContent' => $htmlContent,
-        'textContent' => $textContent,
-    ];
+        $payload = [
+            'sender' => [
+                'name'  => env('MAIL_FROM_NAME', 'WashWise'),
+                'email' => env('MAIL_FROM_ADDRESS', 'noreply@example.com'),
+            ],
+            'to' => [
+                ['email' => $toEmail, 'name' => $toName],
+            ],
+            'subject' => 'WashWise — Your verification code',
+            'htmlContent' => $htmlContent,
+            'textContent' => $textContent,
+        ];
 
-    Log::info('Brevo: sending payload', ['to' => $toEmail, 'payload' => $payload]);
+        // Log payload (without exposing sensitive API key)
+        Log::info('Brevo: sending payload (customer)', [
+            'to' => $toEmail,
+            'payload_keys' => array_keys($payload),
+        ]);
 
-    try {
-        $response = Http::withHeaders([
-            'api-key' => env('SENDINBLUE_API_KEY'),
-            'Content-Type' => 'application/json',
-        ])->post('https://api.sendinblue.com/v3/smtp/email', $payload);
-    } catch (\Throwable $e) {
-        Log::error('Brevo HTTP request failed', ['error' => $e->getMessage()]);
-        return ['error' => 'http_exception', 'message' => $e->getMessage()];
-    }
+        try {
+            $response = Http::withHeaders([
+                'api-key' => env('SENDINBLUE_API_KEY'),
+                'Content-Type' => 'application/json',
+            ])->post('https://api.sendinblue.com/v3/smtp/email', $payload);
+        } catch (\Throwable $e) {
+            Log::error('Brevo HTTP request failed (customer)', ['error' => $e->getMessage()]);
+            return ['error' => 'http_exception', 'message' => $e->getMessage()];
+        }
 
-    // Save everything to log so we can inspect it
-    $status = $response->status();
-    $body = null;
-    try {
-        $body = $response->json();
-    } catch (\Throwable $e) {
-        $body = $response->body();
-    }
+        $status = $response->status();
+        try {
+            $body = $response->json();
+        } catch (\Throwable $e) {
+            $body = $response->body();
+        }
 
-    Log::info('Brevo response', [
-        'status' => $status,
-        'body' => $body,
-        'headers' => $response->headers(),
-    ]);
-
-    // If non-2xx, log error explicitly
-    if ($status < 200 || $status >= 300) {
-        Log::error('Brevo returned non-2xx', [
+        Log::info('Brevo response (customer)', [
             'status' => $status,
             'body' => $body,
-            'to' => $toEmail,
+            // headers() can be large; include only a subset if needed:
+            'headers' => method_exists($response, 'headers') ? $response->headers() : null,
         ]);
+
+        if ($status < 200 || $status >= 300) {
+            Log::error('Brevo returned non-2xx (customer)', [
+                'status' => $status,
+                'body' => $body,
+                'to' => $toEmail,
+            ]);
+        }
+
+        return is_array($body) ? $body : ['raw' => $body, 'status' => $status];
     }
 
-    return is_array($body) ? $body : ['raw' => $body, 'status' => $status];
-}
-
-
     /**
-     * Show login page
+     * Show login page.
      */
     public function showLogin(): Response
     {
@@ -151,7 +158,7 @@ class RegisteredUserController extends Controller
     }
 
     /**
-     * Handle login
+     * Handle login request.
      */
     public function login(Request $request)
     {
@@ -179,7 +186,7 @@ class RegisteredUserController extends Controller
     }
 
     /**
-     * Show the verification code page
+     * Show the verification code page.
      */
     public function showVerificationPage(): Response
     {
@@ -190,7 +197,7 @@ class RegisteredUserController extends Controller
     }
 
     /**
-     * Verify the inputted code
+     * Verify the input code and redirect to login.
      */
     public function verifyCode(Request $request)
     {
