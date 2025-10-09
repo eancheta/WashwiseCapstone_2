@@ -17,23 +17,23 @@ class FeedbackController extends Controller
         return view('customer.feedback_form', compact('shop'));
     }
 
-    public function store(Request $request, $shopId)
-    {
-        $request->validate([
-            'rating' => 'required|integer|min:1|max:5',
-            'comment' => 'nullable|string|max:1000',
-        ]);
+public function store(Request $request, $shopId)
+{
+    $request->validate([
+        'rating' => 'required|integer|min:1|max:5',
+        'comment' => 'nullable|string|max:1000',
+    ]);
 
-        Feedback::create([
-            'shop_id' => $shopId,
-            'user_id' => Auth::id(), // requires logged-in user
-            'rating'  => $request->rating,
-            'comment' => $request->comment,
-        ]);
+    Feedback::create([
+        'shop_id' => $shopId,
+        'user_id' => Auth::id(),
+        'rating'  => $request->rating,
+        'comment' => $request->comment ?? ' ', // ✅ store space instead of null
+    ]);
 
-        return redirect()
-            ->route('customer.feedback.create', $shopId)
-            ->with('success', 'Feedback submitted successfully!');
-    }
+    return redirect()
+        ->route('customer.feedback.create', $shopId)
+        ->with('success', 'Feedback submitted successfully!');
+}
 }
 
