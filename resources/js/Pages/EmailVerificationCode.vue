@@ -37,8 +37,6 @@ function submit() {
     <nav class="w-full bg-[#182235] flex flex-col sm:flex-row sm:items-center px-4 sm:px-8 py-2 text-white font-semibold shadow z-10">
       <ul class="flex flex-col sm:flex-row gap-4 sm:gap-8 items-center flex-1">
         <TextLink :href="route('home')" class="text-[#FF2D2D]">Home</TextLink>
-        <li><TextLink href="#">About</TextLink></li>
-        <li><TextLink href="#">Service</TextLink></li>
       </ul>
       <div class="flex items-center gap-4 mt-2 sm:mt-0">
         <TextLink

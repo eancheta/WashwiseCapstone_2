@@ -5,7 +5,6 @@ use Illuminate\Support\Facades\Session;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\Auth\StaticLoginController;
 use App\Http\Controllers\Auth\CustomerAuthController;
 use App\Http\Controllers\AdminController;
@@ -23,9 +22,11 @@ use App\Http\Controllers\Owner\WalkinController;
 use App\Http\Controllers\Customer\FeedbackController;
 use App\Http\Controllers\Owner\ReviewController;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
+use App\Http\Controllers\Auth\RegisteredUserController;
+
 
 // routes/web.php
-Route::get('/emailvcode', [EmailVerificationController::class, 'show'])
+Route::get('/emailvcode', [RegisteredUserController::class, 'show'])
     ->name('emailvcode'); // no auth middleware
 
 // Change password page + update
@@ -119,7 +120,7 @@ Route::post('/login', [CustomerAuthController::class, 'login'])->name('login.sub
 Route::post('/logout', [CustomerAuthController::class, 'logout'])->name('logout');
 Route::get('/register', fn () => Inertia::render('auth/Register'))->name('register');
 Route::get('/emailvcode', fn () => Inertia::render('EmailVerificationCode'))->middleware('auth')->name('emailvcode');
-Route::post('/verify-code', [EmailVerificationController::class, 'verify'])->middleware('auth')->name('verify.code');
+Route::post('/verify-code', [RegisteredUserController::class, 'verify'])->middleware('auth')->name('verify.code');
 
 /*
 |--------------------------------------------------------------------------
