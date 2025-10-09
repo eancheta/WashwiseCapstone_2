@@ -126,7 +126,7 @@ watch(() => props.shop, (s) => { if (s?.id && form.date_of_booking) fetchBooking
           <input type="text" v-model="form.name" placeholder="Your Name" class="w-full p-2 border rounded focus:ring-2 focus:ring-[#002B5C]" required/>
           <input type="email" v-model="form.email" placeholder="Email Address" class="w-full p-2 border rounded focus:ring-2 focus:ring-[#002B5C]" required/>
           <select v-model="form.size_of_the_car" class="w-full p-2 border rounded focus:ring-2 focus:ring-[#002B5C]" required>
-            <option value="">Select Car Size</option>
+            <option value="">Select Car Types</option>
             <option>HatchBack</option>
             <option>Sedan</option>
             <option>MPV</option>

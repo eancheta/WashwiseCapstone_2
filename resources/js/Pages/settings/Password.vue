@@ -1,8 +1,13 @@
 <script setup lang="ts">
 import { Head, useForm, router } from '@inertiajs/vue3'
+import { ref } from 'vue'
+
+const showCurrent = ref(false)
+const showNew = ref(false)
+const showConfirm = ref(false)
 
 function goBack() {
-  router.visit('/dashboard') // back to customer dashboard
+  router.visit('/dashboard')
 }
 
 const form = useForm({
@@ -38,7 +43,6 @@ function goTo(path: string) {
     <!-- Main Form -->
     <div class="flex flex-1 items-center justify-center px-4">
       <div class="relative w-full max-w-md bg-white rounded-2xl shadow-xl p-8 z-10">
-        <!-- Decorative Background -->
         <div class="absolute -top-10 -left-10 w-24 h-24 bg-[#FF2D2D] opacity-10 rounded-full blur-2xl"></div>
         <div class="absolute -bottom-10 -right-10 w-32 h-32 bg-[#002B5C] opacity-10 rounded-full blur-2xl"></div>
 
@@ -49,45 +53,66 @@ function goTo(path: string) {
 
           <form @submit.prevent="submit" class="space-y-6">
             <!-- Current Password -->
-            <div>
+            <div class="relative">
               <label class="block text-sm font-bold text-[#182235] mb-1">Current Password</label>
               <input
                 v-model="form.current_password"
-                type="password"
-                class="mt-1 block w-full border-2 border-gray-300 rounded-lg p-2.5 text-[#182235] focus:ring-2 focus:ring-[#FF2D2D] transition"
+                :type="showCurrent ? 'text' : 'password'"
+                class="mt-1 block w-full border-2 border-gray-300 rounded-lg p-2.5 pr-10 text-[#182235] focus:ring-2 focus:ring-[#FF2D2D] transition"
                 autocomplete="current-password"
                 required
               />
+              <button
+                type="button"
+                class="absolute right-3 top-9 text-gray-500 hover:text-[#FF2D2D]"
+                @click="showCurrent = !showCurrent"
+              >
+                <i :class="showCurrent ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye'"></i>
+              </button>
               <div v-if="form.errors.current_password" class="text-red-500 text-sm mt-1">
                 {{ form.errors.current_password }}
               </div>
             </div>
 
             <!-- New Password -->
-            <div>
+            <div class="relative">
               <label class="block text-sm font-bold text-[#182235] mb-1">New Password</label>
               <input
                 v-model="form.password"
-                type="password"
-                class="mt-1 block w-full border-2 border-gray-300 rounded-lg p-2.5 text-[#182235] focus:ring-2 focus:ring-[#FF2D2D] transition"
+                :type="showNew ? 'text' : 'password'"
+                class="mt-1 block w-full border-2 border-gray-300 rounded-lg p-2.5 pr-10 text-[#182235] focus:ring-2 focus:ring-[#FF2D2D] transition"
                 autocomplete="new-password"
                 required
               />
+              <button
+                type="button"
+                class="absolute right-3 top-9 text-gray-500 hover:text-[#FF2D2D]"
+                @click="showNew = !showNew"
+              >
+                <i :class="showNew ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye'"></i>
+              </button>
               <div v-if="form.errors.password" class="text-red-500 text-sm mt-1">
                 {{ form.errors.password }}
               </div>
             </div>
 
             <!-- Confirm Password -->
-            <div>
+            <div class="relative">
               <label class="block text-sm font-bold text-[#182235] mb-1">Confirm New Password</label>
               <input
                 v-model="form.password_confirmation"
-                type="password"
-                class="mt-1 block w-full border-2 border-gray-300 rounded-lg p-2.5 text-[#182235] focus:ring-2 focus:ring-[#FF2D2D] transition"
+                :type="showConfirm ? 'text' : 'password'"
+                class="mt-1 block w-full border-2 border-gray-300 rounded-lg p-2.5 pr-10 text-[#182235] focus:ring-2 focus:ring-[#FF2D2D] transition"
                 autocomplete="new-password"
                 required
               />
+              <button
+                type="button"
+                class="absolute right-3 top-9 text-gray-500 hover:text-[#FF2D2D]"
+                @click="showConfirm = !showConfirm"
+              >
+                <i :class="showConfirm ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye'"></i>
+              </button>
             </div>
 
             <!-- Submit -->

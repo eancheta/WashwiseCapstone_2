@@ -26,7 +26,8 @@
     <form action="{{ route('owner.password.update') }}" method="POST">
       @csrf
 
-      <div class="mb-4">
+      <!-- Current Password -->
+      <div class="mb-4 relative">
         <label for="current_password" class="block text-sm font-semibold text-gray-700 mb-2">
           Current Password
         </label>
@@ -34,13 +35,18 @@
           type="password"
           id="current_password"
           name="current_password"
-          class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-red-500 focus:outline-none"
+          class="w-full border border-gray-300 rounded-lg px-4 py-2 pr-10 focus:ring-2 focus:ring-red-500 focus:outline-none"
           placeholder="Enter your current password"
           required
         >
+        <button type="button" onclick="togglePassword('current_password', this)"
+          class="absolute right-3 top-9 text-gray-500 hover:text-[#FF2D2D]">
+          <i class="fa-solid fa-eye"></i>
+        </button>
       </div>
 
-      <div class="mb-4">
+      <!-- New Password -->
+      <div class="mb-4 relative">
         <label for="new_password" class="block text-sm font-semibold text-gray-700 mb-2">
           New Password
         </label>
@@ -48,13 +54,18 @@
           type="password"
           id="new_password"
           name="new_password"
-          class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-red-500 focus:outline-none"
+          class="w-full border border-gray-300 rounded-lg px-4 py-2 pr-10 focus:ring-2 focus:ring-red-500 focus:outline-none"
           placeholder="Enter your new password"
           required
         >
+        <button type="button" onclick="togglePassword('new_password', this)"
+          class="absolute right-3 top-9 text-gray-500 hover:text-[#FF2D2D]">
+          <i class="fa-solid fa-eye"></i>
+        </button>
       </div>
 
-      <div class="mb-6">
+      <!-- Confirm Password -->
+      <div class="mb-6 relative">
         <label for="new_password_confirmation" class="block text-sm font-semibold text-gray-700 mb-2">
           Confirm New Password
         </label>
@@ -62,10 +73,14 @@
           type="password"
           id="new_password_confirmation"
           name="new_password_confirmation"
-          class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-red-500 focus:outline-none"
+          class="w-full border border-gray-300 rounded-lg px-4 py-2 pr-10 focus:ring-2 focus:ring-red-500 focus:outline-none"
           placeholder="Confirm your new password"
           required
         >
+        <button type="button" onclick="togglePassword('new_password_confirmation', this)"
+          class="absolute right-3 top-9 text-gray-500 hover:text-[#FF2D2D]">
+          <i class="fa-solid fa-eye"></i>
+        </button>
       </div>
 
       <button
@@ -77,4 +92,20 @@
     </form>
   </div>
 </div>
+
+<script>
+  function togglePassword(id, btn) {
+    const input = document.getElementById(id);
+    const icon = btn.querySelector("i");
+    if (input.type === "password") {
+      input.type = "text";
+      icon.classList.replace("fa-eye", "fa-eye-slash");
+    } else {
+      input.type = "password";
+      icon.classList.replace("fa-eye-slash", "fa-eye");
+    }
+  }
+</script>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 @endsection

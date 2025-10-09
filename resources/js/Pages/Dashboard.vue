@@ -31,6 +31,7 @@ const logout = () => {
 // Modal state
 const reminderOpen = ref(false)
 const selectedShop = ref<Shop | null>(null)
+const agreeChecked = ref(false) // ✅ Checkbox state
 
 const openReminder = (shop: Shop) => {
   if (shop.status === 'closed') {
@@ -40,9 +41,14 @@ const openReminder = (shop: Shop) => {
   if (!props.auth.user) { Inertia.get('/login'); return }
   selectedShop.value = shop
   reminderOpen.value = true
+  agreeChecked.value = false // reset checkbox each time modal opens
 }
 
 const confirmBooking = () => {
+  if (!agreeChecked.value) {
+    alert('⚠️ Please check the agreement box before confirming your booking.')
+    return
+  }
   if (selectedShop.value) {
     Inertia.get(`/customer/book/${selectedShop.value.id}`)
     reminderOpen.value = false
@@ -52,6 +58,7 @@ const confirmBooking = () => {
 const cancelReminder = () => {
   reminderOpen.value = false
   selectedShop.value = null
+  agreeChecked.value = false
 }
 
 const filteredShops = computed(() => {
@@ -124,7 +131,6 @@ function handleImgError(e: Event) {
             <option value="all">All Districts</option>
             <option v-for="d in props.districts" :key="d" :value="d">District {{ d }}</option>
           </select>
-          <!-- Arrow Icon -->
           <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
             <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -169,7 +175,20 @@ function handleImgError(e: Event) {
         <li>If you are unable to come, kindly note that the reservation/down payment is non-refundable.</li>
         <li>If you arrive late, accommodation will depend on staff availability.</li>
       </ul>
-      <p class="text-sm text-gray-700 font-semibold mb-4">✅ By clicking “Confirm Booking”, you agree to these conditions.</p>
+
+      <!-- ✅ Checkbox Agreement -->
+      <div class="flex items-start mb-4">
+        <input
+          id="agree"
+          type="checkbox"
+          v-model="agreeChecked"
+          class="mt-1 w-4 h-4 text-[#002B5C] border-gray-300 rounded focus:ring-[#FF2D2D]"
+        />
+        <label for="agree" class="ml-2 text-sm text-gray-700 font-semibold">
+          By clicking “Confirm Booking”, you agree to these conditions.
+        </label>
+      </div>
+
       <div class="flex flex-col sm:flex-row justify-end gap-3">
         <button @click="cancelReminder" class="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400 w-full sm:w-auto">Cancel</button>
         <button @click="confirmBooking" class="px-4 py-2 bg-[#002B5C] text-white rounded-lg hover:bg-[#FF2D2D] w-full sm:w-auto">Confirm Booking</button>
