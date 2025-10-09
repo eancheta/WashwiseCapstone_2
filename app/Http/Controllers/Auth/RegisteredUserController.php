@@ -140,7 +140,7 @@ class RegisteredUserController extends Controller
     public function showVerificationPage(): Response
     {
         $email = session('customer_verification_email');
-        return Inertia::render('auth/CustomerVerificationCode', [
+        return Inertia::render('EmailVerificationCode', [
             'email' => $email,
         ]);
     }
