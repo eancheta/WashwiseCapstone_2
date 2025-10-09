@@ -199,22 +199,32 @@ class RegisteredUserController extends Controller
     /**
      * Verify the input code and redirect to login.
      */
-    public function verifyCode(Request $request)
-    {
-        $request->validate(['code' => 'required|numeric']);
+public function verifyCode(Request $request)
+{
+    $request->validate(['code' => 'required|numeric']);
 
-        $email = session('customer_verification_email');
-        $user = User::where('email', $email)->first();
+    $email = session('customer_verification_email');
+    $user = User::where('email', $email)->first();
 
-        if (!$user || $user->verification_code !== $request->code) {
-            return back()->withErrors(['code' => 'Invalid verification code.']);
-        }
-
-        $user->update([
-            'email_verified_at' => now(),
-            'verification_code' => null,
-        ]);
-
-        return redirect()->route('login')->with('success', 'Email verified successfully. You can now log in.');
+    if (!$user) {
+        return back()->withErrors(['code' => 'User not found.']);
     }
+
+    if ($user->verification_code !== $request->code) {
+        return back()->withErrors(['code' => 'Invalid verification code.']);
+    }
+
+    // ✅ Update verified_at safely
+    $user->email_verified_at = now();
+    $user->verification_code = null;
+    $user->save();
+
+    // ✅ Optional: Log for debugging
+    \Log::info('✅ User verified successfully', [
+        'email' => $user->email,
+        'verified_at' => $user->email_verified_at,
+    ]);
+
+    return redirect()->route('login')->with('success', 'Email verified successfully. You can now log in.');
+}
 }
