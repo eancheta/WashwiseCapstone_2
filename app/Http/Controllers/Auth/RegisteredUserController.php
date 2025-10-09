@@ -74,7 +74,7 @@ class RegisteredUserController extends Controller
      */
     private function sendVerificationCode($toEmail, $toName, $code)
     {
-        $htmlContent = View::make('emails.customer-verification-code', [
+        $htmlContent = View::make('emails.verify-code', [
             'name' => $toName,
             'code' => $code,
         ])->render();

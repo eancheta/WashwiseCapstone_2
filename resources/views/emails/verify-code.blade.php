@@ -8,7 +8,7 @@
     <div style="max-width: 600px; margin: auto; background: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.05);">
         <h2 style="color: #2c3e50;">Verify Your Email for WashWise</h2>
 
-        <p>Hi {{ $name }},</p>
+        <p>Hi {{ $toName }},</p>
 
         <p>
             Thank you for signing up with <strong>WashWise</strong> – your go-to platform for hassle-free car wash bookings in Quezon City!
