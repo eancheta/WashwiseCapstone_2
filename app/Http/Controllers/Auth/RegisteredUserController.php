@@ -70,7 +70,7 @@ class RegisteredUserController extends Controller
         session(['customer_verification_email' => $user->email]);
 
         // Redirect to customer verification page
-        return redirect()->route('customer.verify.show')->with('email', $user->email);
+        return redirect()->route('emailvcode')->with('email', $user->email);
     }
 
     /**
