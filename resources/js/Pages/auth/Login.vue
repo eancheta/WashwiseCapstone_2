@@ -40,7 +40,7 @@ const submit = () => {
           <span>📞</span> Call Us <span class="font-normal">+012 345 6789</span>
         </div>
         <div class="flex items-center gap-2">
-          <span>✉️</span> Email Us <span class="font-normal">info@example.com</span>
+          <span>✉️</span> Email Us <span class="font-normal">washwise00@gmail.com</span>
         </div>
       </div>
     </div>
@@ -49,7 +49,7 @@ const submit = () => {
     <nav class="w-full bg-[#182235] flex flex-col sm:flex-row sm:items-center px-4 sm:px-8 py-2 text-white font-semibold shadow z-10">
       <!-- Links -->
       <ul class="flex flex-col sm:flex-row gap-4 sm:gap-8 items-center flex-1">
-        <TextLink :href="route('home')" class="text-[#FF2D2D]">Home</TextLink>
+        <TextLink :href="route('home')" class="text-white">Home</TextLink>
       </ul>
 
       <!-- Actions -->
@@ -62,7 +62,7 @@ const submit = () => {
         </TextLink>
         <TextLink
           :href="route('register')"
-          class="px-4 sm:px-6 py-2 rounded-full border-2 font-semibold transition text-sm sm:text-base border-[#FF2D2D] text-[#FF2D2D]"
+          class="px-4 sm:px-6 py-2 rounded-full border-2 font-semibold transition text-sm sm:text-base border-[#FF2D2D] text-white"
         >
           Register
         </TextLink>

@@ -40,7 +40,7 @@ function submit() {
         <span>📞</span> <span class="font-bold">Call Us</span> <span class="font-normal">+012 345 6789</span>
       </div>
       <div class="flex items-center gap-2">
-        <span>✉️</span> <span class="font-bold">Email Us</span> <span class="font-normal">info@example.com</span>
+        <span>✉️</span> <span class="font-bold">Email Us</span> <span class="font-normal">washwise00@gmail.com</span>
       </div>
     </div>
   </div>
@@ -49,8 +49,6 @@ function submit() {
   <nav class="w-full bg-[#182235] flex items-center px-8 py-2 text-white font-semibold shadow z-10">
     <ul class="flex gap-8 items-center flex-1">
       <li><a href="/" class="text-[#FF2D2D] font-bold text-base">Home</a></li>
-      <li><a href="/about-us" class="text-base">About</a></li>
-      <li><a href="#" class="text-base">Service</a></li>
     </ul>
     <div class="flex items-center gap-4 ml-8">
 

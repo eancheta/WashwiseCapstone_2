@@ -28,7 +28,7 @@ function submit() {
           <span>📞</span> Call Us <span class="font-normal">+012 345 6789</span>
         </div>
         <div class="flex items-center gap-2">
-          <span>✉️</span> Email Us <span class="font-normal">info@example.com</span>
+          <span>✉️</span> Email Us <span class="font-normal">washwise00@gmail.com</span>
         </div>
       </div>
     </div>
@@ -36,7 +36,7 @@ function submit() {
     <!-- Navbar -->
     <nav class="w-full bg-[#182235] flex flex-col sm:flex-row sm:items-center px-4 sm:px-8 py-2 text-white font-semibold shadow z-10">
       <ul class="flex flex-col sm:flex-row gap-4 sm:gap-8 items-center flex-1">
-        <TextLink :href="route('home')" class="text-[#FF2D2D]">Home</TextLink>
+        <TextLink :href="route('home')" class="text-white">Home</TextLink>
       </ul>
       <div class="flex items-center gap-4 mt-2 sm:mt-0">
         <TextLink
@@ -47,7 +47,7 @@ function submit() {
         </TextLink>
         <TextLink
           :href="route('register')"
-          class="px-4 sm:px-6 py-2 rounded-full border-2 font-semibold transition text-sm sm:text-base border-[#FF2D2D] text-[#FF2D2D]"
+          class="px-4 sm:px-6 py-2 rounded-full border-2 font-semibold transition text-sm sm:text-base border-[#FF2D2D] text-white"
         >
           Register
         </TextLink>
@@ -62,7 +62,7 @@ function submit() {
       >
         <h2 class="text-2xl sm:text-3xl font-bold text-center text-[#182235]">Verify Your Email</h2>
         <p class="text-center text-gray-500 mb-4 text-sm sm:text-base">
-          Please enter the verification code we sent to
+          Please enter the verification code we sent to wait atleast 5 minutes to 10 minutes see the code
           <span class="font-semibold text-[#002B5C]">{{ email }}</span>.
         </p>
 
