@@ -83,47 +83,51 @@ public function update(Request $request)
 }
 
 
-    public static function ensureBookingTableExists($shopId)
-    {
-        $tableName = "bookings_shop_{$shopId}";
+public static function ensureBookingTableExists($shopId)
+{
+    $tableName = "bookings_shop_{$shopId}";
 
-        if (! Schema::hasTable($tableName)) {
-            Schema::create($tableName, function (Blueprint $table) {
-                $table->id();
+    if (!Schema::hasTable($tableName)) {
+        Schema::create($tableName, function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->string('name');
+            $table->string('size_of_the_car');
+            $table->string('contact_no');
+            $table->string('email')->nullable();
+            $table->time('time_of_booking');
+            $table->date('date_of_booking');
+            $table->integer('slot_number');
+            $table->decimal('payment_amount', 8, 2)->nullable();
+            $table->string('status')->default('pending');
+            $table->string('payment_proof')->nullable();
+            $table->text('reason')->nullable(); // ✅ Added reason column
+            $table->timestamps();
+        });
+    } else {
+        $columns = Schema::getColumnListing($tableName);
+        Schema::table($tableName, function (Blueprint $table) use ($columns) {
+            if (!in_array('user_id', $columns)) {
                 $table->unsignedBigInteger('user_id')->nullable();
-                $table->string('name');
-                $table->string('size_of_the_car');
-                $table->string('contact_no');
+            }
+            if (!in_array('email', $columns)) {
                 $table->string('email')->nullable();
-                $table->time('time_of_booking');
-                $table->date('date_of_booking');
-                $table->integer('slot_number');
-                $table->decimal('payment_amount', 8, 2)->nullable();
-                $table->string('status')->default('pending');
+            }
+            if (!in_array('payment_amount', $columns)) {
+                $table->decimal('payment_amount', 8, 2)->default(50);
+            }
+            if (!in_array('payment_status', $columns)) {
+                $table->enum('payment_status', ['pending', 'paid'])->default('pending');
+            }
+            if (!in_array('payment_proof', $columns)) {
                 $table->string('payment_proof')->nullable();
-                $table->timestamps();
-            });
-        } else {
-            $columns = Schema::getColumnListing($tableName);
-            Schema::table($tableName, function (Blueprint $table) use ($columns) {
-                if (! in_array('user_id', $columns)) {
-                    $table->unsignedBigInteger('user_id')->nullable();
-                }
-                if (! in_array('email', $columns)) {
-                    $table->string('email')->nullable();
-                }
-                if (! in_array('payment_amount', $columns)) {
-                    $table->decimal('payment_amount', 8, 2)->default(50);
-                }
-                if (! in_array('payment_status', $columns)) {
-                    $table->enum('payment_status', ['pending', 'paid'])->default('pending');
-                }
-                if (! in_array('payment_proof', $columns)) {
-                    $table->string('payment_proof')->nullable();
-                }
-            });
-        }
+            }
+            if (!in_array('reason', $columns)) {
+                $table->text('reason')->nullable(); // ✅ Added this for backward compatibility
+            }
+        });
     }
+}
 
     public function create()
     {
