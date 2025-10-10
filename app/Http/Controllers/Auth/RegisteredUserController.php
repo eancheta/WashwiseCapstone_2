@@ -88,31 +88,40 @@ class RegisteredUserController extends Controller
         return Inertia::render('auth/Login');
     }
 
-    public function login(Request $request)
-    {
-        $credentials = $request->validate([
-            'email'     => 'required|email',
-            'password'  => 'required|string',
-        ]);
+public function login(Request $request)
+{
+    // Validate input
+    $credentials = $request->validate([
+        'email'    => 'required|email',
+        'password' => 'required|string',
+    ]);
 
-        $user = User::where('email', $credentials['email'])->first();
+    // Fetch user by email to check verification status
+    $user = User::where('email', $credentials['email'])->first();
 
-        if (!$user) {
-            return back()->withErrors(['email' => 'Account not found.'])->withInput();
-        }
-
-        // Block login if user is not verified
-        if ($user->status !== 'verified') {
-            return back()->withErrors(['email' => 'Your account is not verified. Please check your email.'])->withInput();
-        }
-
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
-            return redirect()->intended(route('dashboard'));
-        }
-
-        return back()->withErrors(['email' => 'Invalid credentials'])->withInput();
+    if (!$user) {
+        // Account does not exist
+        return back()->withErrors(['email' => 'Account not found.'])->withInput();
     }
+
+    if ($user->status !== 'verified') {
+        // User exists but is not verified
+        return back()->withErrors(['email' => 'Your account is not verified. Please check your email.'])->withInput();
+    }
+
+    // Attempt login only for verified users
+    if (Auth::attempt([
+        'email'    => $credentials['email'],
+        'password' => $credentials['password'],
+        'status'   => 'verified', // ensure only verified users can login
+    ])) {
+        $request->session()->regenerate(); // prevent session fixation
+        return redirect()->intended(route('dashboard'));
+    }
+
+    // If login fails (wrong password)
+    return back()->withErrors(['email' => 'Invalid credentials'])->withInput();
+}
 
     public function showVerificationPage(): Response
     {
