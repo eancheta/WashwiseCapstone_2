@@ -91,43 +91,38 @@ class RegisteredUserController extends Controller
 public function login(Request $request)
 {
     $data = $request->validate([
-        'email'    => 'required|email',
+        'email' => 'required|email',
         'password' => 'required|string',
     ]);
 
-    // Fetch user
     $user = User::where('email', $data['email'])->first();
+
+    Log::info('Login attempt', [
+        'email' => $data['email'],
+        'user_found' => (bool)$user,
+        'user_id' => $user->id ?? null,
+        'db_status' => $user->status ?? null,
+    ]);
 
     if (! $user) {
         return back()->withErrors(['email' => 'Account not found.'])->withInput();
     }
 
-    // Normalize status to avoid hidden spaces or case issues
-    $status = is_null($user->status) ? '' : trim(strtolower($user->status));
-
-    // Debug log (optional)
-    Log::info('User login attempt debug', [
-        'email' => $data['email'],
-        'db_status' => $user->status,
-        'normalized_status' => $status,
-        'email_verified_at' => $user->email_verified_at ? $user->email_verified_at->toDateTimeString() : null,
-        'password_hash_length' => strlen($user->password ?? ''),
-    ]);
-
-    // Prevent login if not verified
+    $status = $user->status === null ? '' : trim(strtolower($user->status));
     if ($status !== 'verified') {
+        Log::warning('Login blocked - status not verified', ['email' => $data['email'], 'status' => $user->status]);
         return back()->withErrors(['email' => 'Your account is not verified. Please check your email.'])->withInput();
     }
 
-    // Password check
     if (! Hash::check($data['password'], $user->password)) {
-        return back()->withErrors(['email' => 'Invalid credentials'])->withInput();
+        Log::warning('Login blocked - invalid password', ['email' => $data['email']]);
+        return back()->withErrors(['email' => 'Invalid credentials.'])->withInput();
     }
 
-    // Log in verified user
     Auth::login($user);
     $request->session()->regenerate();
 
+    Log::info('Login success', ['email' => $data['email'], 'id' => $user->id]);
     return redirect()->intended(route('dashboard'));
 }
 
