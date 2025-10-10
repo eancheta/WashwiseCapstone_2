@@ -48,7 +48,7 @@ class WalkinController extends Controller
 
         DB::table($tableName)->insert($validated);
 
-        return redirect()->route('owner.appointments')->with('success', 'Walk-in appointment added successfully.');
+        return redirect()->route('owner.walkin')->with('success', 'Walk-in appointment added successfully.');
     }
 }
 
