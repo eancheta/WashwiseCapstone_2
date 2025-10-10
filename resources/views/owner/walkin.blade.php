@@ -17,37 +17,43 @@
       font-family: 'Inter', sans-serif;
       display: flex;
       flex-direction: column;
-      align-items: center;
       justify-content: flex-start;
+      align-items: stretch;
       color: #fff;
       overflow-y: auto;
     }
 
     header {
       text-align: center;
-      margin-top: 40px;
+      padding: 2rem 1rem;
+      background: rgba(0,0,0,0.2);
+      backdrop-filter: blur(4px);
     }
 
     h1 {
       font-size: 2.5rem;
       font-weight: 800;
+      margin: 0;
     }
 
     p.subtitle {
-      color: #cbd5e1;
+      color: #e2e8f0;
       font-size: 1.1rem;
       margin-top: 0.5rem;
     }
 
     form {
       width: 100%;
-      max-width: 900px;
+      flex: 1;
       background-color: #fff;
       color: #000;
-      margin-top: 30px;
-      border-radius: 1rem;
-      padding: 2rem;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+      padding: 3rem 5vw;
+      box-sizing: border-box;
+      border-top-left-radius: 2rem;
+      border-top-right-radius: 2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
     }
 
     label {
@@ -66,10 +72,15 @@
       color: #333;
     }
 
+    .grid-two {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem;
+    }
+
     button {
       background-color: #002B5C;
       color: #fff;
-      width: 100%;
       padding: 1rem;
       border-radius: 0.75rem;
       font-weight: 600;
@@ -77,6 +88,7 @@
       border: none;
       cursor: pointer;
       transition: background 0.3s ease;
+      margin-top: 1rem;
     }
 
     button:hover {
@@ -92,13 +104,13 @@
   </header>
 
   @if (session('success'))
-    <div class="mt-4 bg-green-100 text-green-800 p-3 rounded-lg w-full max-w-3xl text-center">
+    <div class="mt-4 bg-green-100 text-green-800 p-3 rounded-lg w-full text-center">
       {{ session('success') }}
     </div>
   @endif
 
   @if (session('error'))
-    <div class="mt-4 bg-red-100 text-red-800 p-3 rounded-lg w-full max-w-3xl text-center">
+    <div class="mt-4 bg-red-100 text-red-800 p-3 rounded-lg w-full text-center">
       {{ session('error') }}
     </div>
   @endif
@@ -106,24 +118,37 @@
   <form action="{{ route('owner.walkin.store') }}" method="POST">
     @csrf
 
-    <label for="name">Customer Name</label>
-    <input type="text" name="name" id="name" value="{{ old('name') }}" required>
+    <div class="grid-two">
+      <div>
+        <label for="name">Customer Name</label>
+        <input type="text" name="name" id="name" value="{{ old('name') }}" required>
+      </div>
+      <div>
+        <label for="contact_no">Contact No</label>
+        <input type="text" name="contact_no" id="contact_no" value="{{ old('contact_no') }}" required>
+      </div>
+    </div>
 
-    <label for="contact_no">Contact No</label>
-    <input type="text" name="contact_no" id="contact_no" value="{{ old('contact_no') }}" required>
+    <div class="grid-two">
+      <div>
+        <label for="size_of_the_car">Car Size</label>
+        <select name="size_of_the_car" id="size_of_the_car" required>
+          <option value="">Select</option>
+          <option value="HatchBack" {{ old('size_of_the_car') == 'HatchBack' ? 'selected' : '' }}>HatchBack</option>
+          <option value="Sedan" {{ old('size_of_the_car') == 'Sedan' ? 'selected' : '' }}>Sedan</option>
+          <option value="SUV" {{ old('size_of_the_car') == 'SUV' ? 'selected' : '' }}>SUV</option>
+          <option value="Pickup" {{ old('size_of_the_car') == 'Pickup' ? 'selected' : '' }}>Pickup</option>
+          <option value="Van" {{ old('size_of_the_car') == 'Van' ? 'selected' : '' }}>Van</option>
+          <option value="Motorcycle" {{ old('size_of_the_car') == 'Motorcycle' ? 'selected' : '' }}>Motorcycle</option>
+        </select>
+      </div>
+      <div>
+        <label for="slot_number">Slot Number</label>
+        <input type="number" name="slot_number" id="slot_number" value="{{ old('slot_number', 1) }}" min="1" max="4" required>
+      </div>
+    </div>
 
-    <label for="size_of_the_car">Car Size</label>
-    <select name="size_of_the_car" id="size_of_the_car" required>
-      <option value="">Select</option>
-      <option value="HatchBack" {{ old('size_of_the_car') == 'HatchBack' ? 'selected' : '' }}>HatchBack</option>
-      <option value="Sedan" {{ old('size_of_the_car') == 'Sedan' ? 'selected' : '' }}>Sedan</option>
-      <option value="SUV" {{ old('size_of_the_car') == 'SUV' ? 'selected' : '' }}>SUV</option>
-      <option value="Pickup" {{ old('size_of_the_car') == 'Pickup' ? 'selected' : '' }}>Pickup</option>
-      <option value="Van" {{ old('size_of_the_car') == 'Van' ? 'selected' : '' }}>Van</option>
-      <option value="Motorcycle" {{ old('size_of_the_car') == 'Motorcycle' ? 'selected' : '' }}>Motorcycle</option>
-    </select>
-
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+    <div class="grid-two">
       <div>
         <label for="date_of_booking">Date</label>
         <input type="date" name="date_of_booking" id="date_of_booking" value="{{ old('date_of_booking') }}" required>
@@ -133,9 +158,6 @@
         <input type="time" name="time_of_booking" id="time_of_booking" value="{{ old('time_of_booking') }}" required>
       </div>
     </div>
-
-    <label for="slot_number">Slot Number</label>
-    <input type="number" name="slot_number" id="slot_number" value="{{ old('slot_number', 1) }}" min="1" max="4" required>
 
     <button type="submit">Add Walk-in</button>
   </form>
