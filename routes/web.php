@@ -28,7 +28,19 @@ use App\Http\Controllers\Owner\WalkinController;
 use App\Http\Controllers\Customer\FeedbackController;
 use App\Http\Controllers\Owner\ReviewController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use app\Http\Middleware\EnsureUserIsVerified;
 
+
+Route::get('/debug-current-user', function () {
+    /** @var \Illuminate\Contracts\Auth\Guard $guard */
+    $guard = auth();
+
+    if ($guard->check()) {
+        return $guard->user()->toArray();
+    }
+
+    return 'no user';
+});
 
 Route::get('/debug-send-customer', function () {
     $controller = app(RegisteredUserController::class);
