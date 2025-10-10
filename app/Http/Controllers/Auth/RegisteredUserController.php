@@ -91,36 +91,36 @@ class RegisteredUserController extends Controller
 public function login(Request $request)
 {
     // Validate input
-    $credentials = $request->validate([
+    $data = $request->validate([
         'email'    => 'required|email',
         'password' => 'required|string',
     ]);
 
-    // Fetch user by email to check verification status
-    $user = User::where('email', $credentials['email'])->first();
+    // Fetch user
+    $user = User::where('email', $data['email'])->first();
 
     if (!$user) {
-        // Account does not exist
         return back()->withErrors(['email' => 'Account not found.'])->withInput();
     }
 
-    if ($user->status !== 'verified') {
-        // User exists but is not verified
+    // Normalize status to avoid leading/trailing spaces or case issues
+    $status = is_null($user->status) ? '' : trim(strtolower($user->status));
+
+    // If not verified, refuse login
+    if ($status !== 'verified') {
         return back()->withErrors(['email' => 'Your account is not verified. Please check your email.'])->withInput();
     }
 
-    // Attempt login only for verified users
-    if (Auth::attempt([
-        'email'    => $credentials['email'],
-        'password' => $credentials['password'],
-        'status'   => 'verified', // ensure only verified users can login
-    ])) {
-        $request->session()->regenerate(); // prevent session fixation
-        return redirect()->intended(route('dashboard'));
+    // Check password explicitly
+    if (! Hash::check($data['password'], $user->password)) {
+        return back()->withErrors(['email' => 'Invalid credentials.'])->withInput();
     }
 
-    // If login fails (wrong password)
-    return back()->withErrors(['email' => 'Invalid credentials'])->withInput();
+    // All good: log the user in
+    Auth::login($user);                        // or Auth::loginUsingId($user->id)
+    $request->session()->regenerate();         // prevent session fixation
+
+    return redirect()->intended(route('dashboard'));
 }
 
     public function showVerificationPage(): Response
