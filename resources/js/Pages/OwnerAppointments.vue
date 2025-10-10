@@ -2,23 +2,24 @@
   <Head title="Owner Appointments" />
 
   <div class="min-h-screen bg-gradient-to-br from-gray-100 via-white to-gray-100 py-6 px-4 flex flex-col items-center">
-    <div class="w-full max-w-7xl p-6 sm:p-10">
+    <div class="w-full max-w-7xl p-6 sm:p-10 relative">
+
+      <!-- Return Button -->
+      <div class="absolute top-6 left-6">
+        <button
+          @click="goBack"
+          class="px-5 py-2 bg-[#002B5C] text-white font-semibold rounded-xl shadow-md hover:bg-[#FF2D2D] transition transform hover:-translate-y-0.5"
+        >
+          ← Return to Dashboard
+        </button>
+      </div>
+
       <!-- Header -->
       <div class="text-center mb-8">
         <h1 class="text-3xl sm:text-4xl font-extrabold text-[#002B5C] mb-2">
           Customer Appointments
         </h1>
         <p class="text-gray-500">Manage and monitor all customer bookings efficiently</p>
-      </div>
-
-      <!-- Return Button -->
-      <div class="mb-6 flex justify-start">
-        <button
-          @click="goBack"
-          class="px-6 py-3 bg-[#002B5C] text-white font-semibold rounded-xl shadow-md hover:bg-[#FF2D2D] transition transform hover:-translate-y-0.5"
-        >
-          ← Return to Dashboard
-        </button>
       </div>
 
       <!-- Filter Card -->
@@ -87,18 +88,26 @@
               <td class="px-4 py-3">{{ appt.contact_no }}</td>
               <td class="px-4 py-3">{{ appt.slot_number }}</td>
               <td class="px-4 py-3">{{ appt.created_at }}</td>
-                <td class="px-4 py-3 text-center">
-                  <img
-                    :src="getPaymentProofSrc(appt)"
-                    alt="Payment Proof"
-                    class="h-16 w-16 object-cover rounded border mx-auto"
-                    @error="handleImageError"
-                  />
-                </td>
+
+              <!-- Payment Proof -->
+              <td class="px-4 py-3 text-center">
+                <img
+                  :src="getPaymentProofSrc(appt)"
+                  alt="Payment Proof"
+                  class="h-16 w-16 object-cover rounded border mx-auto cursor-pointer hover:scale-105 transition"
+                  @click="openImagePreview(getPaymentProofSrc(appt))"
+                  @error="handleImageError"
+                />
+              </td>
+
               <td class="px-4 py-3 text-center font-bold text-[#FF2D2D]">{{ appt.payment_amount ?? 'Walk_IN' }}</td>
+
               <td class="px-4 py-3 text-center flex justify-center gap-3">
                 <button @click="approve(appt.id)" class="px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 shadow-md transition transform hover:-translate-y-0.5">
                   Approve
+                </button>
+                <button @click="openDeclineModal(appt.id)" class="px-4 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 shadow-md transition transform hover:-translate-y-0.5">
+                  Decline
                 </button>
               </td>
             </tr>
@@ -106,6 +115,41 @@
         </table>
       </div>
     </div>
+  </div>
+
+  <!-- Decline Modal -->
+  <div v-if="showDeclineModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+    <div class="bg-white w-full max-w-md rounded-2xl shadow-xl p-6 relative">
+      <h2 class="text-xl font-bold text-[#002B5C] mb-4">Decline Appointment</h2>
+      <p class="text-gray-600 mb-3">Please write the reason for declining this appointment:</p>
+      <textarea
+        v-model="declineReason"
+        rows="4"
+        placeholder="Type reason here..."
+        class="w-full border border-gray-300 rounded-lg p-3 text-gray-800 focus:ring-2 focus:ring-[#FF2D2D] focus:outline-none"
+      ></textarea>
+
+      <div class="mt-6 flex justify-end gap-3">
+        <button
+          @click="showDeclineModal = false"
+          class="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg font-semibold hover:bg-gray-400"
+        >
+          Cancel
+        </button>
+        <button
+          @click="submitDecline"
+          class="px-5 py-2 bg-[#FF2D2D] text-white font-semibold rounded-lg hover:bg-[#E02626] transition"
+        >
+          Send & Decline
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Image Preview Modal -->
+  <div v-if="showImagePreview" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50">
+    <img :src="previewSrc" alt="Preview" class="max-h-[80vh] rounded-xl shadow-2xl border-4 border-white" />
+    <button @click="showImagePreview=false" class="absolute top-6 right-8 text-white text-3xl font-bold">✕</button>
   </div>
 </template>
 
@@ -135,7 +179,26 @@ function approve(id: number) {
   router.post(`/owner/appointments/${id}/approve`)
 }
 
-// ✅ Always return one <img> source
+// --- Decline logic ---
+const showDeclineModal = ref(false)
+const declineReason = ref('')
+const selectedId = ref<number | null>(null)
+
+function openDeclineModal(id: number) {
+  selectedId.value = id
+  showDeclineModal.value = true
+}
+
+function submitDecline() {
+  if (!selectedId.value) return
+  router.post(`/owner/appointments/${selectedId.value}/decline`, {
+    reason: declineReason.value
+  })
+  showDeclineModal.value = false
+  declineReason.value = ''
+}
+
+// --- Payment Proof Logic ---
 function getPaymentProofSrc(appt: Appointment): string {
   if (!appt.payment_proof) return '/images/no-proof.png'
   if (appt.payment_proof.startsWith('http')) return appt.payment_proof
@@ -143,12 +206,20 @@ function getPaymentProofSrc(appt: Appointment): string {
   return `/storage/${appt.payment_proof}`
 }
 
-// ✅ On broken image → replace with fallback
 function handleImageError(event: Event) {
   const target = event.target as HTMLImageElement
   target.src = '/images/no-proof.png'
 }
 
+const showImagePreview = ref(false)
+const previewSrc = ref('')
+
+function openImagePreview(src: string) {
+  previewSrc.value = src
+  showImagePreview.value = true
+}
+
+// --- Filters ---
 const dateRange = ref<string>('all')
 const fromDate = ref<string>('')
 const toDate = ref<string>('')
