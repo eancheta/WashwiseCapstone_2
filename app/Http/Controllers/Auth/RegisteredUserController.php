@@ -90,7 +90,6 @@ class RegisteredUserController extends Controller
 
 public function login(Request $request)
 {
-    // Validate input
     $data = $request->validate([
         'email'    => 'required|email',
         'password' => 'required|string',
@@ -99,26 +98,35 @@ public function login(Request $request)
     // Fetch user
     $user = User::where('email', $data['email'])->first();
 
-    if (!$user) {
+    if (! $user) {
         return back()->withErrors(['email' => 'Account not found.'])->withInput();
     }
 
-    // Normalize status to avoid leading/trailing spaces or case issues
+    // Normalize status to avoid hidden spaces or case issues
     $status = is_null($user->status) ? '' : trim(strtolower($user->status));
 
-    // If not verified, refuse login
+    // Debug log (optional)
+    Log::info('User login attempt debug', [
+        'email' => $data['email'],
+        'db_status' => $user->status,
+        'normalized_status' => $status,
+        'email_verified_at' => $user->email_verified_at ? $user->email_verified_at->toDateTimeString() : null,
+        'password_hash_length' => strlen($user->password ?? ''),
+    ]);
+
+    // Prevent login if not verified
     if ($status !== 'verified') {
         return back()->withErrors(['email' => 'Your account is not verified. Please check your email.'])->withInput();
     }
 
-    // Check password explicitly
+    // Password check
     if (! Hash::check($data['password'], $user->password)) {
-        return back()->withErrors(['email' => 'Invalid credentials.'])->withInput();
+        return back()->withErrors(['email' => 'Invalid credentials'])->withInput();
     }
 
-    // All good: log the user in
-    Auth::login($user);                        // or Auth::loginUsingId($user->id)
-    $request->session()->regenerate();         // prevent session fixation
+    // Log in verified user
+    Auth::login($user);
+    $request->session()->regenerate();
 
     return redirect()->intended(route('dashboard'));
 }
