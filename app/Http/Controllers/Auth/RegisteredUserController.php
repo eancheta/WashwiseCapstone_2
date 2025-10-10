@@ -101,7 +101,7 @@ class RegisteredUserController extends Controller
             return back()->withErrors(['email' => 'Account not found.'])->withInput();
         }
 
-        // 🚫 Block login if user is not verified
+        // Block login if user is not verified
         if ($user->status !== 'verified') {
             return back()->withErrors(['email' => 'Your account is not verified. Please check your email.'])->withInput();
         }
