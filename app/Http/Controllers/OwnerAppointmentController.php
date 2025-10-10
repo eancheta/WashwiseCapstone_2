@@ -189,7 +189,7 @@ public function approve($id)
     /**
      * Decline a booking.
      */
-    public function decline(Request $request, $id)
+public function decline(Request $request, $id)
 {
     $request->validate([
         'reason' => 'required|string|max:1000',
@@ -199,57 +199,88 @@ public function approve($id)
     $shopId = CarWashShop::where('owner_id', $ownerId)->value('id');
     $tableName = "bookings_shop_{$shopId}";
 
-    if (!DB::getSchemaBuilder()->hasTable($tableName)) {
+    if (! DB::getSchemaBuilder()->hasTable($tableName)) {
+        Log::error("Decline: bookings table missing for shop {$shopId}");
         return back()->with('error', 'No bookings found for this shop.');
     }
 
     $booking = DB::table($tableName)->where('id', $id)->first();
-    if (!$booking) {
+    if (! $booking) {
+        Log::error("Decline: booking not found, id={$id}, table={$tableName}");
         return back()->with('error', 'Booking not found.');
     }
 
+    // update DB
     DB::table($tableName)
         ->where('id', $id)
         ->update(['status' => 'declined', 'reason' => $request->reason]);
 
-    if ($booking->email) {
-        $shop = CarWashShop::findOrFail($shopId);
+    // Prepare email payload (same structure as approve)
+    $shop = CarWashShop::find($shopId);
+    $emailData = [
+        'customer_name' => $booking->name,
+        'service_name' => $booking->size_of_the_car . ' Wash',
+        'date_time' => $booking->date_of_booking . ' ' . $booking->time_of_booking,
+        'car_wash_name' => $shop->name ?? 'WashWise',
+        'car_wash_address' => $shop->address ?? '',
+        'reason' => $request->reason,
+    ];
 
-        $emailData = [
-            'customer_name' => $booking->name,
-            'service_name' => $booking->size_of_the_car . ' Wash',
-            'date_time' => $booking->date_of_booking . ' ' . $booking->time_of_booking,
-            'car_wash_name' => $shop->name,
-            'car_wash_address' => $shop->address,
-            'reason' => $request->reason,
+    // If no email, nothing to send
+    if (empty($booking->email)) {
+        Log::info("Decline: no email for booking id={$id}, skipping send.");
+        return back()->with('success', 'Appointment declined (no email to send).');
+    }
+
+    // Log intent
+    Log::info('Decline: sending decline email', ['to' => $booking->email, 'booking_id' => $id, 'payload' => $emailData]);
+
+    // Try Sendinblue HTTP API (same as approve)
+    try {
+        $apiKey = env('SENDINBLUE_API_KEY');
+        $payload = [
+            'sender' => [
+                'name' => env('MAIL_FROM_NAME', 'WashWise'),
+                'email' => env('MAIL_FROM_ADDRESS', 'no-reply@washwise.com'),
+            ],
+            'to' => [
+                ['email' => $booking->email, 'name' => $booking->name],
+            ],
+            'subject' => 'Your Car Wash Appointment Has Been Declined',
+            'htmlContent' => view('emails.appointment_declined', [
+                'customer_name' => $emailData['customer_name'],
+                'service_name' => $emailData['service_name'],
+                'date_time' => $emailData['date_time'],
+                'car_wash_name' => $emailData['car_wash_name'],
+                'car_wash_address' => $emailData['car_wash_address'],
+                'reason' => $emailData['reason'],
+            ])->render(),
         ];
 
+        $resp = Http::withHeaders([
+            'api-key' => $apiKey,
+            'Accept' => 'application/json',
+        ])->post('https://api.sendinblue.com/v3/smtp/email', $payload);
+
+        Log::info('Decline: sendinblue response', ['status' => $resp->status(), 'body' => $resp->body()]);
+
+        if ($resp->failed()) {
+            Log::error('Decline: sendinblue failed', ['body' => $resp->body()]);
+            // fallback to local log mailer using Laravel Mailable to preserve record
+            \Mail::to($booking->email)->send(new \App\Mail\AppointmentDeclined($emailData));
+            Log::info('Decline: fallback Mail::send used (log/mail driver).');
+        }
+    } catch (\Exception $e) {
+        Log::error('Decline: exception when sending via sendinblue', ['message' => $e->getMessage()]);
+        // fallback to Laravel Mail (log driver will capture)
         try {
-            $apiKey = env('SENDINBLUE_API_KEY');
-
-            $response = Http::withHeaders([
-                'api-key'      => $apiKey,
-                'Content-Type' => 'application/json',
-            ])->post('https://api.sendinblue.com/v3/smtp/email', [
-                'sender' => [
-                    'name'  => env('MAIL_FROM_NAME', 'WashWise'),
-                    'email' => env('MAIL_FROM_ADDRESS', 'no-reply@washwise.com'),
-                ],
-                'to' => [
-                    ['email' => $booking->email, 'name' => $booking->name],
-                ],
-                'subject' => 'Your Car Wash Appointment Has Been Declined',
-                'htmlContent' => view('emails.appointment_declined', $emailData)->render(),
-            ]);
-
-            if ($response->failed()) {
-                Log::error("Brevo decline email failed: " . $response->body());
-            }
-        } catch (\Exception $e) {
-            Log::error('Failed to send decline email for booking ID: ' . $id . ' | ' . $e->getMessage());
+            \Mail::to($booking->email)->send(new \App\Mail\AppointmentDeclined($emailData));
+            Log::info('Decline: fallback Mail::send used after exception.');
+        } catch (\Exception $e2) {
+            Log::error('Decline: fallback Mail::send also failed', ['message' => $e2->getMessage()]);
         }
     }
 
-    return back()->with('success', 'Appointment declined and email sent.');
+    return back()->with('success', 'Appointment declined and email attempted.');
 }
 }
