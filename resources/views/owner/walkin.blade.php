@@ -2,19 +2,19 @@
 
 @section('content')
 <style>
-    /* Hide navbar/header only for this page */
-    nav, header {
+    /* Hide navbar/header only, not our custom button */
+    header, nav.site-navbar {
         display: none !important;
     }
 </style>
 
 <div class="min-h-screen relative flex items-center justify-center bg-[#F8FAFC] py-10 px-4">
 
-    <!-- 🔙 Return Button -->
-    <div class="absolute top-5 left-5">
+    <!-- 🔙 Return Button (always visible) -->
+    <div class="absolute top-6 left-6 z-50">
         <a href="{{ route('carwashownerdashboard') }}"
-           class="flex items-center gap-2 px-3 py-1.5 bg-gray-200 text-black rounded-lg text-sm font-medium shadow-md hover:bg-[#FF2D2D] hover:text-white transition">
-            ⬅ <span>Return</span>
+           class="flex items-center gap-2 px-4 py-2 bg-[#002B5C] text-white rounded-lg text-sm sm:text-base font-semibold shadow-md hover:bg-[#FF2D2D] transition-all duration-200">
+            ← Return
         </a>
     </div>
 
