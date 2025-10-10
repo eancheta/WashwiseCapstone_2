@@ -49,6 +49,22 @@ Route::get('/debug-send-customer', function () {
     return response()->json($resp);
 });
 
+Route::get('/owner/change-password', [OwnerAuthController::class, 'edit'])
+    ->name('owner.password.edit');
+Route::post('/owner/change-password', [OwnerAuthController::class, 'update'])
+    ->name('owner.password.update');
+
+// Edit shop page + update
+Route::middleware(['web', 'auth:carwashowner'])->group(function () {
+    // Show edit page (owner edits their own shop)
+    Route::get('/owner/edit-shop', [OwnerShopController::class, 'edit'])
+        ->name('owner.shop.edit');
+
+    // Handle update (POST to keep it simple; you can change to PUT if you prefer)
+    Route::post('/owner/edit-shop', [OwnerShopController::class, 'update'])
+        ->name('owner.shop.update');
+});
+
 /*
 |--------------------------------------------------------------------------
 | CUSTOMER AUTH (Register → Verify → Login)
