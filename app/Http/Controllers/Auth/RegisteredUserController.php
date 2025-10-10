@@ -97,32 +97,27 @@ public function login(Request $request)
 
     $user = User::where('email', $data['email'])->first();
 
-    Log::info('Login attempt', [
-        'email' => $data['email'],
-        'user_found' => (bool)$user,
-        'user_id' => $user->id ?? null,
-        'db_status' => $user->status ?? null,
-    ]);
-
-    if (! $user) {
+    if (!$user) {
         return back()->withErrors(['email' => 'Account not found.'])->withInput();
     }
 
+    // Normalize status
     $status = $user->status === null ? '' : trim(strtolower($user->status));
-    if ($status !== 'verified') {
-        Log::warning('Login blocked - status not verified', ['email' => $data['email'], 'status' => $user->status]);
+
+    // Block login if not verified
+    if ($status !== 'verified' || !$user->email_verified_at) {
         return back()->withErrors(['email' => 'Your account is not verified. Please check your email.'])->withInput();
     }
 
+    // Check password
     if (! Hash::check($data['password'], $user->password)) {
-        Log::warning('Login blocked - invalid password', ['email' => $data['email']]);
-        return back()->withErrors(['email' => 'Invalid credentials.'])->withInput();
+        return back()->withErrors(['email' => 'Invalid credentials'])->withInput();
     }
 
+    // Log in user
     Auth::login($user);
     $request->session()->regenerate();
 
-    Log::info('Login success', ['email' => $data['email'], 'id' => $user->id]);
     return redirect()->intended(route('dashboard'));
 }
 
