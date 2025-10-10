@@ -200,7 +200,7 @@ function submitDecline() {
 
 // --- Payment Proof Logic ---
 function getPaymentProofSrc(appt: Appointment): string {
-  if (!appt.payment_proof) return 'No Proof'
+  if (!appt.payment_proof) return '/images/hero-carwash.jpg'
   if (appt.payment_proof.startsWith('http')) return appt.payment_proof
   if (appt.payment_proof.startsWith('/storage/')) return appt.payment_proof
   return `/storage/${appt.payment_proof}`
@@ -208,7 +208,7 @@ function getPaymentProofSrc(appt: Appointment): string {
 
 function handleImageError(event: Event) {
   const target = event.target as HTMLImageElement
-  target.src = 'no-proof'
+  target.src = '/images/hero-carwash.jpg'
 }
 
 const showImagePreview = ref(false)
