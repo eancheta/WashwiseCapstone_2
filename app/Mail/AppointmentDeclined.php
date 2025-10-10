@@ -25,6 +25,8 @@ class AppointmentDeclined extends Mailable
      */
     public function build()
     {
+        \Log::info('Building AppointmentDeclined email', ['appointment' => $this->appointment]);
+
         return $this->subject('Your Appointment Has Been Declined')
             ->view('emails.appointment_declined')
             ->with([
