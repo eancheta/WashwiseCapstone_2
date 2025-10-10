@@ -10,27 +10,25 @@ class AppointmentDeclined extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $appointment;
+    public $details;
 
-    /**
-     * Create a new message instance.
-     */
-    public function __construct($appointment)
+    public function __construct($details)
     {
-        $this->appointment = $appointment;
+        $this->details = $details;
     }
 
-    /**
-     * Build the message.
-     */
     public function build()
     {
-        \Log::info('Building AppointmentDeclined email', ['appointment' => $this->appointment]);
-
-        return $this->subject('Your Appointment Has Been Declined')
-            ->view('emails.appointment_declined')
-            ->with([
-                'appointment' => $this->appointment,
-            ]);
+        return $this->subject('Your Car Wash Appointment Has Been Declined')
+                    ->view('emails.appointment_declined')
+                    ->with([
+                        'customer_name' => $this->details['customer_name'],
+                        'service_name' => $this->details['service_name'],
+                        'date_time' => $this->details['date_time'],
+                        'car_wash_name' => $this->details['car_wash_name'],
+                        'car_wash_address' => $this->details['car_wash_address'],
+                        'decline_reason' => $this->details['reason'],
+                    ]);
     }
 }
+
