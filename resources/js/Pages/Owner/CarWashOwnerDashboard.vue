@@ -2,7 +2,12 @@
 import { Head, Link, usePage, router } from '@inertiajs/vue3'
 import { ref, computed } from 'vue'
 import { route } from 'ziggy-js'
+import { defineProps } from 'vue'
 
+// define incoming props from the controller
+const props = defineProps<{
+    isOpen: boolean
+}>()
 // Use any to avoid strict PageProps mismatch errors in TS dev environment
 const page = usePage<any>()
 
@@ -213,12 +218,18 @@ function openShop(id?: number | null) {
         </button>
       </div>
 
-      <Link
-        :href="route('owner.walkin')"
-        class="mt-6 px-8 py-3 rounded-full bg-[#FF2D2D] text-white font-bold text-lg shadow hover:bg-[#d72626] transition"
-      >
-        Walk-in
-      </Link>
+<Link
+    :href="props.isOpen ? route('owner.walkin') : '#'"
+    :class="[
+        'mt-6 px-8 py-3 rounded-full text-white font-bold text-lg shadow transition',
+        props.isOpen
+            ? 'bg-[#FF2D2D] hover:bg-[#d72626]'
+            : 'bg-gray-400 cursor-not-allowed'  // grey out when disabled
+    ]"
+>
+    Walk-in
+</Link>
+
     </div>
   </section>
 </template>

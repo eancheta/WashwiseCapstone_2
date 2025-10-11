@@ -199,20 +199,21 @@ public static function ensureBookingTableExists($shopId)
             ->with('success', 'Shop created successfully!');
     }
 
-    public function index()
-    {
-        $ownerId = Auth::guard('carwashowner')->id();
-        if (! $ownerId) {
-            return redirect()->route('owner.login.show');
-        }
-
-        $shop = CarWashShop::where('owner_id', $ownerId)->first();
-
-        return Inertia::render('Public/ShopBooking', [
-            'shop' => $shop,
-            'pageTitle' => "Book at {$shop->name}",
-        ]);
+public function index()
+{
+    $ownerId = Auth::guard('carwashowner')->id();
+    if (! $ownerId) {
+        return redirect()->route('owner.login.show');
     }
+
+    $shop = CarWashShop::where('owner_id', $ownerId)->first();
+
+    return Inertia::render('Public/ShopBooking', [
+        'shop' => $shop,
+        'isOpen' => $shop->status === 'open', // ✅ Pass open/closed status
+        'pageTitle' => "Book at {$shop->name}",
+    ]);
+}
 
     public function closeShop($id)
     {
