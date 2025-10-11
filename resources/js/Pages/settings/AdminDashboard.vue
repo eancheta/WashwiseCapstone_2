@@ -1,21 +1,20 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { router } from '@inertiajs/vue3'
+import { route } from 'ziggy-js'
 
-// ✅ The fix: A function to get the correct photo source
+// ✅ Helper to get correct photo URL
 function getPhotoSrc(photoPath: string | null): string {
     if (!photoPath) {
-        // Use a placeholder if there's no photo path
-        return 'https://placehold.co/100x100?text=No+Photo';
+        return 'https://placehold.co/100x100?text=No+Photo'
     }
-    // Check if the path is already a full URL (from Cloudinary)
     if (photoPath.startsWith('http://') || photoPath.startsWith('https://')) {
-        return photoPath;
+        return photoPath
     }
-    // Fallback for a local storage path, just in case
-    return `/storage/${photoPath}`;
+    return `/storage/${photoPath}`
 }
 
+// Interfaces
 interface Owner {
     id: number;
     name: string;
@@ -43,24 +42,30 @@ interface User {
     updated_at: string;
 }
 
+// Props from parent/Inertia
 const { owners, users } = defineProps<{
     owners: Owner[];
     users: User[];
-}>();
+}>()
 
-const activeTab = ref('users');
+const activeTab = ref('users')
 
+// ✅ Approve owner with confirmation
 const approve = (id: number) => {
-    router.post(`/admin/owners/${id}/approve`);
-};
+    if (!confirm('Are you sure you want to approve this owner?')) return
+    router.post(route('owners.approve', { id }))
+}
 
+// ✅ Decline owner with confirmation
 const decline = (id: number) => {
-    router.post(`/admin/owners/${id}/decline`);
-};
+    if (!confirm('Are you sure you want to decline this owner?')) return
+    router.post(route('owners.decline', { id }))
+}
 
+// ✅ Logout
 const logout = () => {
-    router.post('/logout');
-};
+    router.post('/logout')
+}
 </script>
 
 <template>
