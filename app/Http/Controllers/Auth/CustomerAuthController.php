@@ -33,7 +33,7 @@ public function login(Request $request)
     $status = $user->status === null ? '' : trim(strtolower($user->status));
 
     // Block login if not verified
-    if ($status !== 'verified' || ! $user->email_verified_at) {
+    if ($status !== 'verified') {
         return back()->withErrors(['email' => 'Your account is not verified. Please check your email.'])->withInput();
     }
 
