@@ -6,7 +6,7 @@ import { defineProps } from 'vue'
 
 // define incoming props from the controller
 const props = defineProps<{
-    isOpen: boolean
+  isOpen: boolean
 }>()
 // Use any to avoid strict PageProps mismatch errors in TS dev environment
 const page = usePage<any>()
@@ -224,11 +224,15 @@ function openShop(id?: number | null) {
         'mt-6 px-8 py-3 rounded-full text-white font-bold text-lg shadow transition',
         props.isOpen
             ? 'bg-[#FF2D2D] hover:bg-[#d72626]'
-            : 'bg-gray-400 cursor-not-allowed'  // grey out when disabled
+            : 'bg-gray-400 cursor-not-allowed'
     ]"
 >
     Walk-in
 </Link>
+
+<p v-if="!props.isOpen" class="text-sm text-gray-500 mt-1">
+    Shop is currently closed
+</p>
 
     </div>
   </section>

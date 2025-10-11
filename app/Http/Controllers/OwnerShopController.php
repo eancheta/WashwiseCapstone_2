@@ -202,7 +202,7 @@ public static function ensureBookingTableExists($shopId)
 public function index()
 {
     $ownerId = Auth::guard('carwashowner')->id();
-    if (! $ownerId) {
+    if (!$ownerId) {
         return redirect()->route('owner.login.show');
     }
 
@@ -210,7 +210,7 @@ public function index()
 
     return Inertia::render('Public/ShopBooking', [
         'shop' => $shop,
-        'isOpen' => $shop->status === 'open', // ✅ Pass open/closed status
+        'isOpen' => $shop->status === 'open', // ✅ Pass true/false
         'pageTitle' => "Book at {$shop->name}",
     ]);
 }
