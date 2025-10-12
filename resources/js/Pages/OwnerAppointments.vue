@@ -1,9 +1,8 @@
 <template>
   <Head title="Owner Appointments" />
 
-<div class="min-h-screen bg-gradient-to-br from-[#001F3F] via-[#002B5C] to-[#00509E] flex flex-col items-center py-12 px-6">
-    <!-- Full Width Container -->
-    <div class="w-full backdrop-blur-xl bg-white/10 rounded-3xl shadow-2xl border border-white/20 p-8 relative">
+  <div class="min-h-screen bg-gradient-to-br from-[#001F3F] via-[#002B5C] to-[#00509E] flex flex-col items-center py-12 px-6">
+    <div class="w-full max-w-7xl backdrop-blur-xl bg-white/10 rounded-3xl shadow-2xl border border-white/20 p-8 relative">
 
       <!-- Return Button -->
       <div class="absolute top-6 left-6">
@@ -36,12 +35,12 @@
           </select>
         </div>
 
-        <div v-if="dateRange === 'custom'">
+        <div v-if="dateRange==='custom'">
           <label class="block text-sm font-semibold text-white mb-1">From</label>
           <input type="date" v-model="fromDate" class="w-full px-4 py-3 rounded-lg font-semibold text-gray-800 focus:ring-4 focus:ring-[#FF2D2D]/60 focus:outline-none" />
         </div>
 
-        <div v-if="dateRange === 'custom'">
+        <div v-if="dateRange==='custom'">
           <label class="block text-sm font-semibold text-white mb-1">To</label>
           <input type="date" v-model="toDate" class="w-full px-4 py-3 rounded-lg font-semibold text-gray-800 focus:ring-4 focus:ring-[#FF2D2D]/60 focus:outline-none" />
         </div>
@@ -52,13 +51,13 @@
         🚫 No appointments found for this range.
       </div>
 
-      <div v-else class="w-full overflow-x-auto mt-6">
-        <table class="min-w-full border-collapse border border-white/20 rounded-xl overflow-hidden shadow-lg backdrop-blur-md text-sm sm:text-base">
+      <div v-else class="overflow-x-auto">
+        <table class="w-full border border-white/20 rounded-xl overflow-hidden shadow-lg backdrop-blur-md">
           <thead class="bg-gradient-to-r from-[#FF2D2D] to-[#FF6B6B] text-white">
             <tr>
-              <th v-for="header in headers" :key="header.value" class="px-4 py-3 text-left font-semibold uppercase tracking-wide">
-                {{ header.text }}
-              </th>
+                <th v-for="header in headers" :key="header.value">
+                     {{ header.text }}
+                </th>
             </tr>
           </thead>
 
@@ -69,9 +68,9 @@
               :class="idx % 2 === 0 ? 'bg-white/10 hover:bg-white/20' : 'bg-white/5 hover:bg-white/15'"
               class="transition-all text-white"
             >
-              <td class="px-4 py-3 whitespace-nowrap text-center">{{ appt.date_of_booking }}</td>
-              <td class="px-4 py-3 whitespace-nowrap text-center">{{ appt.time_of_booking }}</td>
-              <td class="px-4 py-3 text-center">
+              <td class="px-4 py-3">{{ appt.date_of_booking }}</td>
+              <td class="px-4 py-3">{{ appt.time_of_booking }}</td>
+              <td class="px-4 py-3">
                 <span
                   :class="{
                     'bg-green-600/80 text-white px-3 py-1 rounded-full text-sm font-semibold': appt.status === 'approved',
