@@ -34,35 +34,38 @@ class ShopBookingController extends Controller
     /**
      * Check for overlapping bookings within a 3-hour window
      */
-    private function checkForOverlap(string $table, string $date, string $time, int $slotNumber): ?string
-    {
-        try {
-            $newStart = Carbon::parse("$date $time");
-            $newEnd = $newStart->copy()->addHours(3);
+private function checkForOverlap(string $table, string $date, string $time, int $slotNumber): ?string
+{
+    try {
+        // Booking lasts only 30 minutes
+        $newStart = Carbon::parse("$date $time");
+        $newEnd = $newStart->copy()->addMinutes(30);
 
-            $dates = [
-                $newStart->copy()->subDay()->format('Y-m-d'),
-                $newStart->format('Y-m-d'),
-                $newStart->copy()->addDay()->format('Y-m-d'),
-            ];
+        $dates = [
+            $newStart->copy()->subDay()->format('Y-m-d'),
+            $newStart->format('Y-m-d'),
+            $newStart->copy()->addDay()->format('Y-m-d'),
+        ];
 
-            $existing = DB::table($table)
-                ->whereIn('date_of_booking', $dates)
-                ->where('slot_number', $slotNumber)
-                ->get();
+        $existing = DB::table($table)
+            ->whereIn('date_of_booking', $dates)
+            ->where('slot_number', $slotNumber)
+            ->get();
 
-            foreach ($existing as $booking) {
-                $existingStart = Carbon::parse("{$booking->date_of_booking} {$booking->time_of_booking}");
-                $existingEnd = $existingStart->copy()->addHours(3);
-                if ($existingStart->lt($newEnd) && $newStart->lt($existingEnd)) {
-                    return 'The selected slot is occupied within 3 hours of that time.';
-                }
+        foreach ($existing as $booking) {
+            $existingStart = Carbon::parse("{$booking->date_of_booking} {$booking->time_of_booking}");
+            $existingEnd = $existingStart->copy()->addMinutes(30);
+
+            if ($existingStart->lt($newEnd) && $newStart->lt($existingEnd)) {
+                return 'The selected slot is already booked within this 30-minute window.';
             }
-        } catch (\Exception $e) {
-            return 'Invalid date or time format provided.';
         }
-        return null;
+    } catch (\Exception $e) {
+        return 'Invalid date or time format provided.';
     }
+
+    return null;
+}
 
     /**
      * GET /shops/{shop}/availability
