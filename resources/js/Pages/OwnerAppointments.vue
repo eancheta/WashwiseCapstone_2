@@ -1,35 +1,35 @@
 <template>
   <Head title="Owner Appointments" />
 
-  <div class="min-h-screen bg-gradient-to-br from-[#e3f2fd] via-[#ffffff] to-[#e1f5fe] py-10 px-6 flex flex-col items-center">
-    <div class="w-full max-w-7xl backdrop-blur-lg bg-white/90 border border-gray-200 shadow-2xl rounded-3xl p-8 sm:p-10 relative transition-all">
+  <div class="min-h-screen bg-gradient-to-br from-[#001F3F] via-[#003366] to-[#00509E] py-10 px-6 flex flex-col items-center text-white">
+    <div class="w-full max-w-7xl bg-white/10 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/20 p-10 relative overflow-hidden">
+
+      <!-- Glow Background -->
+      <div class="absolute inset-0 bg-gradient-to-r from-[#FF2D2D]/20 via-transparent to-[#FF6B6B]/20 blur-3xl"></div>
 
       <!-- Return Button -->
-      <div class="absolute top-6 left-6">
+      <div class="absolute top-6 left-6 z-10">
         <button
           @click="goBack"
-          class="px-5 py-2 bg-[#002B5C] text-white font-semibold rounded-xl shadow-md hover:bg-[#FF2D2D] transition-all duration-300 transform hover:-translate-y-0.5"
+          class="px-5 py-2 bg-white/20 text-white font-semibold rounded-xl shadow-lg hover:bg-white/30 border border-white/30 transition-all hover:scale-105 backdrop-blur-md"
         >
-          ← Return to Dashboard
+          ← Back
         </button>
       </div>
 
       <!-- Header -->
-      <div class="text-center mb-12">
-        <h1 class="text-4xl sm:text-5xl font-extrabold text-[#002B5C] mb-3 tracking-tight drop-shadow-sm">
-          Customer Appointments
+      <div class="text-center mb-12 relative z-10">
+        <h1 class="text-5xl font-extrabold drop-shadow-lg text-white tracking-wide">
+          Customer Appointments ✨
         </h1>
-        <p class="text-gray-600 text-lg">Monitor and manage all customer bookings effortlessly</p>
+        <p class="text-gray-200 mt-2">Track and manage all bookings with clarity and style.</p>
       </div>
 
       <!-- Filter Card -->
-      <div class="mb-10 p-8 bg-white border border-gray-200 rounded-2xl shadow-md grid grid-cols-1 sm:grid-cols-3 gap-6 transition-all duration-300">
+      <div class="mb-10 grid grid-cols-1 sm:grid-cols-3 gap-6 bg-white/10 p-6 rounded-2xl shadow-md border border-white/20 backdrop-blur-sm">
         <div>
-          <label class="block text-sm font-bold text-gray-700 mb-2">Date Range</label>
-          <select
-            v-model="dateRange"
-            class="w-full px-4 py-3 font-medium text-[#182235] border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#002B5C] focus:outline-none bg-gray-50 hover:bg-white transition"
-          >
+          <label class="block text-sm font-semibold text-gray-200 mb-1">Date Range</label>
+          <select v-model="dateRange" class="w-full px-4 py-3 rounded-lg text-[#001F3F] font-semibold focus:ring-4 focus:ring-[#FF2D2D]/60 outline-none">
             <option value="all">All</option>
             <option value="today">Today</option>
             <option value="week">This Week</option>
@@ -39,95 +39,73 @@
         </div>
 
         <div v-if="dateRange==='custom'">
-          <label class="block text-sm font-bold text-gray-700 mb-2">From</label>
-          <input
-            type="date"
-            v-model="fromDate"
-            class="w-full px-4 py-3 font-medium text-[#182235] border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#002B5C] focus:outline-none bg-gray-50 hover:bg-white transition"
-          />
+          <label class="block text-sm font-semibold text-gray-200 mb-1">From</label>
+          <input type="date" v-model="fromDate" class="w-full px-4 py-3 rounded-lg text-[#001F3F] font-semibold focus:ring-4 focus:ring-[#FF2D2D]/60 outline-none" />
         </div>
 
         <div v-if="dateRange==='custom'">
-          <label class="block text-sm font-bold text-gray-700 mb-2">To</label>
-          <input
-            type="date"
-            v-model="toDate"
-            class="w-full px-4 py-3 font-medium text-[#182235] border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#002B5C] focus:outline-none bg-gray-50 hover:bg-white transition"
-          />
+          <label class="block text-sm font-semibold text-gray-200 mb-1">To</label>
+          <input type="date" v-model="toDate" class="w-full px-4 py-3 rounded-lg text-[#001F3F] font-semibold focus:ring-4 focus:ring-[#FF2D2D]/60 outline-none" />
         </div>
       </div>
 
       <!-- Appointment Table -->
-      <div v-if="filteredAppointments.length === 0" class="text-gray-500 text-lg text-center py-16">
-        No appointments found.
+      <div v-if="filteredAppointments.length === 0" class="text-gray-100 text-xl text-center py-20 font-medium">
+        🚫 No appointments found for this range.
       </div>
 
-      <div v-else class="overflow-x-auto rounded-2xl shadow-lg border border-gray-200 bg-white/90 backdrop-blur-sm">
-        <table class="w-full border-collapse text-sm sm:text-base">
-          <thead class="bg-gradient-to-r from-[#002B5C] to-[#00509E] text-white">
+      <div v-else class="overflow-x-auto rounded-2xl border border-white/20 shadow-xl backdrop-blur-sm">
+        <table class="w-full text-sm md:text-base border-collapse">
+          <thead class="bg-gradient-to-r from-[#FF2D2D] to-[#FF6B6B] text-white uppercase">
             <tr>
-              <th v-for="header in headers" :key="header.value" class="px-4 py-3 text-left font-semibold uppercase tracking-wide">
+              <th v-for="header in headers" :key="header.value" class="px-5 py-4 text-left font-semibold tracking-wider">
                 {{ header.text }}
               </th>
             </tr>
           </thead>
-
-          <tbody class="text-[#182235] font-medium divide-y divide-gray-200">
+          <tbody>
             <tr
               v-for="(appt, idx) in filteredAppointments"
               :key="appt.id"
-              :class="idx % 2 === 0 ? 'bg-white hover:bg-gray-50' : 'bg-gray-50 hover:bg-gray-100'"
-              class="transition-colors duration-200"
+              :class="idx % 2 === 0 ? 'bg-white/10 hover:bg-white/20' : 'bg-white/5 hover:bg-white/15'"
+              class="transition-all text-white"
             >
-              <td class="px-4 py-3">{{ appt.date_of_booking }}</td>
-              <td class="px-4 py-3">{{ appt.time_of_booking }}</td>
-              <td class="px-4 py-3">
+              <td class="px-5 py-4">{{ appt.date_of_booking }}</td>
+              <td class="px-5 py-4">{{ appt.time_of_booking }}</td>
+              <td class="px-5 py-4">
                 <span
-                  v-if="appt.status === 'approved'"
-                  class="px-2 py-1 bg-green-100 text-green-700 font-semibold rounded-lg text-xs sm:text-sm"
-                >Approved</span>
-                <span
-                  v-else-if="appt.status === 'declined'"
-                  class="px-2 py-1 bg-red-100 text-red-700 font-semibold rounded-lg text-xs sm:text-sm"
-                >Declined</span>
-                <span
-                  v-else
-                  class="px-2 py-1 bg-gray-200 text-gray-700 font-semibold rounded-lg text-xs sm:text-sm"
-                >Pending</span>
+                  :class="{
+                    'bg-green-600/80 text-white px-3 py-1 rounded-full text-sm font-semibold': appt.status === 'approved',
+                    'bg-red-600/80 text-white px-3 py-1 rounded-full text-sm font-semibold': appt.status === 'declined',
+                    'bg-gray-400/70 text-white px-3 py-1 rounded-full text-sm font-semibold': !appt.status || appt.status === 'pending'
+                  }"
+                >
+                  {{ appt.status ?? 'Pending' }}
+                </span>
               </td>
-              <td class="px-4 py-3 text-center">{{ appt.id }}</td>
-              <td class="px-4 py-3">{{ appt.name }}</td>
-              <td class="px-4 py-3">{{ appt.email || 'Walk_IN' }}</td>
-              <td class="px-4 py-3">{{ appt.size_of_the_car }}</td>
-              <td class="px-4 py-3">{{ appt.contact_no }}</td>
-              <td class="px-4 py-3">{{ appt.slot_number }}</td>
-              <td class="px-4 py-3">{{ appt.created_at }}</td>
-
-              <!-- Payment Proof -->
-              <td class="px-4 py-3 text-center">
+              <td class="px-5 py-4 text-center">{{ appt.id }}</td>
+              <td class="px-5 py-4">{{ appt.name }}</td>
+              <td class="px-5 py-4">{{ appt.email || 'Walk-IN' }}</td>
+              <td class="px-5 py-4">{{ appt.size_of_the_car }}</td>
+              <td class="px-5 py-4">{{ appt.contact_no }}</td>
+              <td class="px-5 py-4">{{ appt.slot_number }}</td>
+              <td class="px-5 py-4">{{ appt.created_at }}</td>
+              <td class="px-5 py-4 text-center">
                 <img
                   :src="getPaymentProofSrc(appt)"
                   alt="Payment Proof"
-                  class="h-16 w-16 object-cover rounded-lg border mx-auto cursor-pointer hover:scale-110 transition-transform duration-200"
+                  class="h-16 w-16 object-cover rounded-lg border border-white/30 mx-auto cursor-pointer hover:scale-105 transition-all"
                   @click="openImagePreview(getPaymentProofSrc(appt))"
                   @error="handleImageError"
                 />
               </td>
-
-              <td class="px-4 py-3 text-center font-bold text-[#FF2D2D]">{{ appt.payment_amount ?? 'Walk_IN' }}</td>
-
-              <td class="px-4 py-3 text-center flex justify-center gap-3">
-                <button
-                  @click="approve(appt.id)"
-                  class="px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 shadow-md transition transform hover:-translate-y-0.5"
-                >
-                  Approve
+              <td class="px-5 py-4 text-center font-bold text-[#FFD700]">{{ appt.payment_amount ?? 'Walk-IN' }}</td>
+              <td class="px-5 py-4 text-center flex justify-center gap-3">
+                <button @click="approve(appt.id)" class="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg text-white font-semibold shadow-md transition hover:scale-105">
+                  ✅ Approve
                 </button>
-                <button
-                  @click="openDeclineModal(appt.id)"
-                  class="px-4 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 shadow-md transition transform hover:-translate-y-0.5"
-                >
-                  Decline
+                <button @click="openDeclineModal(appt.id)" class="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg text-white font-semibold shadow-md transition hover:scale-105">
+                  ❌ Decline
                 </button>
               </td>
             </tr>
@@ -138,10 +116,10 @@
   </div>
 
   <!-- Decline Modal -->
-  <div v-if="showDeclineModal" class="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50">
-    <div class="bg-white w-full max-w-md rounded-2xl shadow-xl p-6 relative">
-      <h2 class="text-xl font-bold text-[#002B5C] mb-4">Decline Appointment</h2>
-      <p class="text-gray-600 mb-3">Please write the reason for declining this appointment:</p>
+  <div v-if="showDeclineModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex justify-center items-center z-50">
+    <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 relative">
+      <h2 class="text-2xl font-bold text-[#002B5C] mb-4">Decline Appointment</h2>
+      <p class="text-gray-600 mb-3">Please provide a reason for declining:</p>
       <textarea
         v-model="declineReason"
         rows="4"
@@ -169,7 +147,7 @@
   <!-- Image Preview Modal -->
   <div v-if="showImagePreview" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50">
     <img :src="previewSrc" alt="Preview" class="max-h-[80vh] rounded-xl shadow-2xl border-4 border-white" />
-    <button @click="showImagePreview=false" class="absolute top-6 right-8 text-white text-3xl font-bold">✕</button>
+    <button @click="showImagePreview=false" class="absolute top-6 right-8 text-white text-3xl font-bold hover:text-red-400">✕</button>
   </div>
 </template>
 
