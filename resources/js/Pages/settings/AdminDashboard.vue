@@ -3,7 +3,6 @@ import { ref } from 'vue'
 import { router } from '@inertiajs/vue3'
 import { route } from 'ziggy-js'
 
-// ✅ Helper to get correct photo URL
 function getPhotoSrc(photoPath: string | null): string {
     if (!photoPath) {
         return 'https://placehold.co/100x100?text=No+Photo'
@@ -14,7 +13,6 @@ function getPhotoSrc(photoPath: string | null): string {
     return `/storage/${photoPath}`
 }
 
-// Interfaces
 interface Owner {
     id: number;
     name: string;
@@ -42,45 +40,57 @@ interface User {
     updated_at: string;
 }
 
-// Props from parent/Inertia
 const { owners, users } = defineProps<{
     owners: Owner[];
     users: User[];
 }>()
 
 const activeTab = ref('users')
+const sidebarOpen = ref(false)
 
-// ✅ Approve owner with confirmation
 const approve = (id: number) => {
     if (!confirm('Are you sure you want to approve this owner?')) return
     router.post(route('owners.approve', { id }))
 }
 
-// ✅ Decline owner with confirmation
 const decline = (id: number) => {
     if (!confirm('Are you sure you want to decline this owner?')) return
     router.post(route('owners.decline', { id }))
 }
 
-// ✅ Logout
 const logout = () => {
     router.post('/logout')
 }
 </script>
 
 <template>
-    <div class="min-h-screen flex bg-gray-50">
+    <div class="min-h-screen flex flex-col sm:flex-row bg-gray-50">
+        <!-- Mobile Header -->
+        <div class="sm:hidden flex justify-between items-center bg-white shadow px-4 py-3">
+            <div class="flex items-center gap-2">
+                <img src="/images/washwiselogo2.png" alt="Logo" class="h-8 w-auto" />
+                <h1 class="font-bold text-[#182235]">WashWise Admin</h1>
+            </div>
+            <button @click="sidebarOpen = !sidebarOpen" class="text-[#182235] text-xl">
+                ☰
+            </button>
+        </div>
+
         <!-- Sidebar -->
-        <aside class="w-64 bg-white shadow-lg flex flex-col py-8 px-4">
+        <aside
+            class="bg-white shadow-lg flex flex-col py-6 px-4 w-64 fixed sm:static inset-y-0 left-0 z-30 transform transition-transform duration-300"
+            :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full sm:translate-x-0'"
+        >
             <div class="flex flex-col items-center mb-10">
                 <img src="/images/washwiselogo2.png" alt="WashWise Logo" class="h-14 w-auto mb-2" draggable="false" />
                 <span class="text-xl font-bold text-[#182235]">Admin</span>
             </div>
+
             <nav class="flex flex-col gap-2">
                 <button
                     class="flex items-center gap-3 px-4 py-2 rounded-lg font-semibold transition"
                     :class="activeTab === 'users' ? 'bg-[#FF2D2D] text-white' : 'text-[#182235] hover:bg-[#f8fafc]'"
-                    @click="activeTab = 'users'"
+                    @click="activeTab = 'users'; sidebarOpen = false"
                 >
                     <span>👤</span> Users
                 </button>
@@ -88,11 +98,12 @@ const logout = () => {
                 <button
                     class="flex items-center gap-3 px-4 py-2 rounded-lg font-semibold transition"
                     :class="activeTab === 'owners' ? 'bg-[#FF2D2D] text-white' : 'text-[#182235] hover:bg-[#f8fafc]'"
-                    @click="activeTab = 'owners'"
+                    @click="activeTab = 'owners'; sidebarOpen = false"
                 >
                     <span>🏢</span> Owners
                 </button>
             </nav>
+
             <form @submit.prevent="logout" class="mt-auto pt-10">
                 <button class="w-full bg-[#FF2D2D] hover:bg-[#d72626] text-white px-4 py-2 rounded-lg font-semibold shadow transition">
                     Logout
@@ -101,105 +112,84 @@ const logout = () => {
         </aside>
 
         <!-- Main Content -->
-        <main class="flex-1 p-8">
-            <h1 class="text-2xl font-bold mb-6 text-[#182235]">
-                {{
-                    activeTab === 'users'
-                        ? 'Users'
-                        : activeTab === 'bookings'
-                            ? 'Bookings'
-                            : 'Owners'
-                }}
+        <main class="flex-1 p-4 sm:p-8 mt-14 sm:mt-0">
+            <h1 class="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-[#182235]">
+                {{ activeTab === 'users' ? 'Users' : 'Owners' }}
             </h1>
 
             <!-- Users Table -->
-            <div v-if="activeTab === 'users'" class="overflow-x-auto">
-                <table class="min-w-full bg-white border border-[#182235] shadow-sm rounded">
+            <div v-if="activeTab === 'users'" class="overflow-x-auto bg-white rounded-xl shadow border border-gray-200">
+                <table class="min-w-full text-sm sm:text-base">
                     <thead>
-                        <tr class="bg-[#f8fafc] text-left">
-                            <th class="py-2 px-4 border-b border-[#182235] text-[#182235] font-bold">ID</th>
-                            <th class="py-2 px-4 border-b border-[#182235] text-[#182235] font-bold">Name</th>
-                            <th class="py-2 px-4 border-b border-[#182235] text-[#182235] font-bold">Email</th>
-                            <th class="py-2 px-4 border-b border-[#182235] text-[#182235] font-bold">Verified At</th>
-                            <th class="py-2 px-4 border-b border-[#182235] text-[#182235] font-bold">Verification Code</th>
-                            <th class="py-2 px-4 border-b border-[#182235] text-[#182235] font-bold">Created</th>
-                            <th class="py-2 px-4 border-b border-[#182235] text-[#182235] font-bold">Updated</th>
+                        <tr class="bg-gray-100 text-left text-[#182235]">
+                            <th class="py-2 px-3">ID</th>
+                            <th class="py-2 px-3">Name</th>
+                            <th class="py-2 px-3">Email</th>
+                            <th class="py-2 px-3">Verified At</th>
+                            <th class="py-2 px-3">Verification Code</th>
+                            <th class="py-2 px-3">Created</th>
+                            <th class="py-2 px-3">Updated</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="user in users" :key="user.id" class="hover:bg-[#e0e7ff] transition">
-                            <td class="py-2 px-4 border-b border-[#182235] text-[#182235]">{{ user.id }}</td>
-                            <td class="py-2 px-4 border-b border-[#182235] text-[#182235]">{{ user.name }}</td>
-                            <td class="py-2 px-4 border-b border-[#182235] text-[#182235]">{{ user.email }}</td>
-                            <td class="py-2 px-4 border-b border-[#182235] text-[#182235]">{{ user.email_verified_at || 'Not verified' }}</td>
-                            <td class="py-2 px-4 border-b border-[#182235] text-[#182235]">{{ user.verification_code || 'N/A' }}</td>
-                            <td class="py-2 px-4 border-b border-[#182235] text-[#182235]">{{ user.created_at }}</td>
-                            <td class="py-2 px-4 border-b border-[#182235] text-[#182235]">{{ user.updated_at }}</td>
+                        <tr
+                            v-for="user in users"
+                            :key="user.id"
+                            class="hover:bg-gray-50 border-t text-[#182235] transition"
+                        >
+                            <td class="py-2 px-3">{{ user.id }}</td>
+                            <td class="py-2 px-3">{{ user.name }}</td>
+                            <td class="py-2 px-3">{{ user.email }}</td>
+                            <td class="py-2 px-3">{{ user.email_verified_at || 'Not verified' }}</td>
+                            <td class="py-2 px-3">{{ user.verification_code || 'N/A' }}</td>
+                            <td class="py-2 px-3">{{ user.created_at }}</td>
+                            <td class="py-2 px-3">{{ user.updated_at }}</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
 
             <!-- Owners Table -->
-            <div v-if="activeTab === 'owners'" class="overflow-x-auto">
-                <h1 class="text-2xl font-bold mb-4 text-[#182235]">Car Wash Owners</h1>
-                <table class="min-w-[1000px] w-full bg-white border border-gray-200 shadow-sm rounded-lg text-xs sm:text-sm">
-                    <thead class="bg-gray-100">
+            <div v-if="activeTab === 'owners'" class="overflow-x-auto bg-white rounded-xl shadow border border-gray-200">
+                <table class="min-w-[1000px] w-full text-xs sm:text-sm">
+                    <thead class="bg-gray-100 text-[#182235]">
                         <tr>
-                            <th class="px-2 sm:px-4 py-2 sm:py-3 font-semibold text-[#182235] whitespace-nowrap">ID</th>
-                            <th class="px-2 sm:px-4 py-2 sm:py-3 font-semibold text-[#182235] whitespace-nowrap">Name</th>
-                            <th class="px-2 sm:px-4 py-2 sm:py-3 font-semibold text-[#182235] whitespace-nowrap">Email</th>
-                            <th class="px-2 sm:px-4 py-2 sm:py-3 font-semibold text-[#182235] whitespace-nowrap">Verified At</th>
-                            <th class="px-2 sm:px-4 py-2 sm:py-3 font-semibold text-[#182235] whitespace-nowrap">Password</th>
-                            <th class="px-2 sm:px-4 py-2 sm:py-3 font-semibold text-[#182235] whitespace-nowrap">District</th>
-                            <th class="px-2 sm:px-4 py-2 sm:py-3 font-semibold text-[#182235] whitespace-nowrap">Address</th>
-                            <th class="px-2 sm:px-4 py-2 sm:py-3 font-semibold text-[#182235] whitespace-nowrap">Photo1</th>
-                            <th class="px-2 sm:px-4 py-2 sm:py-3 font-semibold text-[#182235] whitespace-nowrap">Photo2</th>
-                            <th class="px-2 sm:px-4 py-2 sm:py-3 font-semibold text-[#182235] whitespace-nowrap">Photo3</th>
-                            <th class="px-2 sm:px-4 py-2 sm:py-3 font-semibold text-[#182235] whitespace-nowrap">Status</th>
-                            <th class="px-2 sm:px-4 py-2 sm:py-3 font-semibold text-[#182235] whitespace-nowrap">Remember Token</th>
-                            <th class="px-2 sm:px-4 py-2 sm:py-3 font-semibold text-[#182235] whitespace-nowrap">Created At</th>
-                            <th class="px-2 sm:px-4 py-2 sm:py-3 font-semibold text-[#182235] whitespace-nowrap">Updated At</th>
-                            <th class="px-2 sm:px-4 py-2 sm:py-3 font-semibold text-[#182235] whitespace-nowrap">Actions</th>
+                            <th v-for="header in [
+                                'ID','Name','Email','Verified At','Password','District',
+                                'Address','Photo1','Photo2','Photo3','Status','Remember Token','Created','Updated','Actions'
+                            ]" :key="header" class="px-2 sm:px-4 py-2 sm:py-3 font-semibold whitespace-nowrap">
+                                {{ header }}
+                            </th>
                         </tr>
                     </thead>
-                    <tbody class="text-[#182235] font-medium bg-white">
-                        <tr v-for="owner in owners" :key="owner.id" class="border-t hover:bg-[#F8FAFC] transition">
-                            <td class="px-2 sm:px-4 py-2 sm:py-3 text-center">{{ owner.id }}</td>
-                            <td class="px-2 sm:px-4 py-2 sm:py-3">{{ owner.name }}</td>
-                            <td class="px-2 sm:px-4 py-2 sm:py-3">{{ owner.email }}</td>
-                            <td class="px-2 sm:px-4 py-2 sm:py-3">{{ owner.email_verified_at }}</td>
-                            <td class="px-2 sm:px-4 py-2 sm:py-3">{{ owner.password }}</td>
-                            <td class="px-2 sm:px-4 py-2 sm:py-3">{{ owner.district }}</td>
-                            <td class="px-2 sm:px-4 py-2 sm:py-3">{{ owner.address }}</td>
-                            <td class="px-2 sm:px-4 py-2 sm:py-3 text-center">
-                                <img
-                                    :src="getPhotoSrc(owner.photo1)"
-                                    alt="Photo 1"
-                                    class="h-12 w-12 sm:h-16 sm:w-16 object-cover rounded border border-gray-300 mx-auto"
-                                />
+                    <tbody class="text-[#182235]">
+                        <tr v-for="owner in owners" :key="owner.id" class="border-t hover:bg-gray-50 transition">
+                            <td class="px-2 py-2 text-center">{{ owner.id }}</td>
+                            <td class="px-2 py-2">{{ owner.name }}</td>
+                            <td class="px-2 py-2">{{ owner.email }}</td>
+                            <td class="px-2 py-2">{{ owner.email_verified_at }}</td>
+                            <td class="px-2 py-2">{{ owner.password }}</td>
+                            <td class="px-2 py-2">{{ owner.district }}</td>
+                            <td class="px-2 py-2">{{ owner.address }}</td>
+
+                            <td class="px-2 py-2 text-center">
+                                <img :src="getPhotoSrc(owner.photo1)" alt="Photo 1" class="h-10 w-10 sm:h-16 sm:w-16 object-cover rounded border mx-auto" />
                             </td>
-                            <td class="px-2 sm:px-4 py-2 sm:py-3 text-center">
-                                <img
-                                    :src="getPhotoSrc(owner.photo2)"
-                                    alt="Photo 2"
-                                    class="h-12 w-12 sm:h-16 sm:w-16 object-cover rounded border border-gray-300 mx-auto"
-                                />
+                            <td class="px-2 py-2 text-center">
+                                <img :src="getPhotoSrc(owner.photo2)" alt="Photo 2" class="h-10 w-10 sm:h-16 sm:w-16 object-cover rounded border mx-auto" />
                             </td>
-                            <td class="px-2 sm:px-4 py-2 sm:py-3 text-center">
-                                <img
-                                    :src="getPhotoSrc(owner.photo3)"
-                                    alt="Photo 3"
-                                    class="h-12 w-12 sm:h-16 sm:w-16 object-cover rounded border border-gray-300 mx-auto"
-                                />
+                            <td class="px-2 py-2 text-center">
+                                <img :src="getPhotoSrc(owner.photo3)" alt="Photo 3" class="h-10 w-10 sm:h-16 sm:w-16 object-cover rounded border mx-auto" />
                             </td>
-                            <td class="px-2 sm:px-4 py-2 sm:py-3 text-center">{{ owner.status }}</td>
-                            <td class="px-2 sm:px-4 py-2 sm:py-3 text-center">{{ owner.remember_token }}</td>
-                            <td class="px-2 sm:px-4 py-2 sm:py-3 text-center">{{ owner.created_at }}</td>
-                            <td class="px-2 sm:px-4 py-2 sm:py-3 text-center">{{ owner.updated_at }}</td>
-                            <td class="px-2 sm:px-4 py-2 sm:py-3 text-center space-x-2">
-                                <button @click="approve(owner.id)" class="px-3 py-1 sm:px-4 sm:py-1 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition text-xs sm:text-sm">Approve</button>
-                                <button @click="decline(owner.id)" class="px-3 py-1 sm:px-4 sm:py-1 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition text-xs sm:text-sm">Decline</button>
+
+                            <td class="px-2 py-2 text-center">{{ owner.status }}</td>
+                            <td class="px-2 py-2 text-center truncate max-w-[80px]">{{ owner.remember_token }}</td>
+                            <td class="px-2 py-2 text-center">{{ owner.created_at }}</td>
+                            <td class="px-2 py-2 text-center">{{ owner.updated_at }}</td>
+
+                            <td class="px-2 py-2 text-center space-x-1 sm:space-x-2">
+                                <button @click="approve(owner.id)" class="px-2 py-1 sm:px-4 sm:py-1 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition text-xs sm:text-sm">Approve</button>
+                                <button @click="decline(owner.id)" class="px-2 py-1 sm:px-4 sm:py-1 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition text-xs sm:text-sm">Decline</button>
                             </td>
                         </tr>
                     </tbody>
