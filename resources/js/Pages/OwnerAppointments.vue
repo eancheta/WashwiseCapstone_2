@@ -1,32 +1,32 @@
 <template>
   <Head title="Owner Appointments" />
 
-  <div class="min-h-screen bg-gradient-to-br from-[#001F3F] via-[#002B5C] to-[#00509E] flex flex-col items-center py-12 px-6">
-    <div class="w-full max-w-7xl backdrop-blur-xl bg-white/10 rounded-3xl shadow-2xl border border-white/20 p-8 relative">
+  <div class="min-h-screen bg-gradient-to-br from-gray-100 via-white to-gray-100 py-6 px-4 flex flex-col items-center">
+    <div class="w-full max-w-7xl p-6 sm:p-10 relative">
 
       <!-- Return Button -->
       <div class="absolute top-6 left-6">
         <button
           @click="goBack"
-          class="px-5 py-2 bg-white/20 text-white font-semibold rounded-xl shadow hover:bg-white/30 transition-all backdrop-blur-lg border border-white/30 hover:scale-105"
+          class="px-5 py-2 bg-[#002B5C] text-white font-semibold rounded-xl shadow-md hover:bg-[#FF2D2D] transition transform hover:-translate-y-0.5"
         >
           ← Return to Dashboard
         </button>
       </div>
 
       <!-- Header -->
-      <div class="text-center mb-10">
-        <h1 class="text-4xl sm:text-5xl font-extrabold text-white tracking-wide drop-shadow-md">
+      <div class="text-center mb-8">
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-[#002B5C] mb-2">
           Customer Appointments
         </h1>
-        <p class="text-gray-200 mt-2">Track and manage all car wash bookings in style ✨</p>
+        <p class="text-gray-500">Manage and monitor all customer bookings efficiently</p>
       </div>
 
       <!-- Filter Card -->
-      <div class="mb-10 grid grid-cols-1 sm:grid-cols-3 gap-6 bg-white/15 p-6 rounded-2xl shadow-md border border-white/20">
+      <div class="mb-8 p-6 bg-white shadow-lg rounded-2xl grid grid-cols-1 sm:grid-cols-3 gap-4 border border-gray-200">
         <div>
-          <label class="block text-sm font-semibold text-white mb-1">Date Range</label>
-          <select v-model="dateRange" class="w-full px-4 py-3 font-semibold text-gray-800 rounded-lg focus:ring-4 focus:ring-[#FF2D2D]/60 focus:outline-none">
+          <label class="block text-sm font-semibold text-gray-600 mb-1">Date Range</label>
+          <select v-model="dateRange" class="w-full px-4 py-3 font-semibold text-[#182235] border rounded-lg focus:ring-2 focus:ring-[#002B5C] focus:outline-none">
             <option value="all">All</option>
             <option value="today">Today</option>
             <option value="week">This Week</option>
@@ -36,79 +36,78 @@
         </div>
 
         <div v-if="dateRange==='custom'">
-          <label class="block text-sm font-semibold text-white mb-1">From</label>
-          <input type="date" v-model="fromDate" class="w-full px-4 py-3 rounded-lg font-semibold text-gray-800 focus:ring-4 focus:ring-[#FF2D2D]/60 focus:outline-none" />
+          <label class="block text-sm font-semibold text-gray-600 mb-1">From</label>
+          <input type="date" v-model="fromDate" class="w-full px-4 py-3 font-semibold text-[#182235] border rounded-lg focus:ring-2 focus:ring-[#002B5C] focus:outline-none" />
         </div>
 
         <div v-if="dateRange==='custom'">
-          <label class="block text-sm font-semibold text-white mb-1">To</label>
-          <input type="date" v-model="toDate" class="w-full px-4 py-3 rounded-lg font-semibold text-gray-800 focus:ring-4 focus:ring-[#FF2D2D]/60 focus:outline-none" />
+          <label class="block text-sm font-semibold text-gray-600 mb-1">To</label>
+          <input type="date" v-model="toDate" class="w-full px-4 py-3 font-semibold text-[#182235] border rounded-lg focus:ring-2 focus:ring-[#002B5C] focus:outline-none" />
         </div>
       </div>
 
       <!-- Appointment Table -->
-      <div v-if="filteredAppointments.length === 0" class="text-gray-100 text-xl text-center py-16 font-medium">
-        🚫 No appointments found for this range.
+      <div v-if="filteredAppointments.length === 0" class="text-gray-500 text-lg text-center py-12">
+        No appointments found.
       </div>
 
       <div v-else class="overflow-x-auto">
-        <table class="w-full border border-white/20 rounded-xl overflow-hidden shadow-lg backdrop-blur-md">
-          <thead class="bg-gradient-to-r from-[#FF2D2D] to-[#FF6B6B] text-white">
+        <table class="w-full border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+          <thead class="bg-gradient-to-r from-[#002B5C] to-[#00509E] text-white">
             <tr>
-                <th v-for="header in headers" :key="header.value">
-                     {{ header.text }}
-                </th>
+              <th class="px-4 py-3 text-left">Date</th>
+              <th class="px-4 py-3 text-left">Time</th>
+              <th class="px-4 py-3 text-left">Status</th>
+              <th class="px-4 py-3 text-center">ID</th>
+              <th class="px-4 py-3 text-left">Name</th>
+              <th class="px-4 py-3 text-left">Email</th>
+              <th class="px-4 py-3 text-left">Car Size</th>
+              <th class="px-4 py-3 text-left">Contact</th>
+              <th class="px-4 py-3 text-left">Slot</th>
+              <th class="px-4 py-3 text-left">Created</th>
+              <th class="px-4 py-3 text-center">Payment Proof</th>
+              <th class="px-4 py-3 text-center">Amount</th>
+              <th class="px-4 py-3 text-center">Actions</th>
             </tr>
           </thead>
 
-          <tbody>
-            <tr
-              v-for="(appt, idx) in filteredAppointments"
-              :key="appt.id"
-              :class="idx % 2 === 0 ? 'bg-white/10 hover:bg-white/20' : 'bg-white/5 hover:bg-white/15'"
-              class="transition-all text-white"
-            >
+          <tbody class="text-[#182235] font-medium">
+            <tr v-for="(appt, idx) in filteredAppointments" :key="appt.id"
+                :class="idx % 2 === 0 ? 'bg-white hover:bg-gray-50' : 'bg-gray-50 hover:bg-gray-100 transition'">
               <td class="px-4 py-3">{{ appt.date_of_booking }}</td>
               <td class="px-4 py-3">{{ appt.time_of_booking }}</td>
               <td class="px-4 py-3">
-                <span
-                  :class="{
-                    'bg-green-600/80 text-white px-3 py-1 rounded-full text-sm font-semibold': appt.status === 'approved',
-                    'bg-red-600/80 text-white px-3 py-1 rounded-full text-sm font-semibold': appt.status === 'declined',
-                    'bg-gray-400/70 text-white px-3 py-1 rounded-full text-sm font-semibold': !appt.status || appt.status === 'pending'
-                  }"
-                >
-                  {{ appt.status ?? 'Pending' }}
-                </span>
+                <span v-if="appt.status === 'approved'" class="text-green-600 font-semibold">Approved</span>
+                <span v-else-if="appt.status === 'declined'" class="text-red-600 font-semibold">Declined</span>
+                <span v-else class="text-gray-600 font-semibold">Pending</span>
               </td>
               <td class="px-4 py-3 text-center">{{ appt.id }}</td>
               <td class="px-4 py-3">{{ appt.name }}</td>
-              <td class="px-4 py-3">{{ appt.email || 'Walk-IN' }}</td>
+              <td class="px-4 py-3">{{ appt.email || 'Walk_IN' }}</td>
               <td class="px-4 py-3">{{ appt.size_of_the_car }}</td>
               <td class="px-4 py-3">{{ appt.contact_no }}</td>
               <td class="px-4 py-3">{{ appt.slot_number }}</td>
               <td class="px-4 py-3">{{ appt.created_at }}</td>
 
+              <!-- Payment Proof -->
               <td class="px-4 py-3 text-center">
                 <img
                   :src="getPaymentProofSrc(appt)"
                   alt="Payment Proof"
-                  class="h-16 w-16 object-cover rounded-lg border border-white/20 mx-auto cursor-pointer hover:scale-105 transition-all"
+                  class="h-16 w-16 object-cover rounded border mx-auto cursor-pointer hover:scale-105 transition"
                   @click="openImagePreview(getPaymentProofSrc(appt))"
                   @error="handleImageError"
                 />
               </td>
 
-              <td class="px-4 py-3 text-center font-bold text-[#FFD700]">
-                {{ appt.payment_amount ?? 'Walk-IN' }}
-              </td>
+              <td class="px-4 py-3 text-center font-bold text-[#FF2D2D]">{{ appt.payment_amount ?? 'Walk_IN' }}</td>
 
               <td class="px-4 py-3 text-center flex justify-center gap-3">
-                <button @click="approve(appt.id)" class="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg text-white font-semibold shadow-md transition hover:scale-105">
-                  ✅ Approve
+                <button @click="approve(appt.id)" class="px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 shadow-md transition transform hover:-translate-y-0.5">
+                  Approve
                 </button>
-                <button @click="openDeclineModal(appt.id)" class="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg text-white font-semibold shadow-md transition hover:scale-105">
-                  ❌ Decline
+                <button @click="openDeclineModal(appt.id)" class="px-4 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 shadow-md transition transform hover:-translate-y-0.5">
+                  Decline
                 </button>
               </td>
             </tr>
@@ -119,10 +118,10 @@
   </div>
 
   <!-- Decline Modal -->
-  <div v-if="showDeclineModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex justify-center items-center z-50">
-    <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 relative">
-      <h2 class="text-2xl font-bold text-[#002B5C] mb-4">Decline Appointment</h2>
-      <p class="text-gray-600 mb-3">Please provide a reason for declining:</p>
+  <div v-if="showDeclineModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+    <div class="bg-white w-full max-w-md rounded-2xl shadow-xl p-6 relative">
+      <h2 class="text-xl font-bold text-[#002B5C] mb-4">Decline Appointment</h2>
+      <p class="text-gray-600 mb-3">Please write the reason for declining this appointment:</p>
       <textarea
         v-model="declineReason"
         rows="4"
@@ -150,7 +149,7 @@
   <!-- Image Preview Modal -->
   <div v-if="showImagePreview" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50">
     <img :src="previewSrc" alt="Preview" class="max-h-[80vh] rounded-xl shadow-2xl border-4 border-white" />
-    <button @click="showImagePreview=false" class="absolute top-6 right-8 text-white text-3xl font-bold hover:text-red-400">✕</button>
+    <button @click="showImagePreview=false" class="absolute top-6 right-8 text-white text-3xl font-bold">✕</button>
   </div>
 </template>
 
@@ -260,17 +259,4 @@ const filteredAppointments = computed(() => {
 function goBack() {
   router.visit('/owner/dashboard')
 }
-
-const headers = [
-  { text: 'Date', value: 'date_of_booking' },
-  { text: 'Time', value: 'time_of_booking' },
-  { text: 'Status', value: 'status' },
-  { text: 'Name', value: 'name' },
-  { text: 'Email', value: 'email' },
-  { text: 'Car Size', value: 'size_of_the_car' },
-  { text: 'Contact', value: 'contact_no' },
-  { text: 'Slot', value: 'slot_number' },
-  { text: 'Created', value: 'created_at' },
-  { text: 'Actions', value: 'actions' }
-]
 </script>
