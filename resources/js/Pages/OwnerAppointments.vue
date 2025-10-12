@@ -1,7 +1,7 @@
 <template>
   <Head title="Owner Appointments" />
 
-  <div class="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 py-8 px-6 flex flex-col items-center">
+    <div class="flex min-h-screen bg-gradient-to-br from-white via-blue-50 to-[#002B5C]">>
     <div class="w-full max-w-[95%] xl:max-w-[1600px] p-6 sm:p-10 bg-white rounded-2xl shadow-xl border border-gray-200">
 
       <!-- Return Button -->
