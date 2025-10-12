@@ -1,68 +1,64 @@
 <template>
   <Head title="Owner Appointments" />
 
-  <div class="min-h-screen bg-gradient-to-br from-[#001F3F] via-[#003366] to-[#00509E] py-10 px-6 flex flex-col items-center text-white">
-    <div class="w-full max-w-7xl bg-white/10 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/20 p-10 relative overflow-hidden">
+  <div class="h-screen w-screen bg-gradient-to-br from-[#001F3F] via-[#003366] to-[#00509E] text-white overflow-hidden flex flex-col">
+    <!-- Top Section -->
+    <div class="flex justify-between items-center px-8 py-4 bg-white/10 backdrop-blur-md border-b border-white/20 shadow-md">
+      <button
+        @click="goBack"
+        class="px-5 py-2 bg-white/20 text-white font-semibold rounded-xl shadow-lg hover:bg-white/30 border border-white/30 transition-all hover:scale-105 backdrop-blur-md"
+      >
+        ← Back
+      </button>
 
-      <!-- Glow Background -->
-      <div class="absolute inset-0 bg-gradient-to-r from-[#FF2D2D]/20 via-transparent to-[#FF6B6B]/20 blur-3xl"></div>
-
-      <!-- Return Button -->
-      <div class="absolute top-6 left-6 z-10">
-        <button
-          @click="goBack"
-          class="px-5 py-2 bg-white/20 text-white font-semibold rounded-xl shadow-lg hover:bg-white/30 border border-white/30 transition-all hover:scale-105 backdrop-blur-md"
-        >
-          ← Back
-        </button>
+      <div class="text-center">
+        <h1 class="text-4xl font-extrabold drop-shadow-lg tracking-wide">Customer Appointments ✨</h1>
+        <p class="text-gray-200 text-sm">Track and manage all bookings with clarity and style</p>
       </div>
 
-      <!-- Header -->
-      <div class="text-center mb-12 relative z-10">
-        <h1 class="text-5xl font-extrabold drop-shadow-lg text-white tracking-wide">
-          Customer Appointments ✨
-        </h1>
-        <p class="text-gray-200 mt-2">Track and manage all bookings with clarity and style.</p>
+      <div></div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="p-6 grid grid-cols-1 sm:grid-cols-3 gap-6 bg-white/10 border-b border-white/20 backdrop-blur-sm">
+      <div>
+        <label class="block text-sm font-semibold text-gray-200 mb-1">Date Range</label>
+        <select v-model="dateRange" class="w-full px-4 py-3 rounded-lg text-[#001F3F] font-semibold focus:ring-4 focus:ring-[#FF2D2D]/60 outline-none">
+          <option value="all">All</option>
+          <option value="today">Today</option>
+          <option value="week">This Week</option>
+          <option value="month">This Month</option>
+          <option value="custom">Custom</option>
+        </select>
       </div>
 
-      <!-- Filter Card -->
-      <div class="mb-10 grid grid-cols-1 sm:grid-cols-3 gap-6 bg-white/10 p-6 rounded-2xl shadow-md border border-white/20 backdrop-blur-sm">
-        <div>
-          <label class="block text-sm font-semibold text-gray-200 mb-1">Date Range</label>
-          <select v-model="dateRange" class="w-full px-4 py-3 rounded-lg text-[#001F3F] font-semibold focus:ring-4 focus:ring-[#FF2D2D]/60 outline-none">
-            <option value="all">All</option>
-            <option value="today">Today</option>
-            <option value="week">This Week</option>
-            <option value="month">This Month</option>
-            <option value="custom">Custom</option>
-          </select>
-        </div>
-
-        <div v-if="dateRange==='custom'">
-          <label class="block text-sm font-semibold text-gray-200 mb-1">From</label>
-          <input type="date" v-model="fromDate" class="w-full px-4 py-3 rounded-lg text-[#001F3F] font-semibold focus:ring-4 focus:ring-[#FF2D2D]/60 outline-none" />
-        </div>
-
-        <div v-if="dateRange==='custom'">
-          <label class="block text-sm font-semibold text-gray-200 mb-1">To</label>
-          <input type="date" v-model="toDate" class="w-full px-4 py-3 rounded-lg text-[#001F3F] font-semibold focus:ring-4 focus:ring-[#FF2D2D]/60 outline-none" />
-        </div>
+      <div v-if="dateRange==='custom'">
+        <label class="block text-sm font-semibold text-gray-200 mb-1">From</label>
+        <input type="date" v-model="fromDate" class="w-full px-4 py-3 rounded-lg text-[#001F3F] font-semibold focus:ring-4 focus:ring-[#FF2D2D]/60 outline-none" />
       </div>
 
-      <!-- Appointment Table -->
+      <div v-if="dateRange==='custom'">
+        <label class="block text-sm font-semibold text-gray-200 mb-1">To</label>
+        <input type="date" v-model="toDate" class="w-full px-4 py-3 rounded-lg text-[#001F3F] font-semibold focus:ring-4 focus:ring-[#FF2D2D]/60 outline-none" />
+      </div>
+    </div>
+
+    <!-- Main Table Container -->
+    <div class="flex-1 overflow-auto">
       <div v-if="filteredAppointments.length === 0" class="text-gray-100 text-xl text-center py-20 font-medium">
         🚫 No appointments found for this range.
       </div>
 
-      <div v-else class="overflow-x-auto rounded-2xl border border-white/20 shadow-xl backdrop-blur-sm">
+      <div v-else class="w-full h-full overflow-x-auto overflow-y-auto">
         <table class="w-full text-sm md:text-base border-collapse">
-          <thead class="bg-gradient-to-r from-[#FF2D2D] to-[#FF6B6B] text-white uppercase">
+          <thead class="bg-gradient-to-r from-[#FF2D2D] to-[#FF6B6B] text-white uppercase sticky top-0 z-10">
             <tr>
               <th v-for="header in headers" :key="header.value" class="px-5 py-4 text-left font-semibold tracking-wider">
                 {{ header.text }}
               </th>
             </tr>
           </thead>
+
           <tbody>
             <tr
               v-for="(appt, idx) in filteredAppointments"
@@ -113,41 +109,41 @@
         </table>
       </div>
     </div>
-  </div>
 
-  <!-- Decline Modal -->
-  <div v-if="showDeclineModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex justify-center items-center z-50">
-    <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 relative">
-      <h2 class="text-2xl font-bold text-[#002B5C] mb-4">Decline Appointment</h2>
-      <p class="text-gray-600 mb-3">Please provide a reason for declining:</p>
-      <textarea
-        v-model="declineReason"
-        rows="4"
-        placeholder="Type reason here..."
-        class="w-full border border-gray-300 rounded-lg p-3 text-gray-800 focus:ring-2 focus:ring-[#FF2D2D] focus:outline-none"
-      ></textarea>
+    <!-- Decline Modal -->
+    <div v-if="showDeclineModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex justify-center items-center z-50">
+      <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 relative">
+        <h2 class="text-2xl font-bold text-[#002B5C] mb-4">Decline Appointment</h2>
+        <p class="text-gray-600 mb-3">Please provide a reason for declining:</p>
+        <textarea
+          v-model="declineReason"
+          rows="4"
+          placeholder="Type reason here..."
+          class="w-full border border-gray-300 rounded-lg p-3 text-gray-800 focus:ring-2 focus:ring-[#FF2D2D] focus:outline-none"
+        ></textarea>
 
-      <div class="mt-6 flex justify-end gap-3">
-        <button
-          @click="showDeclineModal = false"
-          class="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg font-semibold hover:bg-gray-400"
-        >
-          Cancel
-        </button>
-        <button
-          @click="submitDecline"
-          class="px-5 py-2 bg-[#FF2D2D] text-white font-semibold rounded-lg hover:bg-[#E02626] transition"
-        >
-          Send & Decline
-        </button>
+        <div class="mt-6 flex justify-end gap-3">
+          <button
+            @click="showDeclineModal = false"
+            class="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg font-semibold hover:bg-gray-400"
+          >
+            Cancel
+          </button>
+          <button
+            @click="submitDecline"
+            class="px-5 py-2 bg-[#FF2D2D] text-white font-semibold rounded-lg hover:bg-[#E02626] transition"
+          >
+            Send & Decline
+          </button>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- Image Preview Modal -->
-  <div v-if="showImagePreview" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50">
-    <img :src="previewSrc" alt="Preview" class="max-h-[80vh] rounded-xl shadow-2xl border-4 border-white" />
-    <button @click="showImagePreview=false" class="absolute top-6 right-8 text-white text-3xl font-bold hover:text-red-400">✕</button>
+    <!-- Image Preview Modal -->
+    <div v-if="showImagePreview" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50">
+      <img :src="previewSrc" alt="Preview" class="max-h-[80vh] rounded-xl shadow-2xl border-4 border-white" />
+      <button @click="showImagePreview=false" class="absolute top-6 right-8 text-white text-3xl font-bold hover:text-red-400">✕</button>
+    </div>
   </div>
 </template>
 
