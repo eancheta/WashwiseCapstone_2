@@ -1,33 +1,38 @@
 <template>
   <Head title="Owner Appointments" />
 
-    <div class="flex min-h-screen bg-gradient-to-br from-white via-blue-50 to-[#002B5C] py-4 sm:py-8 px-3 sm:px-6 flex flex-col items-center overflow-x-hidden">
-    <div class="w-full max-w-[95%] xl:max-w-[1600px] p-6 sm:p-10 bg-white rounded-2xl shadow-xl border border-gray-200">
+  <div class="flex min-h-screen bg-gradient-to-br from-white via-blue-50 to-[#002B5C] py-4 sm:py-8 px-3 sm:px-6 flex-col items-center overflow-x-hidden">
+    <div class="w-full max-w-[95%] xl:max-w-[1600px] p-4 sm:p-8 bg-white rounded-2xl shadow-xl border border-gray-200">
 
-      <!-- Return Button -->
-      <div class="flex justify-between items-center mb-8">
+      <!-- Return Button + Header -->
+      <div class="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
         <button
           @click="goBack"
-          class="px-5 py-2 bg-[#002B5C] text-white font-semibold rounded-lg shadow-md hover:bg-[#FF2D2D] transition transform hover:-translate-y-0.5"
+          class="px-5 py-2 bg-[#002B5C] text-white font-semibold rounded-lg shadow-md hover:bg-[#FF2D2D] transition"
         >
           ← Return to Dashboard
         </button>
 
-        <div class="text-center flex-1">
-          <h1 class="text-3xl sm:text-4xl font-extrabold text-[#002B5C] mb-2">
+        <div class="text-center sm:flex-1">
+          <h1 class="text-2xl sm:text-4xl font-extrabold text-[#002B5C] mb-1 sm:mb-2">
             Customer Appointments
           </h1>
-          <p class="text-gray-500">Manage and monitor all customer bookings efficiently</p>
+          <p class="text-gray-500 text-sm sm:text-base">
+            Manage and monitor all customer bookings efficiently
+          </p>
         </div>
 
-        <div class="w-[150px]"></div> <!-- Spacer for centering -->
+        <div class="hidden sm:block w-[150px]"></div>
       </div>
 
       <!-- Filter Card -->
-      <div class="mb-8 p-6 bg-gray-50 shadow-inner rounded-xl grid grid-cols-1 sm:grid-cols-3 gap-4 border border-gray-200">
+      <div class="mb-8 p-4 sm:p-6 bg-gray-50 rounded-xl shadow-inner grid grid-cols-1 sm:grid-cols-3 gap-4 border border-gray-200">
         <div>
           <label class="block text-sm font-semibold text-gray-600 mb-1">Date Range</label>
-          <select v-model="dateRange" class="w-full px-4 py-3 font-semibold text-[#182235] border rounded-lg focus:ring-2 focus:ring-[#002B5C] focus:outline-none">
+          <select
+            v-model="dateRange"
+            class="w-full px-4 py-2 sm:py-3 font-semibold text-[#182235] border rounded-lg focus:ring-2 focus:ring-[#002B5C] focus:outline-none"
+          >
             <option value="all">All</option>
             <option value="today">Today</option>
             <option value="week">This Week</option>
@@ -36,14 +41,22 @@
           </select>
         </div>
 
-        <div v-if="dateRange==='custom'">
+        <div v-if="dateRange === 'custom'">
           <label class="block text-sm font-semibold text-gray-600 mb-1">From</label>
-          <input type="date" v-model="fromDate" class="w-full px-4 py-3 font-semibold text-[#182235] border rounded-lg focus:ring-2 focus:ring-[#002B5C] focus:outline-none" />
+          <input
+            type="date"
+            v-model="fromDate"
+            class="w-full px-4 py-2 sm:py-3 font-semibold text-[#182235] border rounded-lg focus:ring-2 focus:ring-[#002B5C] focus:outline-none"
+          />
         </div>
 
-        <div v-if="dateRange==='custom'">
+        <div v-if="dateRange === 'custom'">
           <label class="block text-sm font-semibold text-gray-600 mb-1">To</label>
-          <input type="date" v-model="toDate" class="w-full px-4 py-3 font-semibold text-[#182235] border rounded-lg focus:ring-2 focus:ring-[#002B5C] focus:outline-none" />
+          <input
+            type="date"
+            v-model="toDate"
+            class="w-full px-4 py-2 sm:py-3 font-semibold text-[#182235] border rounded-lg focus:ring-2 focus:ring-[#002B5C] focus:outline-none"
+          />
         </div>
       </div>
 
@@ -53,22 +66,22 @@
       </div>
 
       <div v-else class="overflow-x-auto rounded-xl border border-gray-200 shadow-md w-full">
-        <table class="min-w-full text-xs sm:text-sm text-left border-collapse">
+        <table class="min-w-full text-[13px] sm:text-sm text-left border-collapse">
           <thead class="bg-[#002B5C] text-white">
             <tr>
-              <th class="px-4 py-3">Date</th>
-              <th class="px-4 py-3">Time</th>
-              <th class="px-4 py-3">Status</th>
-              <th class="px-4 py-3 text-center">ID</th>
-              <th class="px-4 py-3">Name</th>
-              <th class="px-4 py-3">Email</th>
-              <th class="px-4 py-3">Car Size</th>
-              <th class="px-4 py-3">Contact</th>
-              <th class="px-4 py-3">Slot</th>
-              <th class="px-4 py-3">Created</th>
-              <th class="px-4 py-3 text-center">Payment Proof</th>
-              <th class="px-4 py-3 text-center">Amount</th>
-              <th class="px-4 py-3 text-center">Actions</th>
+              <th class="px-3 sm:px-4 py-3">Date</th>
+              <th class="px-3 sm:px-4 py-3">Time</th>
+              <th class="px-3 sm:px-4 py-3">Status</th>
+              <th class="px-3 sm:px-4 py-3 text-center">ID</th>
+              <th class="px-3 sm:px-4 py-3">Name</th>
+              <th class="px-3 sm:px-4 py-3 hidden md:table-cell">Email</th>
+              <th class="px-3 sm:px-4 py-3 hidden md:table-cell">Car Size</th>
+              <th class="px-3 sm:px-4 py-3 hidden md:table-cell">Contact</th>
+              <th class="px-3 sm:px-4 py-3 hidden md:table-cell">Slot</th>
+              <th class="px-3 sm:px-4 py-3 hidden lg:table-cell">Created</th>
+              <th class="px-3 sm:px-4 py-3 text-center hidden md:table-cell">Payment Proof</th>
+              <th class="px-3 sm:px-4 py-3 text-center hidden sm:table-cell">Amount</th>
+              <th class="px-3 sm:px-4 py-3 text-center">Actions</th>
             </tr>
           </thead>
 
@@ -79,50 +92,45 @@
               :class="idx % 2 === 0 ? 'bg-gray-50 hover:bg-gray-100' : 'hover:bg-gray-50'"
               class="transition"
             >
-              <td class="px-4 py-3">{{ appt.date_of_booking }}</td>
-              <td class="px-4 py-3">{{ appt.time_of_booking }}</td>
-              <td class="px-4 py-3">
-                <span
-                  v-if="appt.status === 'approved'"
-                  class="text-green-600 font-semibold"
-                >Approved</span>
-                <span
-                  v-else-if="appt.status === 'declined'"
-                  class="text-red-600 font-semibold"
-                >Declined</span>
+              <td class="px-3 sm:px-4 py-3">{{ appt.date_of_booking }}</td>
+              <td class="px-3 sm:px-4 py-3">{{ appt.time_of_booking }}</td>
+              <td class="px-3 sm:px-4 py-3">
+                <span v-if="appt.status === 'approved'" class="text-green-600 font-semibold">Approved</span>
+                <span v-else-if="appt.status === 'declined'" class="text-red-600 font-semibold">Declined</span>
                 <span v-else class="text-gray-600 font-semibold">Pending</span>
               </td>
-              <td class="px-4 py-3 text-center">{{ appt.id }}</td>
-              <td class="px-4 py-3">{{ appt.name }}</td>
-              <td class="px-4 py-3">{{ appt.email || 'Walk_IN' }}</td>
-              <td class="px-4 py-3">{{ appt.size_of_the_car }}</td>
-              <td class="px-4 py-3">{{ appt.contact_no }}</td>
-              <td class="px-4 py-3">{{ appt.slot_number }}</td>
-              <td class="px-4 py-3">{{ appt.created_at }}</td>
+              <td class="px-3 sm:px-4 py-3 text-center">{{ appt.id }}</td>
+              <td class="px-3 sm:px-4 py-3">{{ appt.name }}</td>
+              <td class="px-3 sm:px-4 py-3 hidden md:table-cell">{{ appt.email || 'Walk_IN' }}</td>
+              <td class="px-3 sm:px-4 py-3 hidden md:table-cell">{{ appt.size_of_the_car }}</td>
+              <td class="px-3 sm:px-4 py-3 hidden md:table-cell">{{ appt.contact_no }}</td>
+              <td class="px-3 sm:px-4 py-3 hidden md:table-cell">{{ appt.slot_number }}</td>
+              <td class="px-3 sm:px-4 py-3 hidden lg:table-cell">{{ appt.created_at }}</td>
 
-              <!-- Payment Proof -->
-              <td class="px-4 py-3 text-center">
+              <td class="px-3 sm:px-4 py-3 text-center hidden md:table-cell">
                 <img
                   :src="getPaymentProofSrc(appt)"
                   alt="Payment Proof"
-                  class="h-16 w-16 object-cover rounded border mx-auto cursor-pointer hover:scale-105 transition"
+                  class="h-12 sm:h-16 w-12 sm:w-16 object-cover rounded border mx-auto cursor-pointer hover:scale-105 transition"
                   @click="openImagePreview(getPaymentProofSrc(appt))"
                   @error="handleImageError"
                 />
               </td>
 
-              <td class="px-4 py-3 text-center font-bold text-[#FF2D2D]">{{ appt.payment_amount ?? 'Walk_IN' }}</td>
+              <td class="px-3 sm:px-4 py-3 text-center font-bold text-[#FF2D2D] hidden sm:table-cell">
+                {{ appt.payment_amount ?? 'Walk_IN' }}
+              </td>
 
-              <td class="px-4 py-3 text-center flex flex-col sm:flex-row justify-center gap-2 sm:gap-3">
+              <td class="px-3 sm:px-4 py-3 text-center flex flex-col sm:flex-row justify-center gap-2 sm:gap-3">
                 <button
                   @click="approve(appt.id)"
-                  class="px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 shadow-sm transition"
+                  class="px-3 sm:px-4 py-1.5 sm:py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 shadow-sm transition"
                 >
                   Approve
                 </button>
                 <button
                   @click="openDeclineModal(appt.id)"
-                  class="px-4 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 shadow-sm transition"
+                  class="px-3 sm:px-4 py-1.5 sm:py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 shadow-sm transition"
                 >
                   Decline
                 </button>
@@ -137,7 +145,7 @@
   <!-- Decline Modal -->
   <div
     v-if="showDeclineModal"
-    class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+    class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 px-4"
   >
     <div class="bg-white w-full max-w-md rounded-2xl shadow-xl p-6 relative">
       <h2 class="text-xl font-bold text-[#002B5C] mb-4">Decline Appointment</h2>
@@ -188,109 +196,105 @@
 </template>
 
 <script setup lang="ts">
-import { Head, router } from '@inertiajs/vue3'
-import { ref, computed } from 'vue'
+import { Head, router } from "@inertiajs/vue3";
+import { ref, computed } from "vue";
 
 interface Appointment {
-  id: number
-  name: string
-  size_of_the_car: string
-  contact_no: string
-  email: string
-  time_of_booking: string
-  date_of_booking: string
-  slot_number: string
-  created_at: string
-  status?: string | null
-  payment_proof?: string | null
-  payment_amount?: number | null
+  id: number;
+  name: string;
+  size_of_the_car: string;
+  contact_no: string;
+  email: string;
+  time_of_booking: string;
+  date_of_booking: string;
+  slot_number: string;
+  created_at: string;
+  status?: string | null;
+  payment_proof?: string | null;
+  payment_amount?: number | null;
 }
 
-const props = defineProps<{ appointments: Appointment[] }>()
+const props = defineProps<{ appointments: Appointment[] }>();
 
-// --- Status actions ---
 function approve(id: number) {
-  router.post(`/owner/appointments/${id}/approve`)
+  router.post(`/owner/appointments/${id}/approve`);
 }
 
-// --- Decline logic ---
-const showDeclineModal = ref(false)
-const declineReason = ref('')
-const selectedId = ref<number | null>(null)
+const showDeclineModal = ref(false);
+const declineReason = ref("");
+const selectedId = ref<number | null>(null);
 
 function openDeclineModal(id: number) {
-  selectedId.value = id
-  showDeclineModal.value = true
+  selectedId.value = id;
+  showDeclineModal.value = true;
 }
 
 function submitDecline() {
-  if (!selectedId.value) return
+  if (!selectedId.value) return;
   router.post(`/owner/appointments/${selectedId.value}/decline`, {
-    reason: declineReason.value
-  })
-  showDeclineModal.value = false
-  declineReason.value = ''
+    reason: declineReason.value,
+  });
+  showDeclineModal.value = false;
+  declineReason.value = "";
 }
 
-// --- Payment Proof Logic ---
 function getPaymentProofSrc(appt: Appointment): string {
-  if (!appt.payment_proof) return '/images/hero-carwash.jpg'
-  if (appt.payment_proof.startsWith('http')) return appt.payment_proof
-  if (appt.payment_proof.startsWith('/storage/')) return appt.payment_proof
-  return `/storage/${appt.payment_proof}`
+  if (!appt.payment_proof) return "/images/hero-carwash.jpg";
+  if (appt.payment_proof.startsWith("http")) return appt.payment_proof;
+  if (appt.payment_proof.startsWith("/storage/")) return appt.payment_proof;
+  return `/storage/${appt.payment_proof}`;
 }
 
 function handleImageError(event: Event) {
-  const target = event.target as HTMLImageElement
-  target.src = '/images/hero-carwash.jpg'
+  const target = event.target as HTMLImageElement;
+  target.src = "/images/hero-carwash.jpg";
 }
 
-const showImagePreview = ref(false)
-const previewSrc = ref('')
+const showImagePreview = ref(false);
+const previewSrc = ref("");
 
 function openImagePreview(src: string) {
-  previewSrc.value = src
-  showImagePreview.value = true
+  previewSrc.value = src;
+  showImagePreview.value = true;
 }
 
-// --- Filters ---
-const dateRange = ref<string>('all')
-const fromDate = ref<string>('')
-const toDate = ref<string>('')
+const dateRange = ref<string>("all");
+const fromDate = ref<string>("");
+const toDate = ref<string>("");
 
 const filteredAppointments = computed(() => {
-  let data = [...props.appointments]
-  const today = new Date()
-  let start: Date | null = null
-  let end: Date | null = null
+  let data = [...props.appointments];
+  const today = new Date();
+  let start: Date | null = null;
+  let end: Date | null = null;
 
-  if (dateRange.value === 'today') {
-    start = new Date(today.toDateString())
-    end = new Date(start)
-    end.setDate(end.getDate() + 1)
-  } else if (dateRange.value === 'week') {
-    const firstDay = today.getDate() - today.getDay()
-    start = new Date(today.setDate(firstDay))
-    end = new Date(today.setDate(firstDay + 7))
-  } else if (dateRange.value === 'month') {
-    start = new Date(today.getFullYear(), today.getMonth(), 1)
-    end = new Date(today.getFullYear(), today.getMonth() + 1, 1)
-  } else if (dateRange.value === 'custom' && fromDate.value && toDate.value) {
-    start = new Date(fromDate.value)
-    end = new Date(toDate.value)
-    end.setDate(end.getDate() + 1)
+  if (dateRange.value === "today") {
+    start = new Date(today.toDateString());
+    end = new Date(start);
+    end.setDate(end.getDate() + 1);
+  } else if (dateRange.value === "week") {
+    const firstDay = today.getDate() - today.getDay();
+    start = new Date(today.setDate(firstDay));
+    end = new Date(today.setDate(firstDay + 7));
+  } else if (dateRange.value === "month") {
+    start = new Date(today.getFullYear(), today.getMonth(), 1);
+    end = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+  } else if (dateRange.value === "custom" && fromDate.value && toDate.value) {
+    start = new Date(fromDate.value);
+    end = new Date(toDate.value);
+    end.setDate(end.getDate() + 1);
   }
 
   if (start && end) {
-    data = data.filter(a => {
-      const apptDate = new Date(a.date_of_booking)
-      return apptDate >= start! && apptDate < end!
-    })
+    data = data.filter((a) => {
+      const apptDate = new Date(a.date_of_booking);
+      return apptDate >= start! && apptDate < end!;
+    });
   }
-  return data
-})
+  return data;
+});
 
 function goBack() {
-  router.visit('/owner/dashboard')
+  router.visit("/owner/dashboard");
 }
 </script>
