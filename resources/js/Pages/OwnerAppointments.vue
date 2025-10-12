@@ -1,11 +1,11 @@
 <template>
   <Head title="Owner Appointments" />
 
-  <div class="min-h-screen bg-gradient-to-br from-gray-100 via-white to-gray-100 py-6 px-4 flex flex-col items-center">
-    <div class="w-full max-w-7xl p-6 sm:p-10 relative">
+  <div class="min-h-screen w-full bg-gradient-to-br from-gray-100 via-white to-gray-100 py-6 px-4 flex flex-col items-center">
+    <div class="w-full h-[90vh] p-6 sm:p-10 relative flex flex-col">
 
       <!-- Return Button -->
-      <div class="absolute top-6 left-6">
+      <div class="absolute top-6 left-6 z-10">
         <button
           @click="goBack"
           class="px-5 py-2 bg-[#002B5C] text-white font-semibold rounded-xl shadow-md hover:bg-[#FF2D2D] transition transform hover:-translate-y-0.5"
@@ -23,7 +23,7 @@
       </div>
 
       <!-- Filter Card -->
-      <div class="mb-8 p-6 bg-white shadow-lg rounded-2xl grid grid-cols-1 sm:grid-cols-3 gap-4 border border-gray-200">
+      <div class="mb-6 p-6 bg-white shadow-lg rounded-2xl grid grid-cols-1 sm:grid-cols-3 gap-4 border border-gray-200">
         <div>
           <label class="block text-sm font-semibold text-gray-600 mb-1">Date Range</label>
           <select v-model="dateRange" class="w-full px-4 py-3 font-semibold text-[#182235] border rounded-lg focus:ring-2 focus:ring-[#002B5C] focus:outline-none">
@@ -47,13 +47,13 @@
       </div>
 
       <!-- Appointment Table -->
-      <div v-if="filteredAppointments.length === 0" class="text-gray-500 text-lg text-center py-12">
+      <div v-if="filteredAppointments.length === 0" class="flex-grow flex justify-center items-center text-gray-500 text-lg text-center">
         No appointments found.
       </div>
 
-      <div v-else class="overflow-x-auto">
-        <table class="w-full border border-gray-200 rounded-xl overflow-hidden shadow-sm">
-          <thead class="bg-gradient-to-r from-[#002B5C] to-[#00509E] text-white">
+      <div v-else class="flex-grow overflow-auto rounded-2xl shadow-lg border border-gray-200 bg-white">
+        <table class="w-full h-full border-collapse text-[#182235] font-medium">
+          <thead class="bg-gradient-to-r from-[#002B5C] to-[#00509E] text-white sticky top-0 z-10">
             <tr>
               <th class="px-4 py-3 text-left">Date</th>
               <th class="px-4 py-3 text-left">Time</th>
@@ -71,7 +71,7 @@
             </tr>
           </thead>
 
-          <tbody class="text-[#182235] font-medium">
+          <tbody>
             <tr v-for="(appt, idx) in filteredAppointments" :key="appt.id"
                 :class="idx % 2 === 0 ? 'bg-white hover:bg-gray-50' : 'bg-gray-50 hover:bg-gray-100 transition'">
               <td class="px-4 py-3">{{ appt.date_of_booking }}</td>
