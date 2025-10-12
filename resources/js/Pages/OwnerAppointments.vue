@@ -1,7 +1,7 @@
 <template>
   <Head title="Owner Appointments" />
 
-    <div class="flex min-h-screen bg-gradient-to-br from-white via-blue-50 to-[#002B5C] py-8 px-6 flex flex-col items-center">
+    <div class="flex min-h-screen bg-gradient-to-br from-white via-blue-50 to-[#002B5C] py-4 sm:py-8 px-3 sm:px-6 flex flex-col items-center overflow-x-hidden">
     <div class="w-full max-w-[95%] xl:max-w-[1600px] p-6 sm:p-10 bg-white rounded-2xl shadow-xl border border-gray-200">
 
       <!-- Return Button -->
@@ -52,8 +52,8 @@
         No appointments found.
       </div>
 
-      <div v-else class="overflow-x-auto rounded-xl border border-gray-200 shadow-md">
-        <table class="w-full text-sm text-left border-collapse">
+      <div v-else class="overflow-x-auto rounded-xl border border-gray-200 shadow-md w-full">
+        <table class="min-w-full text-xs sm:text-sm text-left border-collapse">
           <thead class="bg-[#002B5C] text-white">
             <tr>
               <th class="px-4 py-3">Date</th>
@@ -113,7 +113,7 @@
 
               <td class="px-4 py-3 text-center font-bold text-[#FF2D2D]">{{ appt.payment_amount ?? 'Walk_IN' }}</td>
 
-              <td class="px-4 py-3 text-center flex justify-center gap-3">
+              <td class="px-4 py-3 text-center flex flex-col sm:flex-row justify-center gap-2 sm:gap-3">
                 <button
                   @click="approve(appt.id)"
                   class="px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 shadow-sm transition"
