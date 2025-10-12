@@ -32,7 +32,7 @@ public function store(Request $request, $shopId)
     ]);
 
     return redirect()
-        ->route('customer.feedback.create', $shopId)
+        ->route('dashboard')
         ->with('success', 'Feedback submitted successfully!');
 }
 }
