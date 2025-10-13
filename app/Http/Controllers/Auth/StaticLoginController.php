@@ -17,24 +17,24 @@ class StaticLoginController extends Controller
     public function login(Request $request)
     {
         $credentials = $request->validate([
-            'username' => 'required|string',
+            'email' => 'required|string|email',
             'password' => 'required|string',
         ]);
 
-        $validUsername = 'washwise00@gmail.com';
+        $validEmail = 'washwise00@gmail.com';
         $validPassword = 'washwise123';
 
         if (
-            $credentials['username'] === $validUsername &&
+            $credentials['email'] === $validEmail &&
             $credentials['password'] === $validPassword
-        ) {
+            ) {
             Session::put('authenticated', true);
             return redirect()->route('admindashboard');
-        }
+            }
 
-        return back()->withErrors([
-            'username' => 'Invalid username or password.',
-        ]);
+            return back()->withErrors([
+                'email' => 'Invalid email or password.',
+            ]);
     }
 
     public function logout(Request $request)
