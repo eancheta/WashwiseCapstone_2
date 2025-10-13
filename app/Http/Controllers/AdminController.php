@@ -66,41 +66,46 @@ class AdminController extends Controller
         return redirect()->back()->with('success', 'Owner account approved and email sent.');
     }
 
-    public function decline($id)
-    {
-        $owner = CarWashOwner::findOrFail($id);
+    public function decline(Request $request, $id)
+{
+    $request->validate([
+        'reason' => 'required|string|max:1000',
+    ]);
 
-        try {
-            // Render the declined email Blade file
-            $htmlContent = view('emails.declined', ['owner' => $owner])->render();
+    $owner = CarWashOwner::findOrFail($id);
+    $owner->decline_reason = $request->reason;
+    $owner->status = 'declined';
+    $owner->save();
 
-            // Send with Brevo API
-            Http::withHeaders([
-                'api-key' => env('SENDINBLUE_API_KEY'),
-                'Content-Type' => 'application/json',
-            ])->post('https://api.sendinblue.com/v3/smtp/email', [
-                'sender' => [
-                    'name'  => 'WashWise',
-                    'email' => env('MAIL_FROM_ADDRESS'),
-                ],
-                'to' => [
-                    ['email' => $owner->email, 'name' => $owner->name],
-                ],
-                'subject' => 'Your WashWise Account Has Been Declined',
-                'htmlContent' => $htmlContent,
-            ]);
+    try {
+        $htmlContent = view('emails.declined', [
+            'owner' => $owner,
+            'reason' => $request->reason,
+        ])->render();
 
-        } catch (\Throwable $e) {
-            Log::error('Owner declined email failed', [
-                'owner_id' => $owner->id,
-                'email' => $owner->email,
-                'error' => $e->getMessage(),
-            ]);
-        }
+        Http::withHeaders([
+            'api-key' => env('SENDINBLUE_API_KEY'),
+            'Content-Type' => 'application/json',
+        ])->post('https://api.sendinblue.com/v3/smtp/email', [
+            'sender' => [
+                'name'  => 'WashWise',
+                'email' => env('MAIL_FROM_ADDRESS'),
+            ],
+            'to' => [
+                ['email' => $owner->email, 'name' => $owner->name],
+            ],
+            'subject' => 'Your WashWise Account Has Been Declined',
+            'htmlContent' => $htmlContent,
+        ]);
 
-        // Delete the owner after sending email
-        $owner->delete();
-
-        return back()->with('success', 'Owner declined, email sent, and account removed.');
+    } catch (\Throwable $e) {
+        Log::error('Owner declined email failed', [
+            'owner_id' => $owner->id,
+            'email' => $owner->email,
+            'error' => $e->getMessage(),
+        ]);
     }
+
+    return back()->with('success', 'Owner declined and email sent with reason.');
+}
 }

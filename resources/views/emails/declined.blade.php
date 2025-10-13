@@ -1,45 +1,90 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Application Declined - WashWise</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9fafb;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        .container {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 650px;
+            margin: 0 auto;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+        }
+        h1 {
+            color: #182235;
+            font-size: 22px;
+            margin-bottom: 15px;
+        }
+        .reason-box {
+            background-color: #ffe5e5;
+            border-left: 5px solid #FF2D2D;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            color: #991b1b;
+        }
+        a {
+            color: #FF2D2D;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .footer {
+            font-size: 13px;
+            color: #555;
+            margin-top: 25px;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+        }
+    </style>
 </head>
-<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-    <h1>🏢 Verify Your WashWise Business Owner Account</h1>
+<body>
+    <div class="container">
+        <h1>🏢 Application Declined - WashWise</h1>
 
-    <p>Hello {{ $owner->name }},</p>
+        <p>Hello <strong>{{ $owner->name }}</strong>,</p>
 
-    <p>
-        Thank you for applying to register your car wash business with <strong>WashWise</strong>.
-        After reviewing the information and Business Permit you provided, we regret to inform you
-        that your application has been <strong>declined</strong> at this time.
-    </p>
+        <p>
+            Thank you for applying to register your car wash business with <strong>WashWise</strong>.
+            After reviewing your provided documents and business information, we regret to inform you that
+            your application has been <strong>declined</strong> at this time.
+        </p>
 
-    <p>
-        This decision was made based on discrepancies or issues found in the uploaded documents
-        and business information.
-    </p>
+        @if (!empty($reason))
+        <div class="reason-box">
+            <strong>Reason provided by the administrator:</strong><br>
+            {{ $reason }}
+        </div>
+        @endif
 
-    <p>
-        If you believe this decision was made in error or would like to reapply, you may do so by
-        submitting updated and valid information through our
-        <a href="{{ url('/owner/register') }}" style="color: #4CAF50; text-decoration: none;">registration page</a>.
-    </p>
+        <p>
+            This decision was made based on the evaluation of your submitted business details and requirements.
+            You can reapply after addressing the issue or providing updated, valid information through our
+            <a href="{{ url('/owner/register') }}">registration page</a>.
+        </p>
 
-    <p>
-        For further assistance, you may contact our support team at
-        <a href="mailto:support@washwise.ph" style="color: #4CAF50;">support@washwise.ph</a>.
-    </p>
+        <p>
+            For further assistance, you may contact our support team at
+            <a href="mailto:support@washwise.ph">support@washwise.ph</a>.
+        </p>
 
-    <p>
-        We appreciate your interest in WashWise and hope to work with you in the future.
-    </p>
+        <p>We appreciate your interest in partnering with WashWise and hope to work with you in the future.</p>
 
-    <p>Best regards,</p>
-    <p>
-        <strong>The WashWise Team</strong><br>
-        <a href="https://www.washwise.ph" style="color: #4CAF50;">www.washwise.ph</a> |
-        <a href="mailto:support@washwise.ph" style="color: #4CAF50;">support@washwise.ph</a>
-    </p>
+        <div class="footer">
+            <strong>The WashWise Team</strong><br>
+            <a href="https://www.washwise.ph">www.washwise.ph</a> |
+            <a href="mailto:support@washwise.ph">support@washwise.ph</a>
+        </div>
+    </div>
 </body>
 </html>

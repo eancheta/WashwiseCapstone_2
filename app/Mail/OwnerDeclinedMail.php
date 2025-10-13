@@ -12,13 +12,15 @@ class OwnerDeclinedMail extends Mailable
     use Queueable, SerializesModels;
 
     public $owner;
+    public $reason;
 
     /**
      * Create a new message instance.
      */
-    public function __construct(CarWashOwner $owner)
+    public function __construct(CarWashOwner $owner, $reason = null)
     {
         $this->owner = $owner;
+        $this->reason = $reason;
     }
 
     /**
@@ -27,9 +29,10 @@ class OwnerDeclinedMail extends Mailable
     public function build()
     {
         return $this->subject('Account Declined - WashWise')
-                    ->markdown('emails.declined')
+                    ->view('emails.declined') // Use normal Blade since your template is HTML
                     ->with([
-                        'name' => $this->owner->name,
+                        'owner' => $this->owner,
+                        'reason' => $this->reason, // ✅ Pass the reason to the view
                     ]);
     }
 }
