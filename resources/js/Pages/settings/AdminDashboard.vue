@@ -207,10 +207,27 @@ const logout = () => {
               <td class="px-2 py-2 text-center">{{ owner.created_at }}</td>
               <td class="px-2 py-2 text-center">{{ owner.updated_at }}</td>
 
-              <td class="px-2 py-2 text-center space-x-1 sm:space-x-2">
-                <button @click="approve(owner.id)" class="px-2 py-1 sm:px-4 sm:py-1 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition text-xs sm:text-sm">Approve</button>
-                <button @click="openDeclineModal(owner.id)" class="px-2 py-1 sm:px-4 sm:py-1 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition text-xs sm:text-sm">Decline</button>
-              </td>
+<td class="px-2 py-2 text-center space-x-1 sm:space-x-2">
+  <button
+    @click="approve(owner.id)"
+    :disabled="owner.status === 'approved'"
+    :class="[
+      'px-2 py-1 sm:px-4 sm:py-1 rounded-lg font-semibold transition text-xs sm:text-sm',
+      owner.status === 'approved'
+        ? 'bg-gray-400 text-white cursor-not-allowed'
+        : 'bg-green-600 hover:bg-green-700 text-white'
+    ]"
+  >
+    {{ owner.status === 'approved' ? 'Approved' : 'Approve' }}
+  </button>
+
+  <button
+    @click="openDeclineModal(owner.id)"
+    class="px-2 py-1 sm:px-4 sm:py-1 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition text-xs sm:text-sm"
+  >
+    Decline
+  </button>
+</td>
             </tr>
           </tbody>
         </table>
