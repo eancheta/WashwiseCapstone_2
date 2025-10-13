@@ -21,8 +21,8 @@ class StaticLoginController extends Controller
             'password' => 'required|string',
         ]);
 
-        $validUsername = 'admin';
-        $validPassword = 'secret123';
+        $validUsername = 'washwise00@gmail.com';
+        $validPassword = 'washwise123';
 
         if (
             $credentials['username'] === $validUsername &&
