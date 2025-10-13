@@ -80,6 +80,15 @@ const submitDecline = () => {
 const logout = () => {
   router.post('/logout')
 }
+
+// Image preview modal state
+const showImagePreview = ref(false)
+const previewSrc = ref("")
+
+function openImagePreview(src: string) {
+  previewSrc.value = src
+  showImagePreview.value = true
+}
 </script>
 
 <template>
@@ -192,15 +201,30 @@ const logout = () => {
               <td class="px-2 py-2">{{ owner.district }}</td>
               <td class="px-2 py-2">{{ owner.address }}</td>
 
-              <td class="px-2 py-2 text-center">
-                <img :src="getPhotoSrc(owner.photo1)" alt="Photo 1" class="h-10 w-10 sm:h-16 sm:w-16 object-cover rounded border mx-auto" />
-              </td>
-              <td class="px-2 py-2 text-center">
-                <img :src="getPhotoSrc(owner.photo2)" alt="Photo 2" class="h-10 w-10 sm:h-16 sm:w-16 object-cover rounded border mx-auto" />
-              </td>
-              <td class="px-2 py-2 text-center">
-                <img :src="getPhotoSrc(owner.photo3)" alt="Photo 3" class="h-10 w-10 sm:h-16 sm:w-16 object-cover rounded border mx-auto" />
-              </td>
+<td class="px-2 py-2 text-center">
+  <img
+    :src="getPhotoSrc(owner.photo1)"
+    alt="Photo 1"
+    class="h-10 w-10 sm:h-16 sm:w-16 object-cover rounded border mx-auto cursor-pointer hover:opacity-80 transition"
+    @click="openImagePreview(getPhotoSrc(owner.photo1))"
+  />
+</td>
+<td class="px-2 py-2 text-center">
+  <img
+    :src="getPhotoSrc(owner.photo2)"
+    alt="Photo 2"
+    class="h-10 w-10 sm:h-16 sm:w-16 object-cover rounded border mx-auto cursor-pointer hover:opacity-80 transition"
+    @click="openImagePreview(getPhotoSrc(owner.photo2))"
+  />
+</td>
+<td class="px-2 py-2 text-center">
+  <img
+    :src="getPhotoSrc(owner.photo3)"
+    alt="Photo 3"
+    class="h-10 w-10 sm:h-16 sm:w-16 object-cover rounded border mx-auto cursor-pointer hover:opacity-80 transition"
+    @click="openImagePreview(getPhotoSrc(owner.photo3))"
+  />
+</td>
 
               <td class="px-2 py-2 text-center">{{ owner.status }}</td>
               <td class="px-2 py-2 text-center truncate max-w-[80px]">{{ owner.remember_token }}</td>
@@ -233,7 +257,23 @@ const logout = () => {
         </table>
       </div>
     </main>
-
+<!-- Image Preview Modal -->
+<div
+  v-if="showImagePreview"
+  class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50"
+>
+  <img
+    :src="previewSrc"
+    alt="Preview"
+    class="max-h-[80vh] rounded-xl shadow-2xl border-4 border-white"
+  />
+  <button
+    @click="showImagePreview = false"
+    class="absolute top-6 right-8 text-white text-3xl font-bold"
+  >
+    ✕
+  </button>
+</div>
     <!-- Decline Modal -->
     <div v-if="showDeclineModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 px-4">
       <div class="bg-white w-full max-w-md rounded-2xl shadow-xl p-6 relative">
