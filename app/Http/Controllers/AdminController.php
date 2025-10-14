@@ -68,23 +68,23 @@ public function index()
         return redirect()->back()->with('success', 'Owner account approved and email sent.');
     }
 
-    public function decline(Request $request, $id)
+public function decline(Request $request, $id)
 {
     $request->validate([
         'reason' => 'required|string|max:1000',
     ]);
 
     $owner = CarWashOwner::findOrFail($id);
-    $owner->decline_reason = $request->reason;
-    $owner->status = 'declined';
-    $owner->save();
+    $reason = $request->reason;
 
     try {
+        // Prepare email content
         $htmlContent = view('emails.declined', [
             'owner' => $owner,
-            'reason' => $request->reason,
+            'reason' => $reason,
         ])->render();
 
+        // Send email via SendinBlue
         Http::withHeaders([
             'api-key' => env('SENDINBLUE_API_KEY'),
             'Content-Type' => 'application/json',
@@ -100,14 +100,26 @@ public function index()
             'htmlContent' => $htmlContent,
         ]);
 
+        // Log decline reason before deletion
+        Log::info('Owner declined and deleted', [
+            'owner_id' => $owner->id,
+            'email' => $owner->email,
+            'reason' => $reason,
+        ]);
+
+        // Delete the declined account
+        $owner->delete();
+
+        return back()->with('success', 'Owner declined, email sent, and account deleted successfully.');
+
     } catch (\Throwable $e) {
-        Log::error('Owner declined email failed', [
+        Log::error('Decline email failed or deletion issue', [
             'owner_id' => $owner->id,
             'email' => $owner->email,
             'error' => $e->getMessage(),
         ]);
-    }
 
-    return back()->with('success', 'Owner declined and email sent with reason.');
+        return back()->with('error', 'Failed to send decline email or delete account.');
+    }
 }
 }
