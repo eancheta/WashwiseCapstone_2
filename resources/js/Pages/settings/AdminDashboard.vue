@@ -153,7 +153,7 @@ function openFeedbackModal(owner: any) {
     <!-- Main Content -->
     <main class="flex-1 p-4 sm:p-8 mt-14 sm:mt-0">
       <h1 class="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-[#182235]">
-        {{ activeTab === 'users' ? 'Users' : 'Owners' }}
+        {{ activeTab === 'users' ? 'Customer Account' : 'Owner Account' }}
       </h1>
 
       <!-- Users Table -->
