@@ -29,12 +29,15 @@ public function login(Request $request)
         return back()->withErrors(['email' => 'Account not found.'])->withInput();
     }
 
-    // Normalize status
+    // Block login if email not verified
     $status = $user->status === null ? '' : trim(strtolower($user->status));
-
-    // Block login if not verified
     if ($status !== 'verified') {
         return back()->withErrors(['email' => 'Your account is not verified. Please check your email.'])->withInput();
+    }
+
+    // Block login if customer not yet approved
+    if ($user->customer_status !== 'approved') {
+        return back()->withErrors(['email' => 'Your account is pending approval by the admin.'])->withInput();
     }
 
     // Check password
@@ -42,7 +45,7 @@ public function login(Request $request)
         return back()->withErrors(['email' => 'Invalid credentials'])->withInput();
     }
 
-    // Login verified user
+    // Login approved & verified user
     Auth::login($user);
     $request->session()->regenerate();
 
