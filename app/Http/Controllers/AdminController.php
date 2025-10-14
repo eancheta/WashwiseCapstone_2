@@ -12,20 +12,22 @@ use Illuminate\Support\Facades\Http;
 
 class AdminController extends Controller
 {
-    public function index()
-    {
-        if (!Session::get('authenticated')) {
-            return redirect()->route('loginAdmin');
-        }
-
-        $users = User::all();
-        $owners = CarWashOwner::all();
-
-        return Inertia::render('settings/AdminDashboard', [
-            'users' => $users,
-            'owners' => $owners,
-        ]);
+public function index()
+{
+    if (!Session::get('authenticated')) {
+        return redirect()->route('loginAdmin');
     }
+
+    $users = User::all();
+
+    // Include the owner's shop and all feedback + user info
+    $owners = CarWashOwner::with(['shop.feedback.user'])->get();
+
+    return Inertia::render('settings/AdminDashboard', [
+        'users' => $users,
+        'owners' => $owners,
+    ]);
+}
 
     public function approve($id)
     {

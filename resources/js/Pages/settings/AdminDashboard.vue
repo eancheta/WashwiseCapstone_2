@@ -89,6 +89,17 @@ function openImagePreview(src: string) {
   previewSrc.value = src
   showImagePreview.value = true
 }
+
+const showFeedbackModal = ref(false)
+const selectedFeedback = ref<any[]>([])
+const selectedOwnerName = ref('')
+
+function openFeedbackModal(owner: any) {
+  selectedOwnerName.value = owner.name
+  selectedFeedback.value = owner.shop?.feedback || []
+  showFeedbackModal.value = true
+}
+
 </script>
 
 <template>
@@ -251,6 +262,12 @@ function openImagePreview(src: string) {
   >
     Decline
   </button>
+    <button
+    @click="openFeedbackModal(owner)"
+    class="px-2 py-1 sm:px-4 sm:py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition text-xs sm:text-sm"
+  >
+    Feedback
+  </button>
 </td>
             </tr>
           </tbody>
@@ -302,5 +319,42 @@ function openImagePreview(src: string) {
         </div>
       </div>
     </div>
+
+    <!-- Feedback Modal -->
+<div
+  v-if="showFeedbackModal"
+  class="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 px-4"
+>
+  <div class="bg-white w-full max-w-2xl rounded-2xl shadow-xl p-6 relative">
+    <h2 class="text-xl font-bold text-[#002B5C] mb-4">
+      Feedback for {{ selectedOwnerName }}
+    </h2>
+
+    <div v-if="selectedFeedback.length" class="space-y-3 max-h-[60vh] overflow-y-auto">
+      <div
+        v-for="(feedback, i) in selectedFeedback"
+        :key="i"
+        class="border border-gray-200 rounded-lg p-3"
+      >
+        <div class="flex justify-between items-center">
+          <span class="font-semibold text-[#182235]">{{ feedback.user?.name || 'Anonymous' }}</span>
+          <span class="text-yellow-500">⭐ {{ feedback.rating }}/5</span>
+        </div>
+        <p class="text-gray-700 mt-1">{{ feedback.comment }}</p>
+      </div>
+    </div>
+
+    <div v-else class="text-gray-500 text-center py-4">
+      No feedback yet.
+    </div>
+
+    <button
+      @click="showFeedbackModal = false"
+      class="absolute top-4 right-5 text-gray-600 hover:text-black text-2xl font-bold"
+    >
+      ✕
+    </button>
+  </div>
+</div>
   </div>
 </template>
