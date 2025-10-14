@@ -214,27 +214,29 @@ const submitDeclineCustomer = () => {
         <td class="py-2 px-3">{{ user.created_at }}</td>
         <td class="py-2 px-3">{{ user.updated_at }}</td>
                   <!-- Action Column -->
-    <td class="py-2 px-3 space-x-2">
-      <button
-        @click="approveCustomer(user.id)"
-        :disabled="user.customer_status === 'approved'"
-        :class="[
-          'px-2 py-1 sm:px-4 sm:py-1 rounded-lg font-semibold transition text-xs sm:text-sm',
-          user.customer_status === 'approved'
-            ? 'bg-gray-400 text-white cursor-not-allowed'
-            : 'bg-green-600 hover:bg-green-700 text-white'
-        ]"
-      >
-        {{ user.customer_status === 'approved' ? 'Approved' : 'Approve' }}
-      </button>
+<td class="py-2 px-3">
+  <div class="flex flex-wrap gap-2 justify-center">
+    <!-- Approve Button -->
+    <button
+      @click="approveCustomer(user.id)"
+      :disabled="user.customer_status === 'approved'"
+      class="min-w-[70px] px-3 py-1 sm:px-4 sm:py-2 rounded-lg font-semibold text-xs sm:text-sm transition
+             text-white
+             bg-green-600 hover:bg-green-700
+             disabled:bg-gray-400 disabled:cursor-not-allowed"
+    >
+      {{ user.customer_status === 'approved' ? 'Approved' : 'Approve' }}
+    </button>
 
-      <button
-        @click="openDeclineCustomerModal(user.id)"
-        class="px-2 py-1 sm:px-4 sm:py-1 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition text-xs sm:text-sm"
-      >
-        Decline
-      </button>
-    </td>
+    <!-- Decline Button -->
+    <button
+      @click="openDeclineCustomerModal(user.id)"
+      class="min-w-[70px] px-3 py-1 sm:px-4 sm:py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold text-xs sm:text-sm transition"
+    >
+      Decline
+    </button>
+  </div>
+</td>
             </tr>
           </tbody>
         </table>
@@ -294,32 +296,36 @@ const submitDeclineCustomer = () => {
               <td class="px-2 py-2 text-center">{{ owner.created_at }}</td>
               <td class="px-2 py-2 text-center">{{ owner.updated_at }}</td>
 
-<td class="px-2 py-2 text-center space-x-1 sm:space-x-2">
-  <button
-    @click="approve(owner.id)"
-    :disabled="owner.status === 'approved'"
-    :class="[
-      'px-2 py-1 sm:px-4 sm:py-1 rounded-lg font-semibold transition text-xs sm:text-sm',
-      owner.status === 'approved'
-        ? 'bg-gray-400 text-white cursor-not-allowed'
-        : 'bg-green-600 hover:bg-green-700 text-white'
-    ]"
-  >
-    {{ owner.status === 'approved' ? 'Approved' : 'Approve' }}
-  </button>
-
-  <button
-    @click="openDeclineModal(owner.id)"
-    class="px-2 py-1 sm:px-4 sm:py-1 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition text-xs sm:text-sm"
-  >
-    Decline
-  </button>
+<td class="px-2 py-2 text-center">
+  <div class="flex flex-wrap gap-2 justify-center">
+    <!-- Approve Button -->
     <button
-    @click="openFeedbackModal(owner)"
-    class="px-2 py-1 sm:px-4 sm:py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition text-xs sm:text-sm"
-  >
-    Feedback
-  </button>
+      @click="approve(owner.id)"
+      :disabled="owner.status === 'approved'"
+      class="min-w-[70px] px-3 py-1 sm:px-4 sm:py-2 rounded-lg font-semibold text-xs sm:text-sm transition
+             text-white
+             bg-green-600 hover:bg-green-700
+             disabled:bg-gray-400 disabled:cursor-not-allowed"
+    >
+      {{ owner.status === 'approved' ? 'Approved' : 'Approve' }}
+    </button>
+
+    <!-- Decline Button -->
+    <button
+      @click="openDeclineModal(owner.id)"
+      class="min-w-[70px] px-3 py-1 sm:px-4 sm:py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold text-xs sm:text-sm transition"
+    >
+      Decline
+    </button>
+
+    <!-- Feedback Button -->
+    <button
+      @click="openFeedbackModal(owner)"
+      class="min-w-[70px] px-3 py-1 sm:px-4 sm:py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-xs sm:text-sm transition"
+    >
+      Feedback
+    </button>
+  </div>
 </td>
             </tr>
           </tbody>
