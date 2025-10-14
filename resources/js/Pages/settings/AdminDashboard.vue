@@ -188,14 +188,14 @@ const submitDeclineCustomer = () => {
         <table class="min-w-full text-sm sm:text-base">
           <thead>
             <tr class="bg-gray-100 text-left text-[#182235]">
-              <th class="py-2 px-3">ID</th>
-              <th class="py-2 px-3">Name</th>
-              <th class="py-2 px-3">Email</th>
-              <th class="py-2 px-3">Verified At</th>
-              <th class="py-2 px-3">Verification Code</th>
-              <th class="py-2 px-3">Created</th>
-              <th class="py-2 px-3">Updated</th>
-              <th class="py-2 px-3">Actions</th>
+        <th class="py-2 px-3">ID</th>
+        <th class="py-2 px-3">Name</th>
+        <th class="py-2 px-3">Email</th>
+        <th class="py-2 px-3">Customer Status</th>
+        <th class="py-2 px-3">Status</th>
+        <th class="py-2 px-3">Created</th>
+        <th class="py-2 px-3">Updated</th>
+        <th class="py-2 px-3">Actions</th>
 
             </tr>
           </thead>
@@ -205,13 +205,13 @@ const submitDeclineCustomer = () => {
               :key="user.id"
               class="hover:bg-gray-50 border-t text-[#182235] transition"
             >
-              <td class="py-2 px-3">{{ user.id }}</td>
-              <td class="py-2 px-3">{{ user.name }}</td>
-              <td class="py-2 px-3">{{ user.email }}</td>
-              <td class="py-2 px-3">{{ user.email_verified_at || 'Not verified' }}</td>
-              <td class="py-2 px-3">{{ user.verification_code || 'N/A' }}</td>
-              <td class="py-2 px-3">{{ user.created_at }}</td>
-              <td class="py-2 px-3">{{ user.updated_at }}</td>
+        <td class="py-2 px-3">{{ user.id }}</td>
+        <td class="py-2 px-3">{{ user.name }}</td>
+        <td class="py-2 px-3">{{ user.email }}</td>
+        <td class="py-2 px-3">{{ user.customer_status || 'Pending' }}</td>
+        <td class="py-2 px-3">{{ user.customer_status === 'declined' ? 'Declined' : 'Active' }}</td>
+        <td class="py-2 px-3">{{ user.created_at }}</td>
+        <td class="py-2 px-3">{{ user.updated_at }}</td>
                   <!-- Action Column -->
     <td class="py-2 px-3 space-x-2">
       <button
