@@ -30,6 +30,8 @@ use App\Http\Controllers\Owner\ReviewController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use app\Http\Middleware\EnsureUserIsVerified;
 
+Route::post('/customers/{id}/approve', [AdminController::class, 'approveCustomer'])->name('customers.approve');
+Route::post('/customers/{id}/decline', [AdminController::class, 'declineCustomer'])->name('customers.decline');
 
 Route::get('/debug-current-user', function () {
     /** @var \Illuminate\Contracts\Auth\Guard $guard */

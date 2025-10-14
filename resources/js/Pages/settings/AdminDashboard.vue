@@ -38,6 +38,8 @@ interface User {
   verification_code: string | null
   created_at: string
   updated_at: string
+  customer_status: string | null  // <-- add this
+  reason: string | null
 }
 
 const { owners, users } = defineProps<{
@@ -100,6 +102,31 @@ function openFeedbackModal(owner: any) {
   showFeedbackModal.value = true
 }
 
+const showDeclineCustomerModal = ref(false)
+const declineCustomerReason = ref('')
+const selectedCustomerId = ref<number | null>(null)
+
+const approveCustomer = (id: number) => {
+  if (!confirm('Are you sure you want to approve this customer?')) return
+  router.post(route('customers.approve', { id }))
+}
+
+const openDeclineCustomerModal = (id: number) => {
+  selectedCustomerId.value = id
+  showDeclineCustomerModal.value = true
+}
+
+const submitDeclineCustomer = () => {
+  if (!selectedCustomerId.value || !declineCustomerReason.value.trim()) {
+    alert('Please enter a reason before declining.')
+    return
+  }
+  router.post(route('customers.decline', { id: selectedCustomerId.value }), {
+    reason: declineCustomerReason.value,
+  })
+  showDeclineCustomerModal.value = false
+  declineCustomerReason.value = ''
+}
 </script>
 
 <template>
@@ -168,6 +195,8 @@ function openFeedbackModal(owner: any) {
               <th class="py-2 px-3">Verification Code</th>
               <th class="py-2 px-3">Created</th>
               <th class="py-2 px-3">Updated</th>
+              <th class="py-2 px-3">Actions</th>
+
             </tr>
           </thead>
           <tbody>
@@ -183,6 +212,28 @@ function openFeedbackModal(owner: any) {
               <td class="py-2 px-3">{{ user.verification_code || 'N/A' }}</td>
               <td class="py-2 px-3">{{ user.created_at }}</td>
               <td class="py-2 px-3">{{ user.updated_at }}</td>
+                  <!-- Action Column -->
+    <td class="py-2 px-3 space-x-2">
+      <button
+        @click="approveCustomer(user.id)"
+        :disabled="user.customer_status === 'approved'"
+        :class="[
+          'px-2 py-1 sm:px-4 sm:py-1 rounded-lg font-semibold transition text-xs sm:text-sm',
+          user.customer_status === 'approved'
+            ? 'bg-gray-400 text-white cursor-not-allowed'
+            : 'bg-green-600 hover:bg-green-700 text-white'
+        ]"
+      >
+        {{ user.customer_status === 'approved' ? 'Approved' : 'Approve' }}
+      </button>
+
+      <button
+        @click="openDeclineCustomerModal(user.id)"
+        class="px-2 py-1 sm:px-4 sm:py-1 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition text-xs sm:text-sm"
+      >
+        Decline
+      </button>
+    </td>
             </tr>
           </tbody>
         </table>
@@ -354,6 +405,33 @@ function openFeedbackModal(owner: any) {
     >
       ✕
     </button>
+  </div>
+</div>
+<div v-if="showDeclineCustomerModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 px-4">
+  <div class="bg-white w-full max-w-md rounded-2xl shadow-xl p-6 relative">
+    <h2 class="text-xl font-bold text-[#002B5C] mb-4">Decline Customer Account</h2>
+    <p class="text-gray-600 mb-3">Please write the reason for declining this customer:</p>
+    <textarea
+      v-model="declineCustomerReason"
+      rows="4"
+      placeholder="Type reason here..."
+      class="w-full border border-gray-300 rounded-lg p-3 text-gray-800 focus:ring-2 focus:ring-[#FF2D2D] focus:outline-none"
+    ></textarea>
+
+    <div class="mt-6 flex justify-end gap-3">
+      <button
+        @click="showDeclineCustomerModal = false"
+        class="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg font-semibold hover:bg-gray-400"
+      >
+        Cancel
+      </button>
+      <button
+        @click="submitDeclineCustomer"
+        class="px-5 py-2 bg-[#FF2D2D] text-white font-semibold rounded-lg hover:bg-[#E02626] transition"
+      >
+        Send & Decline
+      </button>
+    </div>
   </div>
 </div>
   </div>
