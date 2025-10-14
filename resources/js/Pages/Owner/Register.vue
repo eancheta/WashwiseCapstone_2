@@ -219,7 +219,7 @@ function submit() {
 
       <!-- Photo Uploads -->
       <div>
-        <Label for="photo1" class="text-gray-700 font-medium">Photo 1</Label>
+        <Label for="photo1" class="text-gray-700 font-medium">Business permit picture 1</Label>
         <input
           type="file"
           id="photo1"
@@ -236,7 +236,7 @@ function submit() {
       </div>
 
       <div>
-        <Label for="photo2" class="text-gray-700 font-medium">Photo 2</Label>
+        <Label for="photo2" class="text-gray-700 font-medium">Business permit picture 2</Label>
         <input
           type="file"
           id="photo2"
@@ -253,7 +253,7 @@ function submit() {
       </div>
 
       <div>
-        <Label for="photo3" class="text-gray-700 font-medium">Photo 3</Label>
+        <Label for="photo3" class="text-gray-700 font-medium">Business permit picture 3</Label>
         <input
           type="file"
           id="photo3"
