@@ -52,11 +52,11 @@
     <div class="container">
         <h1>🏢 Application Declined - WashWise</h1>
 
-        <p>Hello <strong>{{ $owner->name }}</strong>,</p>
+        <p>Hello</p>
 
         <p>
-            Thank you for applying to register your car wash business with <strong>WashWise</strong>.
-            After reviewing your provided documents and business information, we regret to inform you that
+            Thank you for applying to register with <strong>WashWise</strong>.
+            After reviewing your information, we regret to inform you that
             your application has been <strong>declined</strong> at this time.
         </p>
 
@@ -68,22 +68,22 @@
         @endif
 
         <p>
-            This decision was made based on the evaluation of your submitted business details and requirements.
+            This decision was made based on the evaluation of your submitted  details .
             You can reapply after addressing the issue or providing updated, valid information through our
-            <a href="{{ url('/owner/register') }}">registration page</a>.
+            <a href="https://washwisecapstone2-production.up.railway.app">registration page</a>.
         </p>
 
         <p>
             For further assistance, you may contact our support team at
-            <a href="mailto:support@washwise.ph">support@washwise.ph</a>.
+            <a href="mailto:washwise00@gmail.com">washwise00@gmail.com</a>.
         </p>
 
         <p>We appreciate your interest in partnering with WashWise and hope to work with you in the future.</p>
 
         <div class="footer">
             <strong>The WashWise Team</strong><br>
-            <a href="https://www.washwise.ph">www.washwise.ph</a> |
-            <a href="mailto:support@washwise.ph">support@washwise.ph</a>
+            <a href="https://washwisecapstone2-production.up.railway.app">www.washwise.ph</a> |
+            <a href="mailto:washwise00@gmail.com">washwise00@gmail.com</a>
         </div>
     </div>
 </body>
