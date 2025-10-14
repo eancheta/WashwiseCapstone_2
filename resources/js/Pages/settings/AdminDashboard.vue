@@ -39,6 +39,7 @@ interface User {
   created_at: string
   updated_at: string
   customer_status: string | null  // <-- add this
+  status?: string | null
   reason: string | null
 }
 
@@ -209,7 +210,7 @@ const submitDeclineCustomer = () => {
         <td class="py-2 px-3">{{ user.name }}</td>
         <td class="py-2 px-3">{{ user.email }}</td>
         <td class="py-2 px-3">{{ user.customer_status || 'Pending' }}</td>
-        <td class="py-2 px-3">{{ user.customer_status === 'declined' ? 'Declined' : 'Active' }}</td>
+        <td class="py-2 px-3">{{ user.status || 'Not verified' }}</td>
         <td class="py-2 px-3">{{ user.created_at }}</td>
         <td class="py-2 px-3">{{ user.updated_at }}</td>
                   <!-- Action Column -->
