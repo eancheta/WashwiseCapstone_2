@@ -129,7 +129,7 @@ function openFeedbackModal(owner: any) {
           :class="activeTab === 'users' ? 'bg-[#FF2D2D] text-white' : 'text-[#182235] hover:bg-[#f8fafc]'"
           @click="activeTab = 'users'; sidebarOpen = false"
         >
-          <span>👤</span> Users
+          <span>👤</span> Customer Account
         </button>
 
         <button
@@ -137,7 +137,7 @@ function openFeedbackModal(owner: any) {
           :class="activeTab === 'owners' ? 'bg-[#FF2D2D] text-white' : 'text-[#182235] hover:bg-[#f8fafc]'"
           @click="activeTab = 'owners'; sidebarOpen = false"
         >
-          <span>🏢</span> Owners
+          <span>🏢</span> Owners Account
         </button>
       </nav>
 
