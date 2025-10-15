@@ -1,5 +1,10 @@
 @extends('layouts.blade')
-
+<style>
+    /* Hide navbar/header only for this page */
+    nav, header {
+        display: none !important;
+    }
+</style>
 @section('content')
 <div class="min-h-screen relative flex items-center justify-center bg-[#F8FAFC] py-8 px-2">
   <div class="bg-white shadow-lg rounded-2xl p-8 w-full max-w-lg">
