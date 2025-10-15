@@ -132,7 +132,7 @@
 
       {{-- ✅ Submit Link Styled as Button --}}
       <a
-        href="#"
+        href="{{ route('carwashownerdashboard') }}"
         onclick="event.preventDefault(); document.getElementById('updateShopForm').submit();"
         class="block text-center w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 rounded-lg transition-all duration-300 shadow-md"
       >
