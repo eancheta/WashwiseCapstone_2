@@ -112,6 +112,13 @@ function handleImgError(e: Event) { const target = e.target as HTMLImageElement 
 
 watch(() => form.date_of_booking, fetchBookings);
 watch(() => props.shop, (s) => { if (s?.id && form.date_of_booking) fetchBookings(form.date_of_booking); });
+
+function limitContactLength(event: Event) {
+  const input = event.target as HTMLInputElement
+  // Allow only numbers and limit to 11 digits
+  input.value = input.value.replace(/\D/g, '').slice(0, 11)
+  form.contact_no = input.value
+}
 </script>
 
 <template>
@@ -135,15 +142,14 @@ watch(() => props.shop, (s) => { if (s?.id && form.date_of_booking) fetchBooking
             <option>Van</option>
             <option>Motorcycle</option>
           </select>
-         <input
+<input
   type="text"
   v-model="form.contact_no"
   placeholder="09XXXXXXXXX"
   class="w-full p-2 border rounded focus:ring-2 focus:ring-[#002B5C]"
   required
   maxlength="11"
-  pattern="\d{11}"
-  @input="form.contact_no = form.contact_no.replace(/[^0-9]/g, '')"
+  @input="limitContactLength"
 />
           <input type="time" v-model="form.time_of_booking" class="w-full p-2 border rounded focus:ring-2 focus:ring-[#002B5C]" required/>
           <input type="date" v-model="form.date_of_booking" class="w-full p-2 border rounded focus:ring-2 focus:ring-[#002B5C]" required/>

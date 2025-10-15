@@ -63,15 +63,23 @@
                 </div>
 
                 <!-- Contact Number -->
-                <div>
-                    <label for="contact_no" class="block text-sm font-bold text-[#182235] mb-2">Contact Number</label>
-                    <input type="text" name="contact_no" id="contact_no" value="{{ old('contact_no') }}"
-                        class="w-full border-2 border-gray-300 rounded-lg p-3 text-gray-900 focus:ring-2 focus:ring-[#FF2D2D] focus:border-[#FF2D2D] transition"
-                        placeholder="e.g. 09XXXXXXXXX" required>
-                    @error('contact_no')
-                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
+<div>
+    <label for="contact_no" class="block text-sm font-bold text-[#182235] mb-2">Contact Number</label>
+    <input
+        type="text"
+        name="contact_no"
+        id="contact_no"
+        value="{{ old('contact_no') }}"
+        class="w-full border-2 border-gray-300 rounded-lg p-3 text-gray-900 focus:ring-2 focus:ring-[#FF2D2D] focus:border-[#FF2D2D] transition"
+        placeholder="e.g. 09XXXXXXXXX"
+        required
+        maxlength="11"
+        oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 11)"
+    >
+    @error('contact_no')
+        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+    @enderror
+</div>
 
                 <!-- Car Size -->
                 <div>
