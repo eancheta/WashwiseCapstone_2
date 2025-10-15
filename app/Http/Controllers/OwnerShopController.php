@@ -79,7 +79,7 @@ public function update(Request $request)
 
     $shop->update($validated);
 
-    return back()->with('success', 'Shop details updated successfully.')->with('closePage', true);
+    return redirect()->route('carwashownerdashboard')->with('success', 'Shop details updated successfully.');
 }
 
 
