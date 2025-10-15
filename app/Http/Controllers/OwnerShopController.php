@@ -79,11 +79,9 @@ public function update(Request $request)
 
     $shop->update($validated);
 
-    return redirect()->route('owner.shop.edit')
-    ->with([
-        'flash' => [
-            'success' => 'Shop details updated successfully.'
-        ]
+    return view('owner.edit-shop', [
+        'shop' => $shop,
+        'pageTitle' => 'Edit Shop',
     ]);
 }
 
