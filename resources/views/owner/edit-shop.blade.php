@@ -127,12 +127,29 @@
       </div>
 
       {{-- Submit Button --}}
-      <button
-        type="submit"
-        class="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 rounded-lg transition-all duration-300 shadow-md"
-      >
-        Update Shop
-      </button>
+<button
+  type="submit"
+  class="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 rounded-lg transition-all duration-300 shadow-md"
+  id="updateShopBtn"
+>
+  Update Shop
+</button>
+
+@if (session('success'))
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+    Swal.fire({
+      icon: 'success',
+      title: 'Success!',
+      text: '{{ session('success') }}',
+      showConfirmButton: false,
+      timer: 2000
+    }).then(() => {
+      // Redirect to dashboard after alert
+      window.location.href = "{{ route('carwashownerdashboard') }}";
+    });
+  </script>
+@endif
     </form>
   </div>
 </div>
