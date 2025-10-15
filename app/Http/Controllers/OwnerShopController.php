@@ -79,12 +79,7 @@ public function update(Request $request)
 
     $shop->update($validated);
 
-    return redirect()->route('carwashownerdashboard')
-    ->with([
-        'flash' => [
-            'success' => 'Shop details updated successfully.'
-        ]
-    ]);
+return redirect()->to(url('carwashownerdashboard'))->with('success', 'Shop updated successfully');
 }
 
 
