@@ -117,33 +117,50 @@ document.addEventListener('DOMContentLoaded', function () {
         method: form.getAttribute('method') || 'POST',
         body: formData,
         credentials: 'same-origin',
+        redirect: 'follow',
         headers: {
-          'X-Requested-With': 'XMLHttpRequest', // ensures $request->ajax() === true in Laravel
+          'X-Requested-With': 'XMLHttpRequest',
           'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
-          // DO NOT set 'Content-Type' - browser will set correct multipart boundary
+          // DO NOT set 'Content-Type'
         },
       });
 
-      // If response is JSON, parse it. If it's HTML (redirect), treat as success.
-      const contentType = res.headers.get('content-type') || '';
+      // If the server performed a redirect, fetch's `res.redirected` is true and `res.url` holds the final URL.
+      // In that case we should navigate the browser to res.url to perform a full page load.
+      if (res.redirected) {
+        // show success alert briefly then navigate to the redirected URL (full page load)
+        await Swal.fire({
+          icon: 'success',
+          title: 'Success!',
+          text: 'Shop updated successfully',
+          showConfirmButton: false,
+          timer: 900
+        });
+        window.location.href = res.url;
+        return;
+      }
 
+      const contentType = (res.headers.get('content-type') || '').toLowerCase();
+
+      // If response is not ok, try to parse JSON errors (if any) or throw generic error
       if (!res.ok) {
-        // try to parse JSON error
         if (contentType.includes('application/json')) {
-          const json = await res.json();
+          const jsonErr = await res.json();
           let errText = 'Validation error';
-          if (json.errors) {
-            // join validation errors
-            errText = Object.values(json.errors).flat().join('\\n');
-          } else if (json.message) {
-            errText = json.message;
+          if (jsonErr.errors) {
+            errText = Object.values(jsonErr.errors).flat().join('\\n');
+          } else if (jsonErr.message) {
+            errText = jsonErr.message;
           }
           throw new Error(errText);
         } else {
+          // HTML error or server error
           throw new Error('Server error: ' + res.status);
         }
       }
 
+      // At this point response is ok and not redirected.
+      // If JSON -> parse and handle success/errors.
       if (contentType.includes('application/json')) {
         const json = await res.json();
         if (json.success) {
@@ -152,37 +169,41 @@ document.addEventListener('DOMContentLoaded', function () {
             title: 'Success!',
             text: json.message || 'Shop updated successfully',
             showConfirmButton: false,
-            timer: 1500
+            timer: 1200
           });
-          location.reload();
+          // force full fresh reload (cache-busting)
+          const freshUrl = window.location.pathname + '?_=' + Date.now();
+          window.location.href = freshUrl;
           return;
         } else if (json.errors) {
           const msg = Object.values(json.errors).flat().join('\\n');
           throw new Error(msg);
         } else {
-          // unknown json, treat as success
+          // unknown json body, treat as success
           await Swal.fire({
             icon: 'success',
             title: 'Success!',
             text: json.message || 'Shop updated',
             showConfirmButton: false,
-            timer: 1200
+            timer: 1000
           });
-          location.reload();
+          const freshUrl = window.location.pathname + '?_=' + Date.now();
+          window.location.href = freshUrl;
           return;
         }
-      } else {
-        // Response is HTML (likely Laravel redirected). Treat as success:
-        await Swal.fire({
-          icon: 'success',
-          title: 'Success!',
-          text: 'Shop updated successfully',
-          showConfirmButton: false,
-          timer: 1200
-        });
-        // If server redirected to another page, location.reload() will navigate to that page only if the server used a location header. To be safe, go to current URL:
-        location.reload();
       }
+
+      // If we get here, response is HTML (res.ok && not redirected).
+      // That often means the backend returned the updated page HTML. Force a full navigation to the current URL with a cache-busting query to ensure a full fresh load.
+      await Swal.fire({
+        icon: 'success',
+        title: 'Success!',
+        text: 'Shop updated successfully',
+        showConfirmButton: false,
+        timer: 900
+      });
+      const baseUrl = window.location.href.split('?')[0];
+      window.location.href = baseUrl + '?_=' + Date.now();
 
     } catch (err) {
       console.error(err);
