@@ -7,12 +7,14 @@
       Edit Car Wash Shop
     </h2>
 
+    {{-- ✅ Success Message --}}
     @if (session('success'))
       <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded mb-4">
         {{ session('success') }}
       </div>
     @endif
 
+    {{-- ✅ Error Messages --}}
     @if ($errors->any())
       <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4">
         <ul class="list-disc list-inside text-sm">
@@ -23,8 +25,10 @@
       </div>
     @endif
 
+    {{-- ✅ Update Form --}}
     <form id="updateShopForm" action="{{ route('owner.shop.update', $shop->id) }}" method="POST" enctype="multipart/form-data">
       @csrf
+      @method('POST')
 
       {{-- Name --}}
       <div class="mb-4">
@@ -126,15 +130,19 @@
         </div>
       </div>
 
-      {{-- Submit Button --}}
-<a
-  href="{{ route('carwashownerdashboard') }}"
-  onclick="event.preventDefault(); document.getElementById('updateShopForm').submit();"
-  class="block text-center w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 rounded-lg transition-all duration-300 shadow-md"
->
-  Update Shop
-</a>
+      {{-- ✅ Submit Link Styled as Button --}}
+      <a
+        href="#"
+        onclick="event.preventDefault(); document.getElementById('updateShopForm').submit();"
+        class="block text-center w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 rounded-lg transition-all duration-300 shadow-md"
+      >
+        Update Shop
+      </a>
+    </form>
+  </div>
+</div>
 
+{{-- ✅ SweetAlert for success --}}
 @if (session('success'))
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
@@ -147,22 +155,6 @@
     }).then(() => {
       window.location.href = "{{ route('carwashownerdashboard') }}";
     });
-  </script>
-@endif
-    </form>
-  </div>
-</div>
-
-@if (session('success'))
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script>
-    Swal.fire({
-      icon: 'success',
-      title: 'Success!',
-      text: '{{ session('success') }}',
-      showConfirmButton: false,
-      timer: 2000
-    })
   </script>
 @endif
 
