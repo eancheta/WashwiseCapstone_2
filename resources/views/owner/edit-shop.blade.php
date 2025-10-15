@@ -136,4 +136,13 @@
     </form>
   </div>
 </div>
+@if (session('success'))
+  <script>
+    alert("{{ session('success') }}");
+    @if (session('closePage'))
+      // Automatically close the page after success
+      window.close();
+    @endif
+  </script>
+@endif
 @endsection
