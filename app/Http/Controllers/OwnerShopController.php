@@ -78,7 +78,17 @@ public function update(Request $request)
     }
 
     $shop->update($validated);
+    if ($request->ajax() || $request->wantsJson()) {
+        // CHANGE this to whichever route you want the user to land on after update.
+        // Example: route('owner.dashboard') or url()->current() if you want to reload the same page.
+        $redirectUrl = route('carwashownerdashboard'); // <-- adjust route name if needed
 
+        return response()->json([
+            'success'  => true,
+            'message'  => 'Shop updated successfully.',
+            'redirect' => $redirectUrl,
+        ]);
+    }
 return back()->with('success', 'Shop updated successfully.');
 }
 
