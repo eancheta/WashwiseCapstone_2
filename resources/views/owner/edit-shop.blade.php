@@ -142,7 +142,7 @@
   </div>
 </div>
 
-{{-- ✅ SweetAlert for success --}}
+{{-- ✅ SweetAlert for success with page refresh --}}
 @if (session('success'))
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
@@ -153,7 +153,7 @@
       showConfirmButton: false,
       timer: 2000
     }).then(() => {
-      window.location.href = "{{ route('carwashownerdashboard') }}";
+      location.reload(); // <-- refresh current page
     });
   </script>
 @endif
