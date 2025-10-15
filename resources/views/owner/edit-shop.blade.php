@@ -1,12 +1,7 @@
-@extends('layouts.blade')
-<style>
-    /* Hide navbar/header only for this page */
-    nav, header {
-        display: none !important;
-    }
-</style>
+@extends('layouts.app')
+
 @section('content')
-<div class="min-h-screen relative flex items-center justify-center bg-[#F8FAFC] py-8 px-2">
+<div class="flex justify-center items-center min-h-screen bg-gray-50">
   <div class="bg-white shadow-lg rounded-2xl p-8 w-full max-w-lg">
     <h2 class="text-2xl font-bold text-center text-[#182235] mb-6">
       Edit Car Wash Shop
@@ -91,6 +86,10 @@
     {{-- The link styled as button that triggers JS submit --}}
     <a href="#" id="updateShopButton" class="block text-center w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 rounded-lg transition-all duration-300 shadow-md mt-4">
       Update Shop
+    </a>
+
+    <a href="{{ route('carwashownerdashboard') }}"class="flex items-center gap-1.5 px-3 py-1.5 bg-gray-200 text-black rounded-lg text-sm font-medium shadow-md hover:bg-[#FF2D2D] hover:text-white transition">
+            ⬅ <span>Return</span>
     </a>
   </div>
 </div>
