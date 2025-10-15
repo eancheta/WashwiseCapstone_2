@@ -79,9 +79,11 @@ public function update(Request $request)
 
     $shop->update($validated);
 
-    return view('owner.edit-shop', [
-        'shop' => $shop,
-        'pageTitle' => 'Edit Shop',
+    return redirect()->route('carwashownerdashboard')
+    ->with([
+        'flash' => [
+            'success' => 'Shop details updated successfully.'
+        ]
     ]);
 }
 
