@@ -79,7 +79,7 @@ public function update(Request $request)
 
     $shop->update($validated);
 
-return redirect()->to(url('carwashownerdashboard'))->with('success', 'Shop updated successfully');
+return redirect('/owner/dashboard')->with('success', 'Shop updated successfully.');
 }
 
 
