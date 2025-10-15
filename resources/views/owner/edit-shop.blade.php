@@ -2,9 +2,13 @@
 
 @section('content')
 <div class="flex justify-center items-center min-h-screen bg-gray-50">
-        <a href="{{ route('carwashownerdashboard') }}"class="flex items-center gap-2 px-4 py-2 bg-[#002B5C] text-white rounded-lg text-sm font-medium shadow-md hover:bg-[#FF2D2D] hover:text-white transition">
+    <div class="absolute top-4 left-4">
+    <a href="{{ route('carwashownerdashboard') }}"class="flex items-center gap-2 px-4 py-2 bg-[#002B5C] text-white rounded-lg text-sm font-medium shadow-md hover:bg-[#FF2D2D] hover:text-white transition">
             ⬅ <span>Return</span>
     </a>
+
+    </div>
+
   <div class="bg-white shadow-lg rounded-2xl p-8 w-full max-w-lg">
     <h2 class="text-2xl font-bold text-center text-[#182235] mb-6">
       Edit Car Wash Shop
