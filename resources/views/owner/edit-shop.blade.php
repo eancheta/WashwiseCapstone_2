@@ -131,31 +131,54 @@
       </div>
 
       {{-- ✅ Submit Link Styled as Button --}}
-      <a
-        href="#"
-        onclick="event.preventDefault(); document.getElementById('updateShopForm').submit();"
-        class="block text-center w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 rounded-lg transition-all duration-300 shadow-md"
-      >
-        Update Shop
-      </a>
+<a href="#" id="updateShopButton"
+   class="block text-center w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 rounded-lg transition-all duration-300 shadow-md">
+   Update Shop
+</a>
     </form>
   </div>
 </div>
 
 {{-- ✅ SweetAlert for success with page refresh --}}
 @if (session('success'))
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script>
-    Swal.fire({
-      icon: 'success',
-      title: 'Success!',
-      text: '{{ session('success') }}',
-      showConfirmButton: false,
-      timer: 2000
-    }).then(() => {
-      location.reload(); // <-- refresh current page
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+document.getElementById('updateShopButton').addEventListener('click', function(e){
+    e.preventDefault();
+
+    let form = document.getElementById('updateShopForm');
+    let formData = new FormData(form);
+
+    fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        }
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: 'Shop updated successfully',
+                showConfirmButton: false,
+                timer: 2000
+            }).then(() => {
+                location.reload(); // <-- refresh page after alert
+            });
+        }
+    })
+    .catch(err => {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error!',
+            text: 'Something went wrong. Please try again.'
+        });
     });
-  </script>
+});
+</script>
 @endif
 
 @endsection
