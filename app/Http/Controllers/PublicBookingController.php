@@ -14,7 +14,7 @@ class PublicBookingController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'size_of_the_car' => 'required|string',
-            'contact_no' => 'required|string|max:20',
+            'contact_no' => ['required', 'regex:/^09\d{9}$/', 'digits:11'],
             'time_of_booking' => 'required',
             'date_of_booking' => 'required|date',
             'slot_number' => 'required|integer|min:1'

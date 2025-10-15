@@ -176,7 +176,7 @@ private function checkForOverlap(string $table, string $date, string $time, int 
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'size_of_the_car' => 'required|in:HatchBack,Sedan,MPV,SUV,Pickup,Van,Motorcycle',
-            'contact_no' => 'required|string|max:20',
+            'contact_no' => ['required', 'regex:/^09\d{9}$/', 'digits:11'],
             'email' => 'required|email|max:255',
             'date_of_booking' => 'required|date_format:Y-m-d',
             'time_of_booking' => [

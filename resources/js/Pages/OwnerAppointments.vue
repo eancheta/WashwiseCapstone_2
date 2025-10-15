@@ -122,19 +122,28 @@
               </td>
 
               <td class="px-3 sm:px-4 py-3 text-center flex flex-col sm:flex-row justify-center gap-2 sm:gap-3">
-                <button
-                  @click="approve(appt.id)"
-                  class="px-3 sm:px-4 py-1.5 sm:py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 shadow-sm transition"
-                >
-                  Approve
-                </button>
-                <button
-                  @click="openDeclineModal(appt.id)"
-                  class="px-3 sm:px-4 py-1.5 sm:py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 shadow-sm transition"
-                >
-                  Decline
-                </button>
-              </td>
+  <!-- Approve Button -->
+  <button
+    @click="approve(appt.id)"
+    :disabled="appt.status === 'approved' || appt.status === 'declined'"
+    class="px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg font-semibold text-xs sm:text-sm transition text-white
+           bg-green-600 hover:bg-green-700
+           disabled:bg-gray-400 disabled:cursor-not-allowed"
+  >
+    Approve
+  </button>
+
+  <!-- Decline Button -->
+  <button
+    @click="openDeclineModal(appt.id)"
+    :disabled="appt.status === 'approved' || appt.status === 'declined'"
+    class="px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg font-semibold text-xs sm:text-sm transition text-white
+           bg-red-600 hover:bg-red-700
+           disabled:bg-gray-400 disabled:cursor-not-allowed"
+  >
+    Decline
+  </button>
+</td>
             </tr>
           </tbody>
         </table>
