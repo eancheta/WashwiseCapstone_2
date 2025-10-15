@@ -92,6 +92,7 @@
               <th class="px-3 sm:px-4 py-3">Name</th>
               <th class="px-3 sm:px-4 py-3 hidden md:table-cell">Email</th>
               <th class="px-3 sm:px-4 py-3 hidden md:table-cell">Car Size</th>
+              <th class="px-3 sm:px-4 py-3 hidden md:table-cell">Services</th>
               <th class="px-3 sm:px-4 py-3 hidden md:table-cell">Contact</th>
               <th class="px-3 sm:px-4 py-3 hidden md:table-cell">Slot</th>
               <th class="px-3 sm:px-4 py-3 hidden lg:table-cell">Created</th>
@@ -119,6 +120,7 @@
               <td class="px-3 sm:px-4 py-3">{{ appt.name }}</td>
               <td class="px-3 sm:px-4 py-3 hidden md:table-cell">{{ appt.email || 'Walk_IN' }}</td>
               <td class="px-3 sm:px-4 py-3 hidden md:table-cell">{{ appt.size_of_the_car }}</td>
+              <td class="px-3 sm:px-4 py-3 hidden md:table-cell">{{ appt.services_offered || 'N/A' }}</td>
               <td class="px-3 sm:px-4 py-3 hidden md:table-cell">{{ appt.contact_no }}</td>
               <td class="px-3 sm:px-4 py-3 hidden md:table-cell">{{ appt.slot_number }}</td>
               <td class="px-3 sm:px-4 py-3 hidden lg:table-cell">{{ appt.created_at }}</td>
@@ -237,6 +239,7 @@ interface Appointment {
   status?: string | null;
   payment_proof?: string | null;
   payment_amount?: number | null;
+  services_offered?: string | null;
 }
 
 const props = defineProps<{ appointments: Appointment[] }>();

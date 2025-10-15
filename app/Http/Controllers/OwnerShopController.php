@@ -105,7 +105,8 @@ public static function ensureBookingTableExists($shopId)
             $table->decimal('payment_amount', 8, 2)->nullable();
             $table->string('status')->default('pending');
             $table->string('payment_proof')->nullable();
-            $table->text('reason')->nullable(); // ✅ Added reason column
+            $table->text('reason')->nullable();
+            $table->text('services_offered')->nullable();// ✅ Added reason column
             $table->timestamps();
         });
     } else {
@@ -128,6 +129,9 @@ public static function ensureBookingTableExists($shopId)
             }
             if (!in_array('reason', $columns)) {
                 $table->text('reason')->nullable(); // ✅ Added this for backward compatibility
+            }
+            if (!in_array('services_offered', $columns)) { // ✅ Backward compatibility
+                $table->text('services_offered')->nullable();
             }
         });
     }

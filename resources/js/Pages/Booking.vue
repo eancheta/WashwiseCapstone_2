@@ -12,6 +12,7 @@ interface Shop {
     description?: string;
     services_offered?: string;
     qr_code?: string;
+
 }
 
 interface Booking {
@@ -45,6 +46,7 @@ const form = useForm({
     time_of_booking: '',
     date_of_booking: '',
     slot_number: 1,
+    services_offered: '', // ✅ Add this
 });
 
 const shopError = ref<string>('');

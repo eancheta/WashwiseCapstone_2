@@ -47,6 +47,7 @@ public function store(Request $request, $shop)
         'time_of_booking' => 'required',
         'date_of_booking' => 'required|date',
         'slot_number' => 'required|integer|min:1',
+        'services_offered' => 'nullable|string',
     ]);
 
     // Ensure shop exists
@@ -67,6 +68,7 @@ public function store(Request $request, $shop)
     // Prepare data to insert (remove customer_id and updated_at)
     $bookingData = array_merge($validated, [
         'created_at' => now(),
+        'services_offered' => $request->input('services_offered'), // ✅ Add this line here
     ]);
 
     // Log the data before inserting
