@@ -2,10 +2,8 @@
 
 namespace App\Http\Middleware;
 
-use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
-use Tighten\Ziggy\Ziggy;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -16,12 +14,16 @@ class HandleInertiaRequests extends Middleware
         return parent::version($request);
     }
 
-public function share(Request $request): array
+    public function share(Request $request): array
     {
         return array_merge(parent::share($request), [
+            'auth' => [
+                'user' => $request->user('carwashowner'),
+            ],
+
             'flash' => [
-                'success' => fn () => $request->session()->get('success'),
-                'error' => fn () => $request->session()->get('error'),
+                'success' => fn () => $request->session()->get('flash.success') ?? $request->session()->get('success'),
+                'error'   => fn () => $request->session()->get('flash.error') ?? $request->session()->get('error'),
             ],
         ]);
     }

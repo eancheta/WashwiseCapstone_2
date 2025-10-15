@@ -2,8 +2,28 @@
 import { Head, Link, usePage, router } from '@inertiajs/vue3'
 import { ref, computed } from 'vue'
 import { route } from 'ziggy-js'
+import Swal from 'sweetalert2'
+import { onMounted } from 'vue'
 
+onMounted(() => {
+  if (page.props.flash?.success) {
+    Swal.fire({
+      icon: 'success',
+      title: 'Success!',
+      text: page.props.flash.success,
+      showConfirmButton: false,
+      timer: 2000,
+    })
+  }
 
+  if (page.props.flash?.error) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: page.props.flash.error,
+    })
+  }
+})
 
 // Use any to avoid strict PageProps mismatch errors in TS dev environment
 const page = usePage<any>()

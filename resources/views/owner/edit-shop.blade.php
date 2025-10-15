@@ -134,20 +134,20 @@
         Update Shop
       </button>
     </form>
-      @if (session('success'))
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-  Swal.fire({
-    icon: 'success',
-    title: 'Success!',
-    text: '{{ session('success') }}',
-    showConfirmButton: false,
-    timer: 2000
-  })
-</script>
   </div>
-
-@endif
 </div>
+
+@if (session('success'))
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+    Swal.fire({
+      icon: 'success',
+      title: 'Success!',
+      text: '{{ session('success') }}',
+      showConfirmButton: false,
+      timer: 2000
+    })
+  </script>
+@endif
 
 @endsection
