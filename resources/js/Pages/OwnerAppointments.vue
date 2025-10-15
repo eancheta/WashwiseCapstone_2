@@ -4,6 +4,22 @@
   <div class="flex min-h-screen bg-gradient-to-br from-white via-blue-50 to-[#002B5C] py-4 sm:py-8 px-3 sm:px-6 flex-col items-center overflow-x-hidden">
     <div class="w-full max-w-[95%] xl:max-w-[1600px] p-4 sm:p-8 bg-white rounded-2xl shadow-xl border border-gray-200">
 
+        <div v-if="$page.props.flash.success" class="mb-6 w-full">
+  <div
+    class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg font-semibold shadow-sm text-center"
+  >
+    {{ $page.props.flash.success }}
+  </div>
+</div>
+
+<div v-if="$page.props.flash.error" class="mb-6 w-full">
+  <div
+    class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg font-semibold shadow-sm text-center"
+  >
+    {{ $page.props.flash.error }}
+  </div>
+</div>
+
       <!-- Return Button + Header -->
       <div class="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
         <button

@@ -182,7 +182,7 @@ public function approve($id)
         }
     }
 
-    return back()->with('success', 'Booking approved successfully.');
+    return redirect()->route('owner.appointments')->with('success', 'Booking approved successfully.');
 }
 
 
@@ -273,6 +273,6 @@ public function decline(Request $request, $id)
         }
     }
 
-    return back()->with('success', 'Appointment declined and email attempted.');
+    return redirect()->route('owner.appointments')->with('success', 'Appointment declined and email attempted.');
 }
 }
