@@ -150,7 +150,6 @@ function limitContactLength(event: Event) {
           <input type="date" v-model="form.date_of_booking" class="w-full p-2 border rounded focus:ring-2 focus:ring-[#002B5C]" required/>
           <input type="number" v-model="form.slot_number" min="1" max="4" class="w-full p-2 border rounded focus:ring-2 focus:ring-[#002B5C]" required/>
 
-          <!-- Services Offered -->
 <div>
   <label class="block text-sm font-semibold text-gray-700">Services Requested</label>
   <textarea
@@ -163,7 +162,7 @@ function limitContactLength(event: Event) {
     {{ form.errors.services_offered }}
   </div>
 </div>
-          <!-- Taken Slots Table -->
+
           <div v-if="form.date_of_booking" class="mt-4">
             <h3 class="text-sm font-semibold text-gray-700 mb-2">Taken Slots on {{ formattedDate }} (View Only)</h3>
             <div class="overflow-x-auto">
