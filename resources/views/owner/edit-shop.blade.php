@@ -1,7 +1,7 @@
 @extends('layouts.blade')
 
 @section('content')
-<div class="flex justify-center items-center min-h-screen bg-gray-50">
+<div class="min-h-screen relative flex items-center justify-center bg-[#F8FAFC] py-8 px-2">
   <div class="bg-white shadow-lg rounded-2xl p-8 w-full max-w-lg">
     <h2 class="text-2xl font-bold text-center text-[#182235] mb-6">
       Edit Car Wash Shop
