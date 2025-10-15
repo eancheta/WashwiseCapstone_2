@@ -3,7 +3,6 @@
     <div class="w-full max-w-xl bg-white rounded-2xl shadow-lg p-6">
       <h1 class="text-3xl font-extrabold text-center text-[#002B5C] mb-6 tracking-tight">Confirm & Pay for <span class="text-[#FF2D2D]">{{ shop.name }}</span></h1>
 
-      <!-- Success & Error Alerts -->
       <div v-if="$page.props.flash.success" class="bg-green-100 text-green-800 p-3 rounded-lg mb-4 text-base font-medium">
         {{ $page.props.flash.success }}
       </div>
@@ -11,7 +10,6 @@
         {{ $page.props.flash.error }}
       </div>
 
-      <!-- Error for Null Booking -->
       <div v-if="error || !booking" class="bg-red-100 text-red-800 p-3 rounded-lg mb-4 text-base font-medium">
         {{ error || 'Please submit booking details to proceed with payment.' }}
         <div class="mt-2">
@@ -19,7 +17,6 @@
         </div>
       </div>
 
-      <!-- Booking Details -->
       <div v-if="booking" class="space-y-4 mb-6">
         <div class="mb-6 text-center">
           <h2 class="text-base font-bold text-[#182235] mb-2">Scan to Pay <span class="font-normal text-gray-500">(QR Code)</span></h2>
