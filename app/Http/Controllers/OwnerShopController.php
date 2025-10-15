@@ -80,10 +80,7 @@ public function update(Request $request)
     $shop->update($validated);
 
 
-    return view('carwashownerdashboard', [
-        'shop' => $shop,
-        'pageTitle' => 'Edit Shop',
-    ]);
+return redirect('/owner/dashboard')->with('success', 'Shop updated successfully.');
 }
 
 
