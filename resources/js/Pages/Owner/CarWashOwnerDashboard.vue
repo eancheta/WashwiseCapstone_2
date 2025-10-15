@@ -2,24 +2,7 @@
 import { Head, Link, usePage, router } from '@inertiajs/vue3'
 import { ref, computed } from 'vue'
 import { route } from 'ziggy-js'
-import { Inertia } from '@inertiajs/inertia'
-const selectedShop = ref<any>(null)
-const walkInModalOpen = ref(false)
-// define incoming props from the controller
-const walkIn = (shop: any) => {
-  if (shop.status === 'closed') {
-    alert('🚫 Sorry, this shop is currently closed.')
-    return
-  }
 
-  if (!page.props.auth.user) {
-    Inertia.get('/login')
-    return
-  }
-
-  selectedShop.value = shop
-  walkInModalOpen.value = true
-}
 
 
 // Use any to avoid strict PageProps mismatch errors in TS dev environment
@@ -233,21 +216,23 @@ function openShop(id?: number | null) {
       </div>
 
 <div class="mt-6">
-  <button
-    v-if="shop.status === 'open'"
-    @click.prevent="walkIn(shop)"
-    class="px-8 py-3 rounded-full bg-[#FF2D2D] text-white font-bold text-lg shadow hover:bg-[#d72626] hover:scale-105 transition"
-  >
-    Walk-in
-  </button>
+  <!-- When shop is open -->
+<Link
+  v-if="shop.status === 'open'"
+  :href="route('owner.walkin', { id: shop.id })"
+  as="button"
+  class="px-8 py-3 rounded-full bg-[#FF2D2D] text-white font-bold text-lg shadow hover:bg-[#d72626] hover:scale-105 transition"
+>
+  Walk-in
+</Link>
 
-  <button
-    v-else
-    disabled
-    class="px-8 py-3 rounded-full bg-gray-400 text-white font-bold text-lg shadow cursor-not-allowed"
-  >
-    🚫 Closed
-  </button>
+<button
+  v-else
+  disabled
+  class="px-8 py-3 rounded-full bg-gray-400 text-white font-bold text-lg shadow cursor-not-allowed"
+>
+  🚫 Closed
+</button>
 </div>
 
 
