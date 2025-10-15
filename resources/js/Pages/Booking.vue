@@ -144,19 +144,25 @@ function limitContactLength(event: Event) {
             <option>Van</option>
             <option>Motorcycle</option>
           </select>
-<input
-  type="text"
-  v-model="form.contact_no"
-  placeholder="09XXXXXXXXX"
-  class="w-full p-2 border rounded focus:ring-2 focus:ring-[#002B5C]"
-  required
-  maxlength="11"
-  @input="limitContactLength"
-/>
+
+          <input type="text" v-model="form.contact_no" placeholder="09XXXXXXXXX" class="w-full p-2 border rounded focus:ring-2 focus:ring-[#002B5C]" required maxlength="11" @input="limitContactLength"/>
           <input type="time" v-model="form.time_of_booking" class="w-full p-2 border rounded focus:ring-2 focus:ring-[#002B5C]" required/>
           <input type="date" v-model="form.date_of_booking" class="w-full p-2 border rounded focus:ring-2 focus:ring-[#002B5C]" required/>
           <input type="number" v-model="form.slot_number" min="1" max="4" class="w-full p-2 border rounded focus:ring-2 focus:ring-[#002B5C]" required/>
 
+          <!-- Services Offered -->
+<div>
+  <label class="block text-sm font-semibold text-gray-700">Services Requested</label>
+  <textarea
+    v-model="form.services_offered"
+    class="w-full p-2 border rounded focus:ring-2 focus:ring-[#002B5C]"
+    placeholder="Specify services you want"
+    rows="3"
+  ></textarea>
+  <div v-if="form.errors.services_offered" class="text-red-600 text-sm mt-1">
+    {{ form.errors.services_offered }}
+  </div>
+</div>
           <!-- Taken Slots Table -->
           <div v-if="form.date_of_booking" class="mt-4">
             <h3 class="text-sm font-semibold text-gray-700 mb-2">Taken Slots on {{ formattedDate }} (View Only)</h3>
