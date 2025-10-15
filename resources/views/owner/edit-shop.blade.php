@@ -23,7 +23,7 @@
       </div>
     @endif
 
-    <form action="{{ route('owner.shop.update', $shop->id) }}" method="POST" enctype="multipart/form-data">
+    <form id="updateShopForm" action="{{ route('owner.shop.update', $shop->id) }}" method="POST" enctype="multipart/form-data">
       @csrf
 
       {{-- Name --}}
@@ -127,13 +127,13 @@
       </div>
 
       {{-- Submit Button --}}
-<button
-  type="submit"
-  class="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 rounded-lg transition-all duration-300 shadow-md"
-  id="updateShopBtn"
+<a
+  href="#"
+  onclick="event.preventDefault(); document.getElementById('updateShopForm').submit();"
+  class="block text-center w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 rounded-lg transition-all duration-300 shadow-md"
 >
   Update Shop
-</button>
+</a>
 
 @if (session('success'))
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -145,7 +145,6 @@
       showConfirmButton: false,
       timer: 2000
     }).then(() => {
-      // Redirect to dashboard after alert
       window.location.href = "{{ route('carwashownerdashboard') }}";
     });
   </script>
