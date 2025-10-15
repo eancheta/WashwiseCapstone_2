@@ -129,76 +129,18 @@ document.addEventListener('DOMContentLoaded', function () {
         },
       });
 
-      // If the server performed a redirect, fetch's `res.redirected` is true and `res.url` holds the final URL.
-      // In that case we should navigate the browser to res.url to perform a full page load.
-      if (res.redirected) {
-        // show success alert briefly then navigate to the redirected URL (full page load)
-        await Swal.fire({
-          icon: 'success',
-          title: 'Success!',
-          text: 'Shop updated successfully',
-          showConfirmButton: false,
-          timer: 900
-        });
-        window.location.href = res.url;
-        return;
-      }
-
-      const contentType = (res.headers.get('content-type') || '').toLowerCase();
-
-      // If response is not ok, try to parse JSON errors (if any) or throw generic error
+      // Treat non-OK as error (try to surface validation messages if JSON)
       if (!res.ok) {
+        const contentType = (res.headers.get('content-type') || '').toLowerCase();
         if (contentType.includes('application/json')) {
-          const jsonErr = await res.json();
-          let errText = 'Validation error';
-          if (jsonErr.errors) {
-            errText = Object.values(jsonErr.errors).flat().join('\\n');
-          } else if (jsonErr.message) {
-            errText = jsonErr.message;
-          }
-          throw new Error(errText);
-        } else {
-          // HTML error or server error
-          throw new Error('Server error: ' + res.status);
-        }
-      }
-
-      // At this point response is ok and not redirected.
-      // If JSON -> parse and handle success/errors.
-      if (contentType.includes('application/json')) {
-        const json = await res.json();
-        if (json.success) {
-          await Swal.fire({
-            icon: 'success',
-            title: 'Success!',
-            text: json.message || 'Shop updated successfully',
-            showConfirmButton: false,
-            timer: 1200
-          });
-          // force full fresh reload (cache-busting)
-          const freshUrl = window.location.pathname + '?_=' + Date.now();
-          window.location.href = freshUrl;
-          return;
-        } else if (json.errors) {
-          const msg = Object.values(json.errors).flat().join('\\n');
+          const errJson = await res.json();
+          const msg = errJson && errJson.errors ? Object.values(errJson.errors).flat().join('\n') : (errJson.message || 'Validation error');
           throw new Error(msg);
-        } else {
-          // unknown json body, treat as success
-          await Swal.fire({
-            icon: 'success',
-            title: 'Success!',
-            text: json.message || 'Shop updated',
-            showConfirmButton: false,
-            timer: 1000
-          });
-          const freshUrl = window.location.pathname + '?_=' + Date.now();
-          window.location.href = freshUrl;
-          return;
         }
+        throw new Error('Server error: ' + res.status);
       }
 
-      // If we get here, response is HTML (res.ok && not redirected).
-      // That often means the backend returned the updated page HTML. Force a full navigation to the current URL with a cache-busting query to ensure a full fresh load.
+      // SUCCESS: show the SweetAlert exactly as you wanted — NO reload
       await Swal.fire({
         icon: 'success',
         title: 'Success!',
@@ -206,8 +148,8 @@ document.addEventListener('DOMContentLoaded', function () {
         showConfirmButton: false,
         timer: 900
       });
-      const baseUrl = window.location.href.split('?')[0];
-      window.location.href = baseUrl + '?_=' + Date.now();
+
+      // NOTE: no location.reload or navigation here — keep user on the same page
 
     } catch (err) {
       console.error(err);
