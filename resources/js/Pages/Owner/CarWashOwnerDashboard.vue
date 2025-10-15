@@ -198,7 +198,7 @@ function openShop(id?: number | null) {
       <div class="uppercase tracking-widest text-sm text-[#FF2D2D] font-bold mb-4">Book Online</div>
 
       <h1 class="text-4xl md:text-6xl font-extrabold text-white text-center mb-4 leading-tight drop-shadow">
-        Welcomes, <span class="text-white">{{ user ? user.name : 'Owner' }}</span>!
+        Welcome, <span class="text-white">{{ user ? user.name : 'Owner' }}</span>!
       </h1>
 
       <div class="text-base md:text-lg text-gray-100 text-center mb-8 max-w-2xl">

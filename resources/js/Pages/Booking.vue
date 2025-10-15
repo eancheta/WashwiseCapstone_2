@@ -162,7 +162,6 @@ function limitContactLength(event: Event) {
     {{ form.errors.services_offered }}
   </div>
 </div>
-
           <div v-if="form.date_of_booking" class="mt-4">
             <h3 class="text-sm font-semibold text-gray-700 mb-2">Taken Slots on {{ formattedDate }} (View Only)</h3>
             <div class="overflow-x-auto">
