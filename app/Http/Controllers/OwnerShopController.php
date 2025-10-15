@@ -79,7 +79,7 @@ public function update(Request $request)
 
     $shop->update($validated);
 
-return redirect('/owner/dashboard')->with('success', 'Shop updated successfully.');
+return back()->with('success', 'Shop updated successfully.');
 }
 
 
