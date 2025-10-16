@@ -174,95 +174,97 @@ private function checkForOverlap(string $table, string $date, string $time, int 
     /**
      * POST /customer/book/{shop}/confirm
      */
-    public function confirmBooking(Request $request, int $shopId)
-    {
-        $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'size_of_the_car' => 'required|in:HatchBack,Sedan,MPV,SUV,Pickup,Van,Motorcycle',
-            'contact_no' => ['required', 'regex:/^09\d{9}$/', 'digits:11'],
-            'email' => 'required|email|max:255',
-            'date_of_booking' => 'required|date_format:Y-m-d',
-            'time_of_booking' => [
-                'required',
-                'regex:/^([01]\d|2[0-3]):([0-5]\d)$|^(0?[1-9]|1[0-2]):([0-5]\d)\s?(AM|PM)$/i'
-            ],
-            'slot_number' => 'required|integer|min:1|max:4',
-            'payment_amount' => 'required|numeric|in:50',
-            'payment_proof' => 'required|image|mimes:jpg,jpeg,png|max:5120',
-        ]);
+public function confirmBooking(Request $request, int $shopId)
+{
+    $data = $request->validate([
+        'name' => 'required|string|max:255',
+        'size_of_the_car' => 'required|in:HatchBack,Sedan,MPV,SUV,Pickup,Van,Motorcycle',
+        'contact_no' => ['required', 'regex:/^09\d{9}$/', 'digits:11'],
+        'email' => 'required|email|max:255',
+        'date_of_booking' => 'required|date_format:Y-m-d',
+        'time_of_booking' => [
+            'required',
+            'regex:/^([01]\d|2[0-3]):([0-5]\d)$|^(0?[1-9]|1[0-2]):([0-5]\d)\s?(AM|PM)$/i'
+        ],
+        'slot_number' => 'required|integer|min:1|max:4',
+        'payment_amount' => 'required|numeric|in:50',
+        'payment_proof' => 'required|image|mimes:jpg,jpeg,png|max:5120',
+        'services_offered' => 'nullable|string|max:1000', // ✅ add this line
+    ]);
 
-        // Normalize time to 24h format
-        $data['time_of_booking'] = Carbon::parse($data['time_of_booking'])->format('H:i');
+    // Normalize time to 24-hour format
+    $data['time_of_booking'] = Carbon::parse($data['time_of_booking'])->format('H:i');
 
-        $shop = $this->getShopWithCloudinaryImages($shopId);
+    $shop = $this->getShopWithCloudinaryImages($shopId);
 
-        // ✅ Block if closed
-        if ($shop->status === 'closed') {
-            return back()->with('error', "Sorry, {$shop->name} is currently closed.");
-        }
-
-        $table = "bookings_shop_{$shop->id}";
-
-        // Check overlaps
-        $error = $this->checkForOverlap($table, $data['date_of_booking'], $data['time_of_booking'], $data['slot_number']);
-        if ($error) return back()->withErrors(['time_of_booking' => $error])->withInput();
-
-        // Upload payment proof to Cloudinary
-        $cloudinary = new \Cloudinary\Cloudinary(
-            ['cloud' => [
-                'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
-                'api_key'    => env('CLOUDINARY_API_KEY'),
-                'api_secret' => env('CLOUDINARY_API_SECRET'),
-            ]]
-        );
-
-        $uploadResponse = $cloudinary->uploadApi()->upload(
-            $request->file('payment_proof')->getRealPath(),
-            ['folder' => 'carwash_payments']
-        );
-
-        $paymentProofUrl = $uploadResponse['secure_url'];
-        $now = now();
-
-        $query = DB::table($table)
-            ->where('name', $data['name'])
-            ->where('email', $data['email'])
-            ->where('date_of_booking', $data['date_of_booking'])
-            ->where('time_of_booking', $data['time_of_booking'])
-            ->where('slot_number', $data['slot_number']);
-
-        $existingBooking = $query->first();
-
-        if ($existingBooking) {
-            $query->update([
-                'payment_amount' => $data['payment_amount'],
-                'payment_proof' => $paymentProofUrl,
-                'status' => 'pending',
-                'user_id' => Auth::id(),
-                'updated_at' => $now,
-            ]);
-        } else {
-DB::table($table)->insert([
-    'user_id' => Auth::id(),
-    'name' => $data['name'],
-    'email' => $data['email'],
-    'size_of_the_car' => $data['size_of_the_car'],
-    'contact_no' => $data['contact_no'],
-    'time_of_booking' => $data['time_of_booking'],
-    'date_of_booking' => $data['date_of_booking'],
-    'slot_number' => $data['slot_number'],
-    'services_offered' => $data['services_offered'] ?? null,
-    'payment_amount' => $data['payment_amount'],
-    'payment_proof' => $paymentProofUrl,
-    'status' => 'pending',
-    'created_at' => $now,
-    'updated_at' => $now,
-]);
-        }
-
-        return redirect()->route('dashboard')
-            ->with('success', "Booked on slot #{$data['slot_number']} at {$shop->name}. Payment proof uploaded.");
+    // ✅ Block if closed
+    if ($shop->status === 'closed') {
+        return back()->with('error', "Sorry, {$shop->name} is currently closed.");
     }
+
+    $table = "bookings_shop_{$shop->id}";
+
+    // Check overlap
+    $error = $this->checkForOverlap($table, $data['date_of_booking'], $data['time_of_booking'], $data['slot_number']);
+    if ($error) return back()->withErrors(['time_of_booking' => $error])->withInput();
+
+    // Upload payment proof
+    $cloudinary = new \Cloudinary\Cloudinary([
+        'cloud' => [
+            'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
+            'api_key'    => env('CLOUDINARY_API_KEY'),
+            'api_secret' => env('CLOUDINARY_API_SECRET'),
+        ]
+    ]);
+
+    $uploadResponse = $cloudinary->uploadApi()->upload(
+        $request->file('payment_proof')->getRealPath(),
+        ['folder' => 'carwash_payments']
+    );
+
+    $paymentProofUrl = $uploadResponse['secure_url'];
+    $now = now();
+
+    $query = DB::table($table)
+        ->where('name', $data['name'])
+        ->where('email', $data['email'])
+        ->where('date_of_booking', $data['date_of_booking'])
+        ->where('time_of_booking', $data['time_of_booking'])
+        ->where('slot_number', $data['slot_number']);
+
+    $existingBooking = $query->first();
+
+    if ($existingBooking) {
+        $query->update([
+            'payment_amount' => $data['payment_amount'],
+            'payment_proof' => $paymentProofUrl,
+            'services_offered' => $data['services_offered'] ?? null, // ✅ update existing
+            'status' => 'pending',
+            'user_id' => Auth::id(),
+            'updated_at' => $now,
+        ]);
+    } else {
+        DB::table($table)->insert([
+            'user_id' => Auth::id(),
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'size_of_the_car' => $data['size_of_the_car'],
+            'contact_no' => $data['contact_no'],
+            'time_of_booking' => $data['time_of_booking'],
+            'date_of_booking' => $data['date_of_booking'],
+            'slot_number' => $data['slot_number'],
+            'services_offered' => $data['services_offered'] ?? null, // ✅ insert new
+            'payment_amount' => $data['payment_amount'],
+            'payment_proof' => $paymentProofUrl,
+            'status' => 'pending',
+            'created_at' => $now,
+            'updated_at' => $now,
+        ]);
+    }
+
+    return redirect()->route('dashboard')
+        ->with('success', "Booked on slot #{$data['slot_number']} at {$shop->name}. Payment proof uploaded.");
+}
 
     /**
      * Helper: Get shop with Cloudinary images
