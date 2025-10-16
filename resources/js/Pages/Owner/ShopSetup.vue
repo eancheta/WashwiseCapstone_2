@@ -89,7 +89,8 @@
     name="qr_code"
     accept="image/*"
     @change="(e) => handleQrCodeChange(e, 1)"
-    class="mt-1 w-full text-gray-700"
+    class="mt-1 w-full text-gray-700 "
+    required
   />
   <img
     v-if="qrPreviews[0]"
