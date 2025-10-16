@@ -242,13 +242,13 @@ const handleLogoChange = (event: Event) => {
 // ✅ Fix here
 const handleQrCodeChange = (event: Event, index: number) => {
   const target = event.target as HTMLInputElement
+  const key = index === 1 ? 'qr_code' : `qr_code${index}` as keyof ShopForm
+
   if (target.files?.length) {
     const file = target.files[0]
-    const key = `qr_code${index}` as keyof ShopForm
     ;(form as unknown as Record<string, File | null>)[key] = file
     qrPreviews.value[index - 1] = URL.createObjectURL(file)
   } else {
-    const key = `qr_code${index}` as keyof ShopForm
     ;(form as unknown as Record<string, File | null>)[key] = null
     qrPreviews.value[index - 1] = null
   }
