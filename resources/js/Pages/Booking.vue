@@ -133,20 +133,31 @@ const minDate = computed(() => {
     return `${yyyy}-${mm}-${dd}`;
 });
 
-const minTime = computed(() => {
-  if (!form.date_of_booking) return '';
-  const today = new Date();
-  const selectedDate = new Date(form.date_of_booking);
-  if (
-    today.toDateString() === selectedDate.toDateString()
-  ) {
-    // Format current hours and minutes as HH:MM
-    const hours = today.getHours().toString().padStart(2, '0');
-    const minutes = today.getMinutes().toString().padStart(2, '0');
-    return `${hours}:${minutes}`;
-  }
-  return '00:00';
-});
+const minTime = ref('00:00');
+
+watch(
+  () => form.date_of_booking,
+  (newDate) => {
+    if (!newDate) return;
+
+    const today = new Date();
+    const selectedDate = new Date(newDate);
+
+    if (selectedDate.toDateString() === today.toDateString()) {
+      const hours = today.getHours().toString().padStart(2, '0');
+      const minutes = today.getMinutes().toString().padStart(2, '0');
+      minTime.value = `${hours}:${minutes}`;
+
+      // Auto-adjust if user already picked a past time
+      if (form.time_of_booking < minTime.value) {
+        form.time_of_booking = minTime.value;
+      }
+    } else {
+      minTime.value = '00:00';
+    }
+  },
+  { immediate: true }
+);
 </script>
 
 <template>
