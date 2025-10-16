@@ -10,18 +10,23 @@ class CarWashShop extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'owner_id',
-        'name',
-        'address',
-        'district',
-        'logo',
-        'description',
-        'services_offered',
-        'qr_code',
-        'latitude',
-        'longitude'
-    ];
+protected $fillable = [
+    'owner_id',
+    'name',
+    'address',
+    'district',
+    'logo',
+    'description',
+    'services_offered',
+    'status',
+    'qr_code',
+    'qr_code2',
+    'qr_code3',
+    'qr_code4',
+    'qr_code5',
+    'latitude',
+    'longitude'
+];
 
     /**
      * Get the owner that owns the CarWashShop.

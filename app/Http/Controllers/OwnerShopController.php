@@ -158,7 +158,7 @@ $validated = $request->validate([
     'description' => 'nullable|string',
     'services_offered' => 'nullable|string',
     'logo' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
-    'qr_code1' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
+    'qr_code' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
     'qr_code2' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
     'qr_code3' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
     'qr_code4' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
@@ -194,14 +194,14 @@ $validated = $request->validate([
         }
 
 // ✅ QR Code 1
-if ($request->hasFile('qr_code1')) {
-    $file = $request->file('qr_code1');
+if ($request->hasFile('qr_code')) {
+    $file = $request->file('qr_code');
     $response = $cloudinary->uploadApi()->upload($file->getRealPath(), [
         'folder' => 'carwash_qrcodes',
         'resource_type' => 'image',
         'overwrite' => true,
     ]);
-    $shopData['qr_code1'] = $response['secure_url'];
+    $shopData['qr_code'] = $response['secure_url'];
 }
 
 // ✅ QR Code 2

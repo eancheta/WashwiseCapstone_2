@@ -85,8 +85,8 @@
   <label class="block text-sm font-semibold text-gray-700">QR Code 1</label>
   <input
     type="file"
-    id="qr_code1"
-    name="qr_code1"
+    id="qr_code"
+    name="qr_code"
     accept="image/*"
     @change="(e) => handleQrCodeChange(e, 1)"
     class="mt-1 w-full text-gray-700"
@@ -204,7 +204,7 @@ type ShopForm = {
   logo: File | null
   description: string
   services_offered: string
-  qr_code1: File | null
+  qr_code: File | null
   qr_code2: File | null
   qr_code3: File | null
   qr_code4: File | null
@@ -218,7 +218,7 @@ const form = useForm<ShopForm>({
   logo: null,
   description: '',
   services_offered: '',
-  qr_code1: null,
+  qr_code: null,
   qr_code2: null,
   qr_code3: null,
   qr_code4: null,
