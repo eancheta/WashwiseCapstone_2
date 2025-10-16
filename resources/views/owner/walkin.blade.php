@@ -1,6 +1,13 @@
 @extends('layouts.app')
 
 @section('content')
+@php
+$today = date('Y-m-d');        // current date
+$now = date('H:i');            // current time
+$selectedDate = old('date_of_booking', $today);
+$minDate = $today;             // minimum date = today
+$minTime = $selectedDate === $today ? $now : '00:00'; // if today, prevent past times
+@endphp
 <style>
     /* Hide navbar/header only, not our custom button */
     header, nav.site-navbar {
@@ -86,7 +93,7 @@
                     <label for="size_of_the_car" class="block text-sm font-bold text-[#182235] mb-2">Car Size</label>
                     <select name="size_of_the_car" id="size_of_the_car"
                         class="w-full border-2 border-gray-300 rounded-lg p-3 text-gray-900 focus:ring-2 focus:ring-[#FF2D2D] focus:border-[#FF2D2D] transition" required>
-                        <option value="">Select car size</option>
+                        <option value="">Select car type</option>
                         <option value="HatchBack" {{ old('size_of_the_car') == 'HatchBack' ? 'selected' : '' }}>HatchBack</option>
                         <option value="Sedan" {{ old('size_of_the_car') == 'Sedan' ? 'selected' : '' }}>Sedan</option>
                         <option value="SUV" {{ old('size_of_the_car') == 'SUV' ? 'selected' : '' }}>SUV</option>
@@ -103,8 +110,10 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                     <div>
                         <label for="date_of_booking" class="block text-sm font-bold text-[#182235] mb-2">Date</label>
-                        <input type="date" name="date_of_booking" id="date_of_booking" value="{{ old('date_of_booking') }}"
-                            class="w-full border-2 border-gray-300 rounded-lg p-3 text-gray-900 focus:ring-2 focus:ring-[#FF2D2D] focus:border-[#FF2D2D] transition" required>
+<input type="date" name="date_of_booking" id="date_of_booking"
+    value="{{ $selectedDate }}"
+    min="{{ $minDate }}"
+    class="w-full border-2 border-gray-300 rounded-lg p-3 text-gray-900 focus:ring-2 focus:ring-[#FF2D2D] focus:border-[#FF2D2D] transition" required>
                         @error('date_of_booking')
                             <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                         @enderror
@@ -112,8 +121,10 @@
 
                     <div>
                         <label for="time_of_booking" class="block text-sm font-bold text-[#182235] mb-2">Time</label>
-                        <input type="time" name="time_of_booking" id="time_of_booking" value="{{ old('time_of_booking') }}"
-                            class="w-full border-2 border-gray-300 rounded-lg p-3 text-gray-900 focus:ring-2 focus:ring-[#FF2D2D] focus:border-[#FF2D2D] transition" required>
+<input type="time" name="time_of_booking" id="time_of_booking"
+    value="{{ old('time_of_booking') }}"
+    min="{{ $minTime }}"
+    class="w-full border-2 border-gray-300 rounded-lg p-3 text-gray-900 focus:ring-2 focus:ring-[#FF2D2D] focus:border-[#FF2D2D] transition" required>
                         @error('time_of_booking')
                             <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                         @enderror
