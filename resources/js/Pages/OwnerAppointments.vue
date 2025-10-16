@@ -31,7 +31,7 @@
 
         <div class="text-center sm:flex-1">
           <h1 class="text-2xl sm:text-4xl font-extrabold text-[#002B5C] mb-1 sm:mb-2">
-            Customer Appointments
+            Customer Appointments:
           </h1>
           <p class="text-gray-500 text-sm sm:text-base">
             Manage and monitor all customer bookings efficiently
