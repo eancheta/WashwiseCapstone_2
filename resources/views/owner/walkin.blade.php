@@ -1,13 +1,6 @@
 @extends('layouts.app')
 
 @section('content')
-@php
-$today = date('Y-m-d');        // current date
-$now = date('H:i');            // current time
-$selectedDate = old('date_of_booking', $today);
-$minDate = $today;             // minimum date = today
-$minTime = $selectedDate === $today ? $now : '00:00'; // if today, prevent past times
-@endphp
 <style>
     /* Hide navbar/header only, not our custom button */
     header, nav.site-navbar {
@@ -17,7 +10,7 @@ $minTime = $selectedDate === $today ? $now : '00:00'; // if today, prevent past 
 
 <div class="min-h-screen relative flex items-center justify-center bg-[#F8FAFC] py-10 px-4">
 
-    <!-- 🔙 Return Button (always visible) -->
+    <!-- 🔙 Return Button -->
     <div class="absolute top-6 left-6 z-50">
         <a href="{{ route('carwashownerdashboard') }}"
            class="flex items-center gap-2 px-4 py-2 bg-[#002B5C] text-white rounded-lg text-sm sm:text-base font-semibold shadow-md hover:bg-[#FF2D2D] transition-all duration-200">
@@ -70,27 +63,27 @@ $minTime = $selectedDate === $today ? $now : '00:00'; // if today, prevent past 
                 </div>
 
                 <!-- Contact Number -->
-<div>
-    <label for="contact_no" class="block text-sm font-bold text-[#182235] mb-2">Contact Number</label>
-    <input
-        type="text"
-        name="contact_no"
-        id="contact_no"
-        value="{{ old('contact_no') }}"
-        class="w-full border-2 border-gray-300 rounded-lg p-3 text-gray-900 focus:ring-2 focus:ring-[#FF2D2D] focus:border-[#FF2D2D] transition"
-        placeholder="e.g. 09XXXXXXXXX"
-        required
-        maxlength="11"
-        oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 11)"
-    >
-    @error('contact_no')
-        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-    @enderror
-</div>
+                <div>
+                    <label for="contact_no" class="block text-sm font-bold text-[#182235] mb-2">Contact Number</label>
+                    <input
+                        type="text"
+                        name="contact_no"
+                        id="contact_no"
+                        value="{{ old('contact_no') }}"
+                        class="w-full border-2 border-gray-300 rounded-lg p-3 text-gray-900 focus:ring-2 focus:ring-[#FF2D2D] focus:border-[#FF2D2D] transition"
+                        placeholder="e.g. 09XXXXXXXXX"
+                        required
+                        maxlength="11"
+                        oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 11)"
+                    >
+                    @error('contact_no')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
 
                 <!-- Car Size -->
                 <div>
-                    <label for="size_of_the_car" class="block text-sm font-bold text-[#182235] mb-2">Car Size</label>
+                    <label for="size_of_the_car" class="block text-sm font-bold text-[#182235] mb-2">Car type</label>
                     <select name="size_of_the_car" id="size_of_the_car"
                         class="w-full border-2 border-gray-300 rounded-lg p-3 text-gray-900 focus:ring-2 focus:ring-[#FF2D2D] focus:border-[#FF2D2D] transition" required>
                         <option value="">Select car type</option>
@@ -108,23 +101,21 @@ $minTime = $selectedDate === $today ? $now : '00:00'; // if today, prevent past 
 
                 <!-- Date & Time -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    <!-- Date -->
                     <div>
                         <label for="date_of_booking" class="block text-sm font-bold text-[#182235] mb-2">Date</label>
-<input type="date" name="date_of_booking" id="date_of_booking"
-    value="{{ $selectedDate }}"
-    min="{{ $minDate }}"
-    class="w-full border-2 border-gray-300 rounded-lg p-3 text-gray-900 focus:ring-2 focus:ring-[#FF2D2D] focus:border-[#FF2D2D] transition" required>
+                        <input type="date" name="date_of_booking" id="date_of_booking" value="{{ old('date_of_booking') }}"
+                            class="w-full border-2 border-gray-300 rounded-lg p-3 text-gray-900 focus:ring-2 focus:ring-[#FF2D2D] focus:border-[#FF2D2D] transition" required>
                         @error('date_of_booking')
                             <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                         @enderror
                     </div>
 
+                    <!-- Time -->
                     <div>
                         <label for="time_of_booking" class="block text-sm font-bold text-[#182235] mb-2">Time</label>
-<input type="time" name="time_of_booking" id="time_of_booking"
-    value="{{ old('time_of_booking') }}"
-    min="{{ $minTime }}"
-    class="w-full border-2 border-gray-300 rounded-lg p-3 text-gray-900 focus:ring-2 focus:ring-[#FF2D2D] focus:border-[#FF2D2D] transition" required>
+                        <input type="time" name="time_of_booking" id="time_of_booking" value="{{ old('time_of_booking') }}"
+                            class="w-full border-2 border-gray-300 rounded-lg p-3 text-gray-900 focus:ring-2 focus:ring-[#FF2D2D] focus:border-[#FF2D2D] transition" required>
                         @error('time_of_booking')
                             <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                         @enderror
@@ -152,4 +143,44 @@ $minTime = $selectedDate === $today ? $now : '00:00'; // if today, prevent past 
         </div>
     </div>
 </div>
+
+<script>
+    const dateInput = document.getElementById('date_of_booking');
+    const timeInput = document.getElementById('time_of_booking');
+
+    function setMinDate() {
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        dateInput.min = `${yyyy}-${mm}-${dd}`;
+    }
+
+    function updateMinTime() {
+        const today = new Date();
+        const selectedDate = new Date(dateInput.value);
+        if (
+            selectedDate.getFullYear() === today.getFullYear() &&
+            selectedDate.getMonth() === today.getMonth() &&
+            selectedDate.getDate() === today.getDate()
+        ) {
+            // Today → cannot pick past time
+            const hours = String(today.getHours()).padStart(2, '0');
+            const minutes = String(today.getMinutes()).padStart(2, '0');
+            timeInput.min = `${hours}:${minutes}`;
+        } else {
+            // Future date → allow full day
+            timeInput.min = '00:00';
+        }
+    }
+
+    // Initialize on load
+    window.addEventListener('load', () => {
+        setMinDate();
+        updateMinTime();
+    });
+
+    // Update min time whenever date changes
+    dateInput.addEventListener('change', updateMinTime);
+</script>
 @endsection
