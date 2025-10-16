@@ -134,17 +134,18 @@ const minDate = computed(() => {
 });
 
 const minTime = computed(() => {
-    if (!form.date_of_booking) return '00:00';
-    const selected = new Date(form.date_of_booking);
-    const now = new Date();
-    if (
-        selected.getFullYear() === now.getFullYear() &&
-        selected.getMonth() === now.getMonth() &&
-        selected.getDate() === now.getDate()
-    ) {
-        return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-    }
-    return '00:00';
+  if (!form.date_of_booking) return '';
+  const today = new Date();
+  const selectedDate = new Date(form.date_of_booking);
+  if (
+    today.toDateString() === selectedDate.toDateString()
+  ) {
+    // Format current hours and minutes as HH:MM
+    const hours = today.getHours().toString().padStart(2, '0');
+    const minutes = today.getMinutes().toString().padStart(2, '0');
+    return `${hours}:${minutes}`;
+  }
+  return '00:00';
 });
 </script>
 
