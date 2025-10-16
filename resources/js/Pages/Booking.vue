@@ -2,16 +2,29 @@
 import { useForm, router } from '@inertiajs/vue3';
 import { watch, ref, computed } from 'vue';
 import axios from 'axios';
+const showQrPreview = ref(false);
+const qrPreviewSrc = ref('');
+
+function openQr(src: string) {
+  if (!src) return;
+  qrPreviewSrc.value = src;
+  showQrPreview.value = true;
+}
 
 interface Shop {
-    id: number;
-    name: string;
-    address: string;
-    district?: string;
-    logo?: string;
-    description?: string;
-    services_offered?: string;
-    qr_code?: string;
+  id: number;
+  name: string;
+  address: string;
+  district?: string;
+  description?: string;
+  services_offered?: string;
+  logo?: string;
+  status?: string;
+  qr_code?: string;
+  qr_code2?: string;
+  qr_code3?: string;
+  qr_code4?: string;
+  qr_code5?: string;
 }
 
 interface Booking {
@@ -112,7 +125,6 @@ const submit = () => {
 
 const backendBaseUrl = window.location.origin;
 function getLogoSrc(shop: Shop) { return shop.logo?.startsWith('http') ? shop.logo : `/storage/${shop.logo}` || '/images/default-carwash.png'; }
-function getQrCodeSrc(shop: Shop) { return shop.qr_code?.startsWith('http') ? shop.qr_code : `/storage/${shop.qr_code}` || ''; }
 function handleImgError(e: Event) { const target = e.target as HTMLImageElement | null; if (target) target.src = `${backendBaseUrl}/images/default-carwash.png`; }
 
 watch(() => form.date_of_booking, fetchBookings);
@@ -161,6 +173,23 @@ watch(
 </script>
 
 <template>
+    <!-- QR Image Preview Modal -->
+<div
+  v-if="showQrPreview"
+  class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50"
+>
+  <img
+    :src="qrPreviewSrc"
+    alt="QR Code Preview"
+    class="max-h-[80vh] rounded-xl shadow-2xl border-4 border-white"
+  />
+  <button
+    @click="showQrPreview = false"
+    class="absolute top-6 right-8 text-white text-3xl font-bold"
+  >
+    ✕
+  </button>
+</div>
   <div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 flex justify-center">
     <div v-if="shop" class="w-full max-w-3xl bg-white rounded-2xl shadow-lg p-6 sm:p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
 
@@ -238,9 +267,73 @@ watch(
         <p><span class="font-semibold">Address:</span> {{ shop.address }}</p>
         <p><span class="font-semibold">District:</span> {{ shop.district || 'Not specified' }}</p>
         <p><span class="font-semibold">Description:</span> {{ shop.description || 'No description' }}</p>
-        <div v-if="shop.qr_code" class="flex justify-center">
-          <img :src="getQrCodeSrc(shop)" alt="QR Code" class="h-20 w-20 object-contain" @error="handleImgError"/>
-        </div>
+
+<div v-if="shop && (shop.qr_code || shop.qr_code2 || shop.qr_code3 || shop.qr_code4 || shop.qr_code5)" class="mt-4">
+  <h3 class="text-sm font-semibold text-gray-700 mb-2">QR Codes</h3>
+  <div class="overflow-x-auto">
+    <table class="min-w-full border rounded">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-3 py-2 text-center">QR Code 1</th>
+          <th class="px-3 py-2 text-center">QR Code 2</th>
+          <th class="px-3 py-2 text-center">QR Code 3</th>
+          <th class="px-3 py-2 text-center">QR Code 4</th>
+          <th class="px-3 py-2 text-center">QR Code 5</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="px-3 py-3 text-center">
+            <img
+              v-if="shop.qr_code"
+              :src="shop.qr_code"
+              alt="QR Code 1"
+              class="h-12 w-12 object-cover rounded border mx-auto cursor-pointer hover:scale-105 transition"
+              @click="openQr(shop.qr_code)"
+            />
+          </td>
+          <td class="px-3 py-3 text-center">
+            <img
+              v-if="shop.qr_code2"
+              :src="shop.qr_code2"
+              alt="QR Code 2"
+              class="h-12 w-12 object-cover rounded border mx-auto cursor-pointer hover:scale-105 transition"
+              @click="openQr(shop.qr_code2)"
+            />
+          </td>
+          <td class="px-3 py-3 text-center">
+            <img
+              v-if="shop.qr_code3"
+              :src="shop.qr_code3"
+              alt="QR Code 3"
+              class="h-12 w-12 object-cover rounded border mx-auto cursor-pointer hover:scale-105 transition"
+              @click="openQr(shop.qr_code3)"
+            />
+          </td>
+          <td class="px-3 py-3 text-center">
+            <img
+              v-if="shop.qr_code4"
+              :src="shop.qr_code4"
+              alt="QR Code 4"
+              class="h-12 w-12 object-cover rounded border mx-auto cursor-pointer hover:scale-105 transition"
+              @click="openQr(shop.qr_code4)"
+            />
+          </td>
+          <td class="px-3 py-3 text-center">
+            <img
+              v-if="shop.qr_code5"
+              :src="shop.qr_code5"
+              alt="QR Code 5"
+              class="h-12 w-12 object-cover rounded border mx-auto cursor-pointer hover:scale-105 transition"
+              @click="openQr(shop.qr_code5)"
+            />
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
       </div>
     </div>
     <div v-else class="text-red-600 font-medium text-center mt-10">Shop not found.</div>
