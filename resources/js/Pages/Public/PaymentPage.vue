@@ -30,37 +30,37 @@
         </div>
 
         <div>
-          <h3 class="text-sm font-semibold text-gray-700">Name</h3>
+          <h3 class="text-sm font-semibold text-gray-700">Name:</h3>
           <p class="text-base text-[#182235] font-medium">{{ booking.name }}</p>
         </div>
         <div>
-          <h3 class="text-sm font-semibold text-gray-700">Email</h3>
+          <h3 class="text-sm font-semibold text-gray-700">Email:</h3>
           <p class="text-base text-[#182235] font-medium">{{ booking.email }}</p>
         </div>
         <div>
-          <h3 class="text-sm font-semibold text-gray-700">Size</h3>
+          <h3 class="text-sm font-semibold text-gray-700">Size:</h3>
           <p class="text-base text-[#182235] font-medium">{{ booking.size_of_the_car }}</p>
         </div>
         <div>
-          <h3 class="text-sm font-semibold text-gray-700">Contact</h3>
+          <h3 class="text-sm font-semibold text-gray-700">Contact:</h3>
           <p class="text-base text-[#182235] font-medium">{{ booking.contact_no }}</p>
         </div>
         <div class="flex gap-4">
           <div>
-            <h3 class="text-sm font-semibold text-gray-700">Date</h3>
+            <h3 class="text-sm font-semibold text-gray-700">Date:</h3>
             <p class="text-base text-[#182235] font-medium">{{ booking.date_of_booking }}</p>
           </div>
           <div>
-            <h3 class="text-sm font-semibold text-gray-700">Time</h3>
+            <h3 class="text-sm font-semibold text-gray-700">Time:</h3>
             <p class="text-base text-[#182235] font-medium">{{ booking.time_of_booking }}</p>
           </div>
         </div>
         <div>
-          <h3 class="text-sm font-semibold text-gray-700">Slot Number</h3>
+          <h3 class="text-sm font-semibold text-gray-700">Slot Number:</h3>
           <p class="text-base text-[#182235] font-medium">{{ booking.slot_number }}</p>
         </div>
         <div>
-          <h3 class="text-sm font-semibold text-gray-700">Payment Amount</h3>
+          <h3 class="text-sm font-semibold text-gray-700">Payment Amount:</h3>
           <p class="text-base text-[#FF2D2D] font-bold">PHP 50.00</p>
         </div>
       </div>
