@@ -45,6 +45,10 @@ public function update(Request $request)
         'services_offered' => 'nullable|string',
         'logo' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
         'qr_code' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
+        'qr_code2' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
+        'qr_code3' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
+        'qr_code4' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
+        'qr_code5' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
     ]);
 
     // Handle Cloudinary uploads
@@ -57,6 +61,7 @@ public function update(Request $request)
         'url' => ['secure' => true],
     ]);
 
+    // Logo
     if ($request->hasFile('logo')) {
         $file = $request->file('logo');
         $response = $cloudinary->uploadApi()->upload($file->getRealPath(), [
@@ -67,6 +72,7 @@ public function update(Request $request)
         $validated['logo'] = $response['secure_url'];
     }
 
+    // QR Code 1
     if ($request->hasFile('qr_code')) {
         $file = $request->file('qr_code');
         $response = $cloudinary->uploadApi()->upload($file->getRealPath(), [
@@ -77,8 +83,51 @@ public function update(Request $request)
         $validated['qr_code'] = $response['secure_url'];
     }
 
-    $shop->update($validated);
+    // QR Code 2
+    if ($request->hasFile('qr_code2')) {
+        $file = $request->file('qr_code2');
+        $response = $cloudinary->uploadApi()->upload($file->getRealPath(), [
+            'folder' => 'carwash_qrcodes',
+            'resource_type' => 'image',
+            'overwrite' => true,
+        ]);
+        $validated['qr_code2'] = $response['secure_url'];
+    }
 
+    // QR Code 3
+    if ($request->hasFile('qr_code3')) {
+        $file = $request->file('qr_code3');
+        $response = $cloudinary->uploadApi()->upload($file->getRealPath(), [
+            'folder' => 'carwash_qrcodes',
+            'resource_type' => 'image',
+            'overwrite' => true,
+        ]);
+        $validated['qr_code3'] = $response['secure_url'];
+    }
+
+    // QR Code 4
+    if ($request->hasFile('qr_code4')) {
+        $file = $request->file('qr_code4');
+        $response = $cloudinary->uploadApi()->upload($file->getRealPath(), [
+            'folder' => 'carwash_qrcodes',
+            'resource_type' => 'image',
+            'overwrite' => true,
+        ]);
+        $validated['qr_code4'] = $response['secure_url'];
+    }
+
+    // QR Code 5
+    if ($request->hasFile('qr_code5')) {
+        $file = $request->file('qr_code5');
+        $response = $cloudinary->uploadApi()->upload($file->getRealPath(), [
+            'folder' => 'carwash_qrcodes',
+            'resource_type' => 'image',
+            'overwrite' => true,
+        ]);
+        $validated['qr_code5'] = $response['secure_url'];
+    }
+
+    $shop->update($validated);
 
     return view('owner.edit-shop', [
         'shop' => $shop,

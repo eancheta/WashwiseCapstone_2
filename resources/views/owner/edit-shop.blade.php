@@ -70,16 +70,60 @@
         <textarea id="services_offered" name="services_offered" class="w-full border rounded-lg px-4 py-2" rows="3" required>{{ old('services_offered', $shop->services_offered) }}</textarea>
       </div>
 
-      {{-- QR Code --}}
-      <div class="mb-6">
-        <label for="qr_code" class="block text-sm font-semibold text-gray-700 mb-2">QR Code</label>
-        <div class="flex items-center space-x-4">
-          <input type="file" id="qr_code" name="qr_code" class="block w-full text-sm text-gray-700 border rounded-lg cursor-pointer">
-          @if ($shop->qr_code)
-            <img src="{{ $shop->qr_code }}" alt="QR Code" class="h-12 w-12 rounded-lg object-cover border">
-          @endif
-        </div>
-      </div>
+            {{-- QR Code 1 --}}
+            <div class="mb-4">
+                <label for="qr_code" class="block text-sm font-semibold text-gray-700 mb-2">QR Code 1</label>
+                <div class="flex items-center space-x-4">
+                    <input type="file" id="qr_code" name="qr_code" class="block w-full text-sm text-gray-700 border rounded-lg cursor-pointer">
+                    @if ($shop->qr_code)
+                        <img src="{{ $shop->qr_code }}" alt="QR Code" class="h-12 w-12 rounded-lg object-cover border">
+                    @endif
+                </div>
+            </div>
+
+            {{-- QR Code 2 --}}
+            <div class="mb-4">
+                <label for="qr_code2" class="block text-sm font-semibold text-gray-700 mb-2">QR Code 2</label>
+                <div class="flex items-center space-x-4">
+                    <input type="file" id="qr_code2" name="qr_code2" class="block w-full text-sm text-gray-700 border rounded-lg cursor-pointer">
+                    @if ($shop->qr_code2)
+                        <img src="{{ $shop->qr_code2 }}" alt="QR Code 2" class="h-12 w-12 rounded-lg object-cover border">
+                    @endif
+                </div>
+            </div>
+
+            {{-- QR Code 3 --}}
+            <div class="mb-4">
+                <label for="qr_code3" class="block text-sm font-semibold text-gray-700 mb-2">QR Code 3</label>
+                <div class="flex items-center space-x-4">
+                    <input type="file" id="qr_code3" name="qr_code3" class="block w-full text-sm text-gray-700 border rounded-lg cursor-pointer">
+                    @if ($shop->qr_code3)
+                        <img src="{{ $shop->qr_code3 }}" alt="QR Code 3" class="h-12 w-12 rounded-lg object-cover border">
+                    @endif
+                </div>
+            </div>
+
+            {{-- QR Code 4 --}}
+            <div class="mb-4">
+                <label for="qr_code4" class="block text-sm font-semibold text-gray-700 mb-2">QR Code 4</label>
+                <div class="flex items-center space-x-4">
+                    <input type="file" id="qr_code4" name="qr_code4" class="block w-full text-sm text-gray-700 border rounded-lg cursor-pointer">
+                    @if ($shop->qr_code4)
+                        <img src="{{ $shop->qr_code4 }}" alt="QR Code 4" class="h-12 w-12 rounded-lg object-cover border">
+                    @endif
+                </div>
+            </div>
+
+            {{-- QR Code 5 --}}
+            <div class="mb-6">
+                <label for="qr_code5" class="block text-sm font-semibold text-gray-700 mb-2">QR Code 5</label>
+                <div class="flex items-center space-x-4">
+                    <input type="file" id="qr_code5" name="qr_code5" class="block w-full text-sm text-gray-700 border rounded-lg cursor-pointer">
+                    @if ($shop->qr_code5)
+                        <img src="{{ $shop->qr_code5 }}" alt="QR Code 5" class="h-12 w-12 rounded-lg object-cover border">
+                    @endif
+                </div>
+            </div>
 
       {{-- Hidden fallback submit for non-JS users --}}
       <noscript>
