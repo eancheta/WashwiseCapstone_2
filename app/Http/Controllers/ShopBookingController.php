@@ -144,10 +144,13 @@ private function checkForOverlap(string $table, string $date, string $time, int 
                 'regex:/^([01]\d|2[0-3]):([0-5]\d)$|^(0?[1-9]|1[0-2]):([0-5]\d)\s?(AM|PM)$/i'
             ],
             'slot_number' => 'required|integer|min:1|max:4',
+            'services_offered' => 'nullable|string|max:1000',
         ]);
 
         // Normalize time to 24h format
         $data['time_of_booking'] = Carbon::parse($data['time_of_booking'])->format('H:i');
+
+        $data['services_offered'] = $request->input('services_offered', null);
 
         $shop = $this->getShopWithCloudinaryImages($shopId);
 
@@ -239,21 +242,22 @@ private function checkForOverlap(string $table, string $date, string $time, int 
                 'updated_at' => $now,
             ]);
         } else {
-            DB::table($table)->insert([
-                'user_id' => Auth::id(),
-                'name' => $data['name'],
-                'email' => $data['email'],
-                'size_of_the_car' => $data['size_of_the_car'],
-                'contact_no' => $data['contact_no'],
-                'time_of_booking' => $data['time_of_booking'],
-                'date_of_booking' => $data['date_of_booking'],
-                'slot_number' => $data['slot_number'],
-                'payment_amount' => $data['payment_amount'],
-                'payment_proof' => $paymentProofUrl,
-                'status' => 'pending',
-                'created_at' => $now,
-                'updated_at' => $now,
-            ]);
+DB::table($table)->insert([
+    'user_id' => Auth::id(),
+    'name' => $data['name'],
+    'email' => $data['email'],
+    'size_of_the_car' => $data['size_of_the_car'],
+    'contact_no' => $data['contact_no'],
+    'time_of_booking' => $data['time_of_booking'],
+    'date_of_booking' => $data['date_of_booking'],
+    'slot_number' => $data['slot_number'],
+    'services_offered' => $data['services_offered'] ?? null,
+    'payment_amount' => $data['payment_amount'],
+    'payment_proof' => $paymentProofUrl,
+    'status' => 'pending',
+    'created_at' => $now,
+    'updated_at' => $now,
+]);
         }
 
         return redirect()->route('dashboard')
