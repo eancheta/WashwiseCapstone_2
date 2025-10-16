@@ -193,19 +193,61 @@ $validated = $request->validate([
             $shopData['logo'] = $response['secure_url'];
         }
 
-for ($i = 1; $i <= 5; $i++) {
-    $field = 'qr_code' . $i;
-
-    if ($request->hasFile($field)) {
-        $file = $request->file($field);
-        $response = $cloudinary->uploadApi()->upload($file->getRealPath(), [
-            'folder' => 'carwash_qrcodes',
-            'resource_type' => 'image',
-            'overwrite' => true,
-        ]);
-        $shopData[$field] = $response['secure_url'];
-    }
+// ✅ QR Code 1
+if ($request->hasFile('qr_code1')) {
+    $file = $request->file('qr_code1');
+    $response = $cloudinary->uploadApi()->upload($file->getRealPath(), [
+        'folder' => 'carwash_qrcodes',
+        'resource_type' => 'image',
+        'overwrite' => true,
+    ]);
+    $shopData['qr_code1'] = $response['secure_url'];
 }
+
+// ✅ QR Code 2
+if ($request->hasFile('qr_code2')) {
+    $file = $request->file('qr_code2');
+    $response = $cloudinary->uploadApi()->upload($file->getRealPath(), [
+        'folder' => 'carwash_qrcodes',
+        'resource_type' => 'image',
+        'overwrite' => true,
+    ]);
+    $shopData['qr_code2'] = $response['secure_url'];
+}
+
+// ✅ QR Code 3
+if ($request->hasFile('qr_code3')) {
+    $file = $request->file('qr_code3');
+    $response = $cloudinary->uploadApi()->upload($file->getRealPath(), [
+        'folder' => 'carwash_qrcodes',
+        'resource_type' => 'image',
+        'overwrite' => true,
+    ]);
+    $shopData['qr_code3'] = $response['secure_url'];
+}
+
+// ✅ QR Code 4
+if ($request->hasFile('qr_code4')) {
+    $file = $request->file('qr_code4');
+    $response = $cloudinary->uploadApi()->upload($file->getRealPath(), [
+        'folder' => 'carwash_qrcodes',
+        'resource_type' => 'image',
+        'overwrite' => true,
+    ]);
+    $shopData['qr_code4'] = $response['secure_url'];
+}
+
+// ✅ QR Code 5
+if ($request->hasFile('qr_code5')) {
+    $file = $request->file('qr_code5');
+    $response = $cloudinary->uploadApi()->upload($file->getRealPath(), [
+        'folder' => 'carwash_qrcodes',
+        'resource_type' => 'image',
+        'overwrite' => true,
+    ]);
+    $shopData['qr_code5'] = $response['secure_url'];
+}
+
 
         $shop = CarWashShop::create($shopData);
 
