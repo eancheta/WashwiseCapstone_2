@@ -194,15 +194,15 @@ $validated = $request->validate([
         }
 
 // ✅ QR Code 1
-if ($request->hasFile('qr_code')) {
-    $file = $request->file('qr_code');
-    $response = $cloudinary->uploadApi()->upload($file->getRealPath(), [
-        'folder' => 'carwash_qrcodes',
-        'resource_type' => 'image',
-        'overwrite' => true,
-    ]);
-    $shopData['qr_code'] = $response['secure_url'];
-}
+        if ($request->hasFile('qr_code')) {
+            $file = $request->file('qr_code');
+            $response = $cloudinary->uploadApi()->upload($file->getRealPath(), [
+                'folder' => 'carwash_qrcodes',
+                'resource_type' => 'image',
+                'overwrite' => true,
+            ]);
+            $shopData['qr_code'] = $response['secure_url'];
+        }
 
 // ✅ QR Code 2
 if ($request->hasFile('qr_code2')) {
