@@ -80,24 +80,100 @@
         </div>
 
 <!-- QR Codes -->
-        <div>
-          <label class="block text-sm font-semibold text-gray-700">QR Codes (up to 5)</label>
+<!-- ✅ QR Code 1 -->
+<div class="mt-4">
+  <label class="block text-sm font-semibold text-gray-700">QR Code 1</label>
+  <input
+    type="file"
+    id="qr_code1"
+    name="qr_code1"
+    accept="image/*"
+    @change="(e) => handleQrCodeChange(e, 1)"
+    class="mt-1 w-full text-gray-700"
+  />
+  <img
+    v-if="qrPreviews[0]"
+    :src="qrPreviews[0]"
+    alt="QR 1 Preview"
+    class="h-16 w-16 object-contain border border-gray-300 rounded-lg mt-2"
+  />
+</div>
 
-          <template v-for="i in 5" :key="i">
-            <input type="file"
-              :id="`qr_code${i}`"
-              :name="`qr_code${i}`"
-              @change="(e) => handleQrCodeChange(e, i)"
-              accept="image/*"
-              class="w-full text-gray-700 mt-1" />
-          </template>
+<!-- ✅ QR Code 2 -->
+<div class="mt-4">
+  <label class="block text-sm font-semibold text-gray-700">QR Code 2</label>
+  <input
+    type="file"
+    id="qr_code2"
+    name="qr_code2"
+    accept="image/*"
+    @change="(e) => handleQrCodeChange(e, 2)"
+    class="mt-1 w-full text-gray-700"
+  />
+  <img
+    v-if="qrPreviews[1]"
+    :src="qrPreviews[1]"
+    alt="QR 2 Preview"
+    class="h-16 w-16 object-contain border border-gray-300 rounded-lg mt-2"
+  />
+</div>
 
-          <div v-if="form.errors.qr_code1" class="text-red-600 text-sm mt-1">{{ form.errors.qr_code1 }}</div>
-          <div v-if="form.errors.qr_code2" class="text-red-600 text-sm mt-1">{{ form.errors.qr_code2 }}</div>
-          <div v-if="form.errors.qr_code3" class="text-red-600 text-sm mt-1">{{ form.errors.qr_code3 }}</div>
-          <div v-if="form.errors.qr_code4" class="text-red-600 text-sm mt-1">{{ form.errors.qr_code4 }}</div>
-          <div v-if="form.errors.qr_code5" class="text-red-600 text-sm mt-1">{{ form.errors.qr_code5 }}</div>
-        </div>
+<!-- ✅ QR Code 3 -->
+<div class="mt-4">
+  <label class="block text-sm font-semibold text-gray-700">QR Code 3</label>
+  <input
+    type="file"
+    id="qr_code3"
+    name="qr_code3"
+    accept="image/*"
+    @change="(e) => handleQrCodeChange(e, 3)"
+    class="mt-1 w-full text-gray-700"
+  />
+  <img
+    v-if="qrPreviews[2]"
+    :src="qrPreviews[2]"
+    alt="QR 3 Preview"
+    class="h-16 w-16 object-contain border border-gray-300 rounded-lg mt-2"
+  />
+</div>
+
+<!-- ✅ QR Code 4 -->
+<div class="mt-4">
+  <label class="block text-sm font-semibold text-gray-700">QR Code 4</label>
+  <input
+    type="file"
+    id="qr_code4"
+    name="qr_code4"
+    accept="image/*"
+    @change="(e) => handleQrCodeChange(e, 4)"
+    class="mt-1 w-full text-gray-700"
+  />
+  <img
+    v-if="qrPreviews[3]"
+    :src="qrPreviews[3]"
+    alt="QR 4 Preview"
+    class="h-16 w-16 object-contain border border-gray-300 rounded-lg mt-2"
+  />
+</div>
+
+<!-- ✅ QR Code 5 -->
+<div class="mt-4">
+  <label class="block text-sm font-semibold text-gray-700">QR Code 5</label>
+  <input
+    type="file"
+    id="qr_code5"
+    name="qr_code5"
+    accept="image/*"
+    @change="(e) => handleQrCodeChange(e, 5)"
+    class="mt-1 w-full text-gray-700"
+  />
+  <img
+    v-if="qrPreviews[4]"
+    :src="qrPreviews[4]"
+    alt="QR 5 Preview"
+    class="h-16 w-16 object-contain border border-gray-300 rounded-lg mt-2"
+  />
+</div>
 
 
         <!-- Submit Button -->
@@ -115,6 +191,9 @@
 <script setup lang="ts">
 import { useForm } from '@inertiajs/vue3'
 import { ref } from 'vue'
+
+const qrPreviews = ref<(string | null)[]>([null, null, null, null, null])
+
 
 defineProps<{ pageTitle: string }>()
 
@@ -164,9 +243,14 @@ const handleLogoChange = (event: Event) => {
 const handleQrCodeChange = (event: Event, index: number) => {
   const target = event.target as HTMLInputElement
   if (target.files?.length) {
+    const file = target.files[0]
     const key = `qr_code${index}` as keyof ShopForm
-    // Assign safely
-    (form as unknown as Record<string, File | null>)[key] = target.files[0]
+    ;(form as unknown as Record<string, File | null>)[key] = file
+    qrPreviews.value[index - 1] = URL.createObjectURL(file)
+  } else {
+    const key = `qr_code${index}` as keyof ShopForm
+    ;(form as unknown as Record<string, File | null>)[key] = null
+    qrPreviews.value[index - 1] = null
   }
 }
 

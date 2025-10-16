@@ -152,6 +152,7 @@ function limitContactLength(event: Event) {
 
 <div>
   <label class="block text-sm font-semibold text-gray-700">Services Requested</label>
+  <p><span class="font-semibold">Services Offered:</span> {{ shop.services_offered || 'No services listed' }}</p>
   <textarea
     v-model="form.services_offered"
     class="w-full p-2 border rounded focus:ring-2 focus:ring-[#002B5C]"
@@ -194,7 +195,6 @@ function limitContactLength(event: Event) {
         <p><span class="font-semibold">Address:</span> {{ shop.address }}</p>
         <p><span class="font-semibold">District:</span> {{ shop.district || 'Not specified' }}</p>
         <p><span class="font-semibold">Description:</span> {{ shop.description || 'No description' }}</p>
-        <p><span class="font-semibold">Services Offered:</span> {{ shop.services_offered || 'No services listed' }}</p>
         <div v-if="shop.qr_code" class="flex justify-center">
           <img :src="getQrCodeSrc(shop)" alt="QR Code" class="h-20 w-20 object-contain" @error="handleImgError"/>
         </div>
