@@ -151,15 +151,19 @@ public static function ensureBookingTableExists($shopId)
             return redirect()->route('owner.login.show');
         }
 
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'address' => 'required|string|max:255',
-            'district' => 'nullable|string|max:100',
-            'description' => 'nullable|string',
-            'services_offered' => 'nullable|string',
-            'logo' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
-            'qr_code' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
-        ]);
+$validated = $request->validate([
+    'name' => 'required|string|max:255',
+    'address' => 'required|string|max:255',
+    'district' => 'nullable|string|max:100',
+    'description' => 'nullable|string',
+    'services_offered' => 'nullable|string',
+    'logo' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
+    'qr_code1' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
+    'qr_code2' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
+    'qr_code3' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
+    'qr_code4' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
+    'qr_code5' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
+]);
 
         $shopData = [
             'owner_id' => $ownerId,
@@ -189,15 +193,19 @@ public static function ensureBookingTableExists($shopId)
             $shopData['logo'] = $response['secure_url'];
         }
 
-        if ($request->hasFile('qr_code')) {
-            $file = $request->file('qr_code');
-            $response = $cloudinary->uploadApi()->upload($file->getRealPath(), [
-                'folder' => 'carwash_qrcodes',
-                'resource_type' => 'image',
-                'overwrite' => true,
-            ]);
-            $shopData['qr_code'] = $response['secure_url'];
-        }
+for ($i = 1; $i <= 5; $i++) {
+    $field = 'qr_code' . $i;
+
+    if ($request->hasFile($field)) {
+        $file = $request->file($field);
+        $response = $cloudinary->uploadApi()->upload($file->getRealPath(), [
+            'folder' => 'carwash_qrcodes',
+            'resource_type' => 'image',
+            'overwrite' => true,
+        ]);
+        $shopData[$field] = $response['secure_url'];
+    }
+}
 
         $shop = CarWashShop::create($shopData);
 

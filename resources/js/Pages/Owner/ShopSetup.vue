@@ -79,13 +79,26 @@
           <div v-if="form.errors.services_offered" class="text-red-600 text-sm mt-1">{{ form.errors.services_offered }}</div>
         </div>
 
-        <!-- QR Code -->
+<!-- QR Codes -->
         <div>
-          <label class="block text-sm font-semibold text-gray-700">QR Code</label>
-          <input type="file" @change="handleQrCodeChange" accept="image/*"
-            class="w-full text-gray-700 mt-1" />
-          <div v-if="form.errors.qr_code" class="text-red-600 text-sm mt-1">{{ form.errors.qr_code }}</div>
+          <label class="block text-sm font-semibold text-gray-700">QR Codes (up to 5)</label>
+
+          <template v-for="i in 5" :key="i">
+            <input type="file"
+              :id="`qr_code${i}`"
+              :name="`qr_code${i}`"
+              @change="(e) => handleQrCodeChange(e, i)"
+              accept="image/*"
+              class="w-full text-gray-700 mt-1" />
+          </template>
+
+          <div v-if="form.errors.qr_code1" class="text-red-600 text-sm mt-1">{{ form.errors.qr_code1 }}</div>
+          <div v-if="form.errors.qr_code2" class="text-red-600 text-sm mt-1">{{ form.errors.qr_code2 }}</div>
+          <div v-if="form.errors.qr_code3" class="text-red-600 text-sm mt-1">{{ form.errors.qr_code3 }}</div>
+          <div v-if="form.errors.qr_code4" class="text-red-600 text-sm mt-1">{{ form.errors.qr_code4 }}</div>
+          <div v-if="form.errors.qr_code5" class="text-red-600 text-sm mt-1">{{ form.errors.qr_code5 }}</div>
         </div>
+
 
         <!-- Submit Button -->
         <button type="submit"
@@ -105,24 +118,41 @@ import { ref } from 'vue'
 
 defineProps<{ pageTitle: string }>()
 
-const form = useForm({
+type ShopForm = {
+  name: string
+  address: string | null
+  district: number | null
+  logo: File | null
+  description: string
+  services_offered: string
+  qr_code1: File | null
+  qr_code2: File | null
+  qr_code3: File | null
+  qr_code4: File | null
+  qr_code5: File | null
+}
+
+const form = useForm<ShopForm>({
   name: '',
-  address: null as string | null,
-  district: null as number | null,
-  logo: null as File | null,
+  address: null,
+  district: null,
+  logo: null,
   description: '',
   services_offered: '',
-  qr_code: null as File | null,
+  qr_code1: null,
+  qr_code2: null,
+  qr_code3: null,
+  qr_code4: null,
+  qr_code5: null,
 })
 
-// Add ref for logo preview
+// Logo Preview
 const logoPreview = ref<string | null>(null)
 
 const handleLogoChange = (event: Event) => {
   const target = event.target as HTMLInputElement
-  if (target.files && target.files.length > 0) {
+  if (target.files?.length) {
     form.logo = target.files[0]
-    // Generate preview URL
     logoPreview.value = URL.createObjectURL(target.files[0])
   } else {
     form.logo = null
@@ -130,10 +160,13 @@ const handleLogoChange = (event: Event) => {
   }
 }
 
-const handleQrCodeChange = (event: Event) => {
+// ✅ Fix here
+const handleQrCodeChange = (event: Event, index: number) => {
   const target = event.target as HTMLInputElement
-  if (target.files && target.files.length > 0) {
-    form.qr_code = target.files[0]
+  if (target.files?.length) {
+    const key = `qr_code${index}` as keyof ShopForm
+    // Assign safely
+    (form as unknown as Record<string, File | null>)[key] = target.files[0]
   }
 }
 
@@ -141,7 +174,6 @@ const submit = () => {
   form.post(route('owner.shop.store'), {
     onSuccess: () => {
       console.log('Shop created successfully')
-      // Reset logo preview after successful submission
       logoPreview.value = null
     },
     onError: (errors) => console.error('Shop creation error:', errors),
