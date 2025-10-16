@@ -75,7 +75,7 @@
           <label class="block text-sm font-semibold text-gray-700">Services Offered</label>
           <textarea v-model="form.services_offered"
             class="w-full mt-1 p-3 border border-gray-300 rounded-xl text-gray-900 focus:ring-2 focus:ring-[#002B5C] focus:outline-none shadow-sm"
-            placeholder="List services"></textarea>
+            placeholder="List services:"></textarea>
           <div v-if="form.errors.services_offered" class="text-red-600 text-sm mt-1">{{ form.errors.services_offered }}</div>
         </div>
 
