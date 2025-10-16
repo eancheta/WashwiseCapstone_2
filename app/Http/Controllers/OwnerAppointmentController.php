@@ -37,21 +37,22 @@ public function index()
         return Inertia::render('OwnerAppointments', ['appointments' => []]);
     }
 
-    $appointments = DB::table($tableName)
-        ->select(
-            'id',
-            'name',
-            'size_of_the_car',
-            'contact_no',
-            'email',
-            'time_of_booking',
-            'date_of_booking',
-            'slot_number',
-            'created_at',
-            'status',
-            'payment_proof',
-            'payment_amount'
-        )
+$appointments = DB::table($tableName)
+    ->select(
+        'id',
+        'name',
+        'size_of_the_car',
+        'contact_no',
+        'email',
+        'time_of_booking',
+        'date_of_booking',
+        'slot_number',
+        'created_at',
+        'status',
+        'payment_proof',
+        'payment_amount',
+        'services_offered'
+    )
         ->orderBy('date_of_booking', 'desc')
         ->orderBy('time_of_booking', 'desc')
         ->get()

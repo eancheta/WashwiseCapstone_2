@@ -60,7 +60,7 @@
           <p class="text-base text-[#182235] font-medium">{{ booking.slot_number }}</p>
         </div>
         <div v-if="booking.services_offered">
-            <h3 class="text-sm font-semibold text-gray-700">Service Offered:</h3>
+            <h3 class="text-sm font-semibold text-gray-700">Service offered:</h3>
             <p class="text-base text-[#182235] font-medium">{{ booking.services_offered }}</p>
         </div>
         <div>
