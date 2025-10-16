@@ -59,6 +59,10 @@
           <h3 class="text-sm font-semibold text-gray-700">Slot Number:</h3>
           <p class="text-base text-[#182235] font-medium">{{ booking.slot_number }}</p>
         </div>
+        <div v-if="booking.services_offered">
+            <h3 class="text-sm font-semibold text-gray-700">Service Offered:</h3>
+            <p class="text-base text-[#182235] font-medium">{{ booking.services_offered }}</p>
+        </div>
         <div>
           <h3 class="text-sm font-semibold text-gray-700">Payment Amount:</h3>
           <p class="text-base text-[#FF2D2D] font-bold">PHP 50.00</p>
@@ -111,6 +115,7 @@ interface Booking {
   date_of_booking: string
   time_of_booking: string
   slot_number: number
+  services_offered?: string
 }
 
 interface Props {
@@ -141,6 +146,7 @@ const form = useForm({
   slot_number: props.booking?.slot_number ?? 1,
   payment_amount: 50,
   payment_proof: null as File | null,
+  services_offered: props.booking?.services_offered ?? ''
 })
 
 const handleImageError = (e: Event) => {
