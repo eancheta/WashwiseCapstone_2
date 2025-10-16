@@ -73,7 +73,7 @@
       <form v-if="booking" @submit.prevent="confirm" class="space-y-4" enctype="multipart/form-data">
         <div>
           <label class="block text-base font-bold text-[#182235] mb-2">
-            Upload Payment Proof <span class="font-normal text-gray-500">(screenshot of receipt)</span>
+            Upload Payment Proofs <span class="font-normal text-gray-500">(screenshot of receipt)</span>
           </label>
           <input
             @change="handleFile"
