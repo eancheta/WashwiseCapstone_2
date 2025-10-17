@@ -153,7 +153,6 @@
 <script setup lang="ts">
 import { useForm } from '@inertiajs/vue3'
 import { ref } from 'vue'
-import { Inertia } from '@inertiajs/inertia'
 
 interface Shop {
   id: number
@@ -223,10 +222,5 @@ const confirm = () => {
     return
   }
 
-  form.post(`/customer/book/${props.shop.id}/confirm`, {
-    forceFormData: true,
-    onSuccess: () => Inertia.visit('/settings/appearance'),
-    onError: (errors) => console.error('Payment submission error:', errors),
-  })
 }
 </script>

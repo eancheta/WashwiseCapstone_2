@@ -174,6 +174,7 @@ function handleImgError(e: Event) {
         <li>Please make sure to arrive on time for your selected schedule to secure your slot.</li>
         <li>If you are unable to come, kindly note that the reservation/down payment is non-refundable.</li>
         <li>If you arrive late, accommodation will depend on staff availability.</li>
+        <li>In case of unforeseen events (e.g., heavy rain, technical issues, or emergencies), your appointment may be rescheduled to the next available slot. You may also rebook your preferred schedule once the system reopens for booking.</li>
       </ul>
 
       <!-- ✅ Checkbox Agreement -->
