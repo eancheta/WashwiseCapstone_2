@@ -41,6 +41,7 @@ interface User {
   customer_status: string | null  // <-- add this
   status?: string | null
   reason: string | null
+  picture_id?: string | null
 }
 
 const { owners, users } = defineProps<{
@@ -190,6 +191,7 @@ const submitDeclineCustomer = () => {
           <thead>
             <tr class="bg-gray-100 text-left text-[#182235]">
         <th class="py-2 px-3">ID</th>
+        <th class="py-2 px-3">Picture</th>
         <th class="py-2 px-3">Name</th>
         <th class="py-2 px-3">Email</th>
         <th class="py-2 px-3">Customer Status</th>
@@ -207,6 +209,16 @@ const submitDeclineCustomer = () => {
               class="hover:bg-gray-50 border-t text-[#182235] transition"
             >
         <td class="py-2 px-3">{{ user.id }}</td>
+            <td class="py-2 px-3">
+<img
+  v-if="user.picture_id"
+  :src="user.picture_id"
+  alt="User Picture"
+  class="w-10 h-10 object-cover rounded-full border cursor-pointer hover:opacity-80 transition"
+  @click="openImagePreview(user.picture_id)"
+/>
+      <span v-else class="text-gray-400 text-xs">No picture</span>
+    </td>
         <td class="py-2 px-3">{{ user.name }}</td>
         <td class="py-2 px-3">{{ user.email }}</td>
         <td class="py-2 px-3">{{ user.customer_status || 'Pending' }}</td>
