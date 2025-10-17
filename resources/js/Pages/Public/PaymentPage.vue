@@ -125,7 +125,7 @@
       <form v-if="booking" @submit.prevent="confirm" class="space-y-4" enctype="multipart/form-data">
         <div>
           <label class="block text-base font-bold text-[#182235] mb-2">
-            Upload Payment Proof <span class="font-normal text-gray-500">(screenshot of receipt)</span>
+            Upload Payment Proof: <span class="font-normal text-gray-500">(screenshot of receipt)</span>
           </label>
           <input
             @change="handleFile"
@@ -153,6 +153,7 @@
 <script setup lang="ts">
 import { useForm } from '@inertiajs/vue3'
 import { ref } from 'vue'
+import { Inertia } from '@inertiajs/inertia'
 
 interface Shop {
   id: number
@@ -222,5 +223,10 @@ const confirm = () => {
     return
   }
 
+  form.post(`/customer/book/${props.shop.id}/confirm`, {
+    forceFormData: true,
+    onSuccess: () => Inertia.visit('/settings/appearance'),
+    onError: (errors) => console.error('Payment submission error:', errors),
+  })
 }
 </script>
