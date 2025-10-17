@@ -221,19 +221,40 @@ watch(
 
           <input type="number" v-model="form.slot_number" min="1" max="4" class="w-full p-2 border rounded focus:ring-2 focus:ring-[#002B5C]" required/>
 
-          <div>
-            <label class="block text-sm font-semibold text-gray-700">Services Requested</label>
-            <p><span class="font-semibold">Services Offered:</span> {{ shop.services_offered || 'No services listed' }}</p>
-            <textarea
-              v-model="form.services_offered"
-              class="w-full p-2 border rounded focus:ring-2 focus:ring-[#002B5C]"
-              placeholder="Specify services you want"
-              rows="3"
-            ></textarea>
-            <div v-if="form.errors.services_offered" class="text-red-600 text-sm mt-1">
-              {{ form.errors.services_offered }}
-            </div>
-          </div>
+<!-- ✅ Services Offered Section (Clickable Image Support) -->
+<div>
+  <label class="block text-sm font-semibold text-gray-700 mb-1">Services Offered</label>
+
+  <div v-if="shop.services_offered">
+    <!-- Check if it's an image URL -->
+    <div v-if="shop.services_offered.match(/\.(jpg|jpeg|png|gif|webp)$/i) || shop.services_offered.startsWith('http')">
+      <img
+        :src="shop.services_offered.startsWith('http') ? shop.services_offered : `/storage/${shop.services_offered}`"
+        alt="Services Offered"
+        class="h-24 w-24 object-contain rounded border cursor-pointer hover:scale-105 transition"
+        @click="openQr(shop.services_offered.startsWith('http') ? shop.services_offered : `/storage/${shop.services_offered}`)"
+      />
+    </div>
+
+    <!-- Otherwise show text -->
+    <p v-else class="text-gray-700 text-sm">{{ shop.services_offered }}</p>
+  </div>
+
+  <div v-else class="text-gray-500 italic text-sm">No services listed</div>
+
+  <!-- User’s request input -->
+  <label class="block text-sm font-semibold text-gray-700 mt-3">Services Requested</label>
+  <textarea
+    v-model="form.services_offered"
+    class="w-full p-2 border rounded focus:ring-2 focus:ring-[#002B5C]"
+    placeholder="Specify services you want"
+    rows="3"
+  ></textarea>
+
+  <div v-if="form.errors.services_offered" class="text-red-600 text-sm mt-1">
+    {{ form.errors.services_offered }}
+  </div>
+</div>
 
           <div v-if="form.date_of_booking" class="mt-4">
             <h3 class="text-sm font-semibold text-gray-700 mb-2">Taken Slots on {{ formattedDate }} (View Only)</h3>
