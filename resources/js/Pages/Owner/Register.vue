@@ -57,7 +57,23 @@ function handlePhoto3Change(e: Event) {
 }
 
 function submit() {
+  if (!agreedToTerms.value) {
+    alert('You must agree to the Terms and Conditions to register.')
+    return
+  }
+
   form.post(route('owner.register'), { forceFormData: true })
+}
+const showTermsModal = ref(false)
+const agreedToTerms = ref(false)
+
+function openTermsModal() {
+  showTermsModal.value = true
+}
+
+function acceptTerms() {
+  agreedToTerms.value = true
+  showTermsModal.value = false
 }
 </script>
 
@@ -268,7 +284,21 @@ function submit() {
         />
         <InputError :message="form.errors.photo3" />
       </div>
-
+<!-- Terms and Conditions Checkbox -->
+<div class="flex items-start gap-2 mt-2">
+  <input
+    id="terms"
+    type="checkbox"
+    v-model="agreedToTerms"
+    class="mt-1 w-4 h-4 rounded border-gray-300 text-[#FF2D2D] focus:ring-[#FF2D2D]"
+  />
+  <label for="terms" class="text-gray-700 text-sm">
+    I agree to the
+    <button type="button" @click="openTermsModal" class="text-[#FF2D2D] underline">
+      Terms and Conditions
+    </button>
+  </label>
+</div>
       <!-- Submit Button -->
       <button
         type="submit"
@@ -278,6 +308,44 @@ function submit() {
       >
         Register
       </button>
+
     </form>
+    <!-- Terms Modal -->
+<div
+  v-if="showTermsModal"
+  class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4"
+>
+  <div class="bg-white w-full max-w-lg rounded-2xl shadow-xl p-6 relative overflow-y-auto max-h-[80vh]">
+    <h2 class="text-xl font-bold text-[#002B5C] mb-4">WashWise Terms and Conditions</h2>
+    <div class="text-gray-700 space-y-2 text-sm">
+      <p>By signing up for an account on WashWise, you agree to the following terms:</p>
+      <ul class="list-disc ml-5 space-y-1">
+        <li>You certify that the information you provide is accurate and truthful.</li>
+        <li>You are responsible for keeping your account credentials confidential.</li>
+        <li>You agree to use the system only for booking appointments with verified car wash establishments.</li>
+        <li>Appointments must be managed responsibly; frequent cancellations or no-shows may result in limited access.</li>
+        <li>WashWise serves as a booking platform and is not liable for service issues rendered by third-party car wash providers.</li>
+        <li>Your personal data will be processed in accordance with our Privacy Policy and applicable data protection laws.</li>
+        <li>Any misuse of the platform (e.g., fraud, impersonation, or system abuse) may lead to account suspension or termination.</li>
+      </ul>
+      <p class="mt-2">By clicking "I Agree", you confirm that you have read, understood, and accepted these terms.</p>
+    </div>
+
+    <div class="mt-6 flex justify-end gap-3">
+      <button
+        @click="showTermsModal = false"
+        class="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg font-semibold hover:bg-gray-400"
+      >
+        Cancel
+      </button>
+      <button
+        @click="acceptTerms"
+        class="px-5 py-2 bg-[#FF2D2D] text-white font-semibold rounded-lg hover:bg-[#E02626]"
+      >
+        I Agree
+      </button>
+    </div>
+  </div>
+</div>
   </div>
 </template>
