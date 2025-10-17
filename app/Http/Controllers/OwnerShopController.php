@@ -205,7 +205,7 @@ $validated = $request->validate([
     'address' => 'required|string|max:255',
     'district' => 'nullable|string|max:100',
     'description' => 'nullable|string',
-    'services_offered' => 'nullable|string',
+    'services_offered' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
     'logo' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
     'qr_code' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
     'qr_code2' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
@@ -220,8 +220,8 @@ $validated = $request->validate([
             'address' => $validated['address'],
             'district' => $validated['district'] ?? null,
             'description' => $validated['description'] ?? null,
-            'services_offered' => $validated['services_offered'] ?? null,
         ];
+
 
         $cloudinary = new Cloudinary([
             'cloud' => [
@@ -232,15 +232,27 @@ $validated = $request->validate([
             'url' => ['secure' => true],
         ]);
 
-        if ($request->hasFile('logo')) {
-            $file = $request->file('logo');
-            $response = $cloudinary->uploadApi()->upload($file->getRealPath(), [
-                'folder' => 'carwash_logos',
-                'resource_type' => 'image',
-                'overwrite' => true,
-            ]);
-            $shopData['logo'] = $response['secure_url'];
-        }
+// ✅ Upload Services Offered image
+if ($request->hasFile('services_offered')) {
+    $file = $request->file('services_offered');
+    $response = $cloudinary->uploadApi()->upload($file->getRealPath(), [
+        'folder' => 'carwash_services',
+        'resource_type' => 'image',
+        'overwrite' => true,
+    ]);
+    $shopData['services_offered'] = $response['secure_url'];
+}
+
+// ✅ Upload Logo
+if ($request->hasFile('logo')) {
+    $file = $request->file('logo');
+    $response = $cloudinary->uploadApi()->upload($file->getRealPath(), [
+        'folder' => 'carwash_logos',
+        'resource_type' => 'image',
+        'overwrite' => true,
+    ]);
+    $shopData['logo'] = $response['secure_url'];
+}
 
 // ✅ QR Code 1
         if ($request->hasFile('qr_code')) {

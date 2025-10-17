@@ -71,13 +71,19 @@
         </div>
 
         <!-- Services Offered -->
-        <div>
-          <label class="block text-sm font-semibold text-gray-700">Services Offered</label>
-          <textarea v-model="form.services_offered"
-            class="w-full mt-1 p-3 border border-gray-300 rounded-xl text-gray-900 focus:ring-2 focus:ring-[#002B5C] focus:outline-none shadow-sm"
-            placeholder="List services:"></textarea>
-          <div v-if="form.errors.services_offered" class="text-red-600 text-sm mt-1">{{ form.errors.services_offered }}</div>
-        </div>
+<div>
+  <label class="block text-sm font-semibold text-gray-700">Services Offered Image</label>
+  <input
+    type="file"
+    accept="image/*"
+    @change="handleServicesOfferedChange"
+    class="w-full mt-1 p-3 border border-gray-300 rounded-xl text-gray-900 focus:ring-2 focus:ring-[#002B5C] focus:outline-none shadow-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#002B5C] file:text-white hover:file:bg-[#003b7a] cursor-pointer"
+  />
+  <div v-if="servicesOfferedPreview" class="mt-3">
+    <img :src="servicesOfferedPreview" alt="Services Offered Preview" class="h-24 w-24 object-contain rounded-lg border border-gray-300 shadow-sm" />
+  </div>
+  <div v-if="form.errors.services_offered" class="text-red-600 text-sm mt-1">{{ form.errors.services_offered }}</div>
+</div>
 
 <!-- QR Codes -->
 <!-- ✅ QR Code 1 -->
@@ -195,7 +201,18 @@ import { ref } from 'vue'
 
 const qrPreviews = ref<(string | null)[]>([null, null, null, null, null])
 
+const servicesOfferedPreview = ref<string | null>(null)
 
+const handleServicesOfferedChange = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  if (target.files?.length) {
+    form.services_offered = target.files[0] as any
+    servicesOfferedPreview.value = URL.createObjectURL(target.files[0])
+  } else {
+    form.services_offered = '' as any
+    servicesOfferedPreview.value = null
+  }
+}
 defineProps<{ pageTitle: string }>()
 
 type ShopForm = {
@@ -204,7 +221,7 @@ type ShopForm = {
   district: number | null
   logo: File | null
   description: string
-  services_offered: string
+  services_offered: File | null
   qr_code: File | null
   qr_code2: File | null
   qr_code3: File | null
@@ -218,7 +235,7 @@ const form = useForm<ShopForm>({
   district: null,
   logo: null,
   description: '',
-  services_offered: '',
+  services_offered: null,
   qr_code: null,
   qr_code2: null,
   qr_code3: null,
