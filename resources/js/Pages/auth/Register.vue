@@ -6,23 +6,46 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { LoaderCircle } from 'lucide-vue-next'
+import { ref } from 'vue'
 
 // Initialize form fields
-const form = useForm({
+type RegisterForm = {
+  name: string
+  email: string
+  password: string
+  password_confirmation: string
+  picture_id: File | null
+}
+
+const form = useForm<RegisterForm>({
   name: '',
   email: '',
   password: '',
-  password_confirmation: ''
+  password_confirmation: '',
+  picture_id: null,
 })
+
+// File upload handler
+const picturePreview = ref<string | null>(null)
+
+// File handler (same logic as handleLogoChange)
+function handlePictureChange(event: Event) {
+  const target = event.target as HTMLInputElement | null
+  if (target?.files?.length) {
+    form.picture_id = target.files[0]
+    picturePreview.value = URL.createObjectURL(target.files[0])
+  } else {
+    form.picture_id = null
+    picturePreview.value = null
+  }
+}
 
 // Form submission handler
 const submit = () => {
   form.post(route('register'), {
     preserveScroll: true,
     onFinish: () => form.reset('password', 'password_confirmation'),
-    onSuccess: () => {
-      router.visit('/emailvcode')
-    },
+    onSuccess: () => router.visit('/emailvcode'),
     onError: () => console.error('Registration failed:', form.errors)
   })
 }
@@ -139,7 +162,24 @@ const submit = () => {
             />
             <InputError :message="form.errors.password_confirmation" />
           </div>
+  <div>
+    <label class="block text-sm font-semibold text-gray-700">Picture ID</label>
+    <div class="mt-1 flex items-center">
+      <input
+        type="file"
+        accept="image/*"
+        @change="handlePictureChange"
+        class="w-full p-3 border border-gray-300 rounded-xl text-gray-900
+               focus:ring-2 focus:ring-[#002B5C] focus:outline-none shadow-sm
+               file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0
+               file:text-sm file:font-semibold file:bg-[#002B5C] file:text-white
+               hover:file:bg-[#003b7a] cursor-pointer"
+      />
+    </div>
 
+    <!-- Preview -->
+    <img v-if="picturePreview" :src="picturePreview" class="mt-2 w-32 h-32 object-cover border rounded" />
+  </div>
           <!-- Submit Button -->
           <Button
             type="submit"

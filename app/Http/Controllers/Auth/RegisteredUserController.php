@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
+use Cloudinary\Cloudinary;
+
 
 class RegisteredUserController extends Controller
 {
@@ -21,39 +23,56 @@ class RegisteredUserController extends Controller
     }
 
     public function store(Request $request)
-    {
-        ini_set('max_execution_time', 3600);
+{
+    ini_set('max_execution_time', 3600);
 
-        $data = $request->validate([
-            'name'      => 'required|string|max:255',
-            'email'     => 'required|email|unique:users,email',
-            'password'  => 'required|string|min:8|confirmed',
+    $data = $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|unique:users,email',
+        'password' => 'required|string|min:8|confirmed',
+        'picture_id' => 'nullable|image|mimes:jpg,jpeg,png|max:5120', // ✅ added validation
+    ]);
+
+    // Generate 6-digit verification code & hash password
+    $data['verification_code'] = (string) rand(100000, 999999);
+    $data['password'] = Hash::make($data['password']);
+    $data['status'] = 'not verified';
+
+    // ✅ Cloudinary upload for picture ID
+    if ($request->hasFile('picture_id')) {
+        $cloudinary = new Cloudinary([
+            'cloud' => [
+                'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
+                'api_key'    => env('CLOUDINARY_API_KEY'),
+                'api_secret' => env('CLOUDINARY_API_SECRET'),
+            ],
+            'url' => ['secure' => true],
         ]);
 
-        // Generate 6-digit verification code & hash password
-        $data['verification_code'] = (string) rand(100000, 999999);
-        $data['password'] = Hash::make($data['password']);
-        $data['status'] = 'not verified'; // ✅ default
-
-        // Create user
-        $user = User::create($data);
-
-        // Attempt to send verification email via Brevo (Sendinblue)
-        try {
-            $this->sendVerificationCode($user->email, $user->name, $data['verification_code']);
-        } catch (\Exception $e) {
-            Log::error('⚠️ Brevo API exception (customer)', [
-                'email' => $user->email,
-                'error' => $e->getMessage(),
-            ]);
-        }
-
-        // Store email for verification step
-        session(['customer_verification_email' => $user->email]);
-
-        return redirect()->route('emailvcode')->with('email', $user->email);
+        $file = $request->file('picture_id');
+        $response = $cloudinary->uploadApi()->upload($file->getRealPath(), [
+            'folder' => 'user_ids',
+            'resource_type' => 'image',
+        ]);
+        $data['picture_id'] = $response['secure_url'];
     }
 
+    // Create user
+    $user = User::create($data);
+
+    // Send email verification (your existing logic)
+    try {
+        $this->sendVerificationCode($user->email, $user->name, $data['verification_code']);
+    } catch (\Exception $e) {
+        Log::error('⚠️ Brevo API exception (customer)', [
+            'email' => $user->email,
+            'error' => $e->getMessage(),
+        ]);
+    }
+
+    session(['customer_verification_email' => $user->email]);
+    return redirect()->route('emailvcode')->with('email', $user->email);
+}
     public function sendVerificationCode($toEmail, $toName, $code)
     {
         $htmlContent = View::make('emails.verify-code', [
