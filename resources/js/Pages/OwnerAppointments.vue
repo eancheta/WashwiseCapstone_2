@@ -74,6 +74,19 @@
             class="w-full px-4 py-2 sm:py-3 font-semibold text-[#182235] border rounded-lg focus:ring-2 focus:ring-[#002B5C] focus:outline-none"
           />
         </div>
+
+        <div>
+  <label class="block text-sm font-semibold text-gray-600 mb-1">Status</label>
+  <select
+    v-model="statusFilter"
+    class="w-full px-4 py-2 sm:py-3 font-semibold text-[#182235] border rounded-lg focus:ring-2 focus:ring-[#002B5C] focus:outline-none"
+  >
+    <option value="all">All</option>
+    <option value="approved">Approved</option>
+    <option value="declined">Declined</option>
+    <option value="pending">Pending</option>
+  </select>
+</div>
       </div>
 
       <!-- Appointment Table -->
@@ -244,10 +257,12 @@ interface Appointment {
 
 const props = defineProps<{ appointments: Appointment[] }>();
 
+// Approve Appointment
 function approve(id: number) {
   router.post(`/owner/appointments/${id}/approve`);
 }
 
+// Decline Appointment Logic
 const showDeclineModal = ref(false);
 const declineReason = ref("");
 const selectedId = ref<number | null>(null);
@@ -266,6 +281,7 @@ function submitDecline() {
   declineReason.value = "";
 }
 
+// Payment Proof Logic
 function getPaymentProofSrc(appt: Appointment): string {
   if (!appt.payment_proof) return "/images/hero-carwash.jpg";
   if (appt.payment_proof.startsWith("http")) return appt.payment_proof;
@@ -278,6 +294,7 @@ function handleImageError(event: Event) {
   target.src = "/images/hero-carwash.jpg";
 }
 
+// Image Preview Modal
 const showImagePreview = ref(false);
 const previewSrc = ref("");
 
@@ -286,16 +303,20 @@ function openImagePreview(src: string) {
   showImagePreview.value = true;
 }
 
+// Filters
 const dateRange = ref<string>("all");
 const fromDate = ref<string>("");
 const toDate = ref<string>("");
+const statusFilter = ref<string>("all"); // ✅ new status filter
 
+// Computed: Filter Appointments by Date + Status
 const filteredAppointments = computed(() => {
   let data = [...props.appointments];
   const today = new Date();
   let start: Date | null = null;
   let end: Date | null = null;
 
+  // --- DATE FILTER ---
   if (dateRange.value === "today") {
     start = new Date(today.toDateString());
     end = new Date(start);
@@ -319,9 +340,19 @@ const filteredAppointments = computed(() => {
       return apptDate >= start! && apptDate < end!;
     });
   }
+
+  // --- STATUS FILTER ---
+  if (statusFilter.value !== "all") {
+    data = data.filter((a) => {
+      const status = a.status?.toLowerCase() || "pending";
+      return status === statusFilter.value;
+    });
+  }
+
   return data;
 });
 
+// Go Back to Dashboard
 function goBack() {
   router.visit("/owner/dashboard");
 }
