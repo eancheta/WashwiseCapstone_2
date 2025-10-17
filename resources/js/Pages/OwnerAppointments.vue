@@ -98,6 +98,7 @@
         <table class="min-w-full text-[13px] sm:text-sm text-left border-collapse">
           <thead class="bg-[#002B5C] text-white">
             <tr>
+              <th class="px-3 sm:px-4 py-3">No.</th>
               <th class="px-3 sm:px-4 py-3">Date</th>
               <th class="px-3 sm:px-4 py-3">Time</th>
               <th class="px-3 sm:px-4 py-3">Status</th>
@@ -122,6 +123,7 @@
               :class="idx % 2 === 0 ? 'bg-gray-50 hover:bg-gray-100' : 'hover:bg-gray-50'"
               class="transition"
             >
+              <td class="px-3 sm:px-4 py-3 text-center">{{ idx + 1 }}</td>
               <td class="px-3 sm:px-4 py-3">{{ appt.date_of_booking }}</td>
               <td class="px-3 sm:px-4 py-3">{{ appt.time_of_booking }}</td>
               <td class="px-3 sm:px-4 py-3">
