@@ -68,7 +68,7 @@ function submit() {
       <button @click="closeModals" class="absolute top-2 right-2 text-gray-400 hover:text-[#FF2D2D] text-xl">&times;</button>
       <h3 class="text-lg font-bold mb-4 text-[#182235] text-center">Login as:</h3>
       <div class="flex flex-col gap-4">
-        <a href="/login" class="px-4 py-2 rounded bg-[#182235] text-white font-semibold text-center hover:bg-[#FF2D2D] transition">User</a>
+        <a href="/login" class="px-4 py-2 rounded bg-[#182235] text-white font-semibold text-center hover:bg-[#FF2D2D] transition">Customer</a>
         <a href="/owner/login" class="px-4 py-2 rounded bg-[#182235] text-white font-semibold text-center hover:bg-[#FF2D2D] transition">Business Owner</a>
       </div>
     </div>
@@ -80,7 +80,7 @@ function submit() {
       <button @click="closeModals" class="absolute top-2 right-2 text-gray-400 hover:text-[#FF2D2D] text-xl">&times;</button>
       <h3 class="text-lg font-bold mb-4 text-[#182235] text-center">Register as:</h3>
       <div class="flex flex-col gap-4">
-        <a href="/register" class="px-4 py-2 rounded bg-[#182235] text-white font-semibold text-center hover:bg-[#FF2D2D] transition">User</a>
+        <a href="/register" class="px-4 py-2 rounded bg-[#182235] text-white font-semibold text-center hover:bg-[#FF2D2D] transition">Customer</a>
         <a href="/owner/register" class="px-4 py-2 rounded bg-[#182235] text-white font-semibold text-center hover:bg-[#FF2D2D] transition">Business Owner</a>
       </div>
     </div>
