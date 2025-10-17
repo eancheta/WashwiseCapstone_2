@@ -167,6 +167,7 @@ const submit = () => {
     <div class="mt-1 flex items-center">
       <input
         type="file"
+        required
         accept="image/*"
         @change="handlePictureChange"
         class="w-full p-3 border border-gray-300 rounded-xl text-gray-900
