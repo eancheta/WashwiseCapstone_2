@@ -63,12 +63,16 @@
         <label for="description" class="block text-sm font-semibold text-gray-700 mb-2">Description</label>
         <textarea id="description" name="description" class="w-full border rounded-lg px-4 py-2" rows="3" required>{{ old('description', $shop->description) }}</textarea>
       </div>
-
-      {{-- Services --}}
-      <div class="mb-4">
-        <label for="services_offered" class="block text-sm font-semibold text-gray-700 mb-2">Services Offered</label>
-        <textarea id="services_offered" name="services_offered" class="w-full border rounded-lg px-4 py-2" rows="3" required>{{ old('services_offered', $shop->services_offered) }}</textarea>
-      </div>
+{{-- Services Offered (Image Upload) --}}
+<div class="mb-4">
+  <label for="services_offered" class="block text-sm font-semibold text-gray-700 mb-2">Services Offered (Image)</label>
+  <div class="flex items-center space-x-4">
+    <input type="file" id="services_offered" name="services_offered" class="block w-full text-sm text-gray-700 border rounded-lg cursor-pointer">
+    @if ($shop->services_offered)
+      <img src="{{ $shop->services_offered }}" alt="Services Offered" class="h-12 w-12 rounded-lg object-cover border">
+    @endif
+  </div>
+</div>
 
             {{-- QR Code 1 --}}
             <div class="mb-4">
