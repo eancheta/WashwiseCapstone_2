@@ -42,7 +42,7 @@ public function update(Request $request)
         'address' => 'required|string|max:255',
         'district' => 'nullable|string|max:100',
         'description' => 'nullable|string',
-        'services_offered' => 'nullable|string',
+        'services_offered' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
         'logo' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
         'qr_code' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
         'qr_code2' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
@@ -60,6 +60,17 @@ public function update(Request $request)
         ],
         'url' => ['secure' => true],
     ]);
+
+        // ✅ Services Offered Image
+    if ($request->hasFile('services_offered')) {
+        $file = $request->file('services_offered');
+        $response = $cloudinary->uploadApi()->upload($file->getRealPath(), [
+            'folder' => 'carwash_services',
+            'resource_type' => 'image',
+            'overwrite' => true,
+        ]);
+        $validated['services_offered'] = $response['secure_url'];
+    }
 
     // Logo
     if ($request->hasFile('logo')) {
