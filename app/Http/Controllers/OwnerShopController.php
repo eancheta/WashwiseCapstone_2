@@ -16,9 +16,7 @@ use Cloudinary\Cloudinary;
 
 class OwnerShopController extends Controller
 {
-    /**
-     * Ensure the bookings table for a specific shop exists.
-     */
+
 
 public function bookPage($id)
 {
