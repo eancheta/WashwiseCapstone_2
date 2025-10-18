@@ -109,9 +109,9 @@ function openShop(id?: number | null) {
       <img src="/images/washwiselogo2.png" alt="WashWise Logo" class="h-10 w-auto select-none" draggable="false" />
     </div>
 
-    <div class="flex items-center space-x-2 px-3 py-2 rounded-lg">
-      <span class="text-gray-700 font-medium">{{ user ? user.name : 'Owner' }}</span>
-    </div>
+<div class="flex items-center space-x-2 px-3 py-2 rounded-lg">
+  <span class="text-gray-700 font-medium text-sm md:text-base">{{ user ? user.name : 'Owner' }}</span>
+</div>
 </div>
   <!-- Sidebar -->
   <aside
