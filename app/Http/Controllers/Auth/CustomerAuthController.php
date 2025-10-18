@@ -36,7 +36,7 @@ public function login(Request $request)
     }
 
     // Block login if customer not yet approved
-    if ($user->customer_status !== 'approved') {
+    if ($user->customer_status !== 'Approved') {
         return back()->withErrors(['email' => 'Your account is pending approval by the admin.'])->withInput();
     }
 

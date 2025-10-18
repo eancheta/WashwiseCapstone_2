@@ -99,9 +99,9 @@ function openShop(id?: number | null) {
         class="flex flex-col justify-between w-6 h-5 focus:outline-none hover:opacity-80 transition"
         aria-label="Toggle sidebar"
       >
-        <span class="block h-0.5 bg-gray-800 rounded"></span>
-        <span class="block h-0.5 bg-gray-800 rounded"></span>
-        <span class="block h-0.5 bg-gray-800 rounded"></span>
+        <span class="block h-0.5 bg-blue-800 rounded"></span>
+        <span class="block h-0.5 bg-blue-800 rounded"></span>
+        <span class="block h-0.5 bg-blue-800 rounded"></span>
       </button>
 
       <img src="/images/washwiselogo2.png" alt="WashWise Logo" class="h-10 w-auto select-none" draggable="false" />
