@@ -32,14 +32,6 @@ use app\Http\Middleware\EnsureUserIsVerified;
 
 use App\Http\Controllers\Auth\ForgotPasswordController;
 
-Route::get('/forgot-password', function (Request $request) {
-    // adjust 'auth/ForgotPassword' or 'Auth/ForgotPassword' to match your Pages folder casing
-    return Inertia::render('auth/ForgotPassword', [
-        'type' => $request->query('type', 'user')
-    ]);
-})->name('password.request');
-
-// POSTs
 Route::post('/forgot-password/send-code', [ForgotPasswordController::class, 'sendCode'])->name('password.sendCode');
 Route::post('/forgot-password/reset', [ForgotPasswordController::class, 'resetPassword'])->name('password.reset');
 

@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Head, useForm } from '@inertiajs/vue3';
 import { LoaderCircle } from 'lucide-vue-next';
+import { ref } from 'vue'
 
 defineProps<{
     status?: string;
@@ -24,6 +25,33 @@ const submit = () => {
         onError: (errors) => console.error('Login errors:', errors),
     });
 };
+
+const showForgotPassword = ref(false)
+const forgotStep = ref(1)
+const forgotStatus = ref('')
+const forgotForm = useForm({
+  email: '',
+  code: '',
+  password: '',
+  password_confirmation: '',
+})
+const sendCode = () => {
+  forgotForm.post(route('password.sendCode.user'), {
+    onSuccess: () => {
+      forgotStatus.value = 'Verification code sent!'
+      forgotStep.value = 2
+    }
+  })
+}
+
+const resetPassword = () => {
+  forgotForm.post(route('password.reset.user'), {
+    onSuccess: () => {
+      forgotStatus.value = 'Password reset successful! You can now log in.'
+      setTimeout(() => showForgotPassword.value = false, 1500)
+    }
+  })
+}
 </script>
 
 <template>
@@ -140,7 +168,41 @@ const submit = () => {
             Log in
           </Button>
         </div>
-<a :href="route('password.request', { type: 'user' })">Forgot your password?</a>
+<a href="#" @click.prevent="showForgotPassword = true" class="text-blue-600 hover:underline text-sm">
+  Forgot your password?
+</a>
+
+<div v-if="showForgotPassword" class="mt-6 bg-white p-4 rounded shadow-md">
+  <h3 class="text-lg font-bold mb-3">Reset Password</h3>
+
+  <!-- Step 1: Email -->
+  <form v-if="forgotStep === 1" @submit.prevent="sendCode">
+    <label>Email</label>
+    <input v-model="forgotForm.email" type="email" required class="border p-2 w-full rounded mb-2"/>
+    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded w-full">
+      Send Verification Code
+    </button>
+  </form>
+
+  <!-- Step 2: Code + New Password -->
+  <form v-else @submit.prevent="resetPassword">
+    <label>Verification Code</label>
+    <input v-model="forgotForm.code" type="text" required class="border p-2 w-full rounded mb-2"/>
+    <label>New Password</label>
+    <input v-model="forgotForm.password" type="password" required class="border p-2 w-full rounded mb-2"/>
+    <label>Confirm Password</label>
+    <input v-model="forgotForm.password_confirmation" type="password" required class="border p-2 w-full rounded mb-2"/>
+    <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded w-full">
+      Reset Password
+    </button>
+  </form>
+
+  <p class="text-sm mt-2 text-gray-500">
+    <a href="#" @click.prevent="showForgotPassword = false" class="text-blue-600 hover:underline">
+      Back to login
+    </a>
+  </p>
+</div>
 
         <!-- Links -->
         <div class="text-center text-sm mt-2">
