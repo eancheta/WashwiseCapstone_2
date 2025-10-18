@@ -162,7 +162,7 @@ public function update(Request $request)
             return back()->withErrors(['email' => 'Account not found.'])->withInput();
         }
 
-        if ($owner->status !== 'approved') {
+        if ($owner->status !== 'Approved') {
             return back()->withErrors(['email' => 'Your account is pending approval by the admin.'])->withInput();
         }
 
