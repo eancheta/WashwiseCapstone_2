@@ -340,7 +340,7 @@ public function index()
 
     return Inertia::render('Public/ShopBooking', [
         'shop' => $shop,
-        'isOpen' => $shop->status === 'open', // ✅ Pass true/false
+        'isOpen' => $shop->status === 'Open', // ✅ Pass true/false
         'pageTitle' => "Book at {$shop->name}",
     ]);
 }

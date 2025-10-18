@@ -239,7 +239,7 @@ const submitDecline = () => {
 <td class="py-2 px-3">
   <div class="flex flex-wrap gap-2 justify-center">
     <!-- If approved -->
-    <template v-if="user.customer_status === 'approved'">
+    <template v-if="user.customer_status === 'Approved'">
       <button
         @click="openDeclineCustomerModal(user.id)"
         class="min-w-[70px] px-3 py-1 sm:px-4 sm:py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold text-xs sm:text-sm transition"
@@ -329,7 +329,7 @@ const submitDecline = () => {
 <td class="px-2 py-2 text-center">
   <div class="flex flex-wrap gap-2 justify-center">
     <!-- If approved -->
-    <template v-if="owner.status === 'approved'">
+    <template v-if="owner.status === 'Approved'">
       <button
         @click="openDeclineModal(owner.id)"
         class="min-w-[70px] px-3 py-1 sm:px-4 sm:py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold text-xs sm:text-sm transition"
@@ -396,8 +396,8 @@ const submitDecline = () => {
     <!-- Decline Modal -->
     <div v-if="showDeclineModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 px-4">
       <div class="bg-white w-full max-w-md rounded-2xl shadow-xl p-6 relative">
-        <h2 class="text-xl font-bold text-[#002B5C] mb-4">Decline Owner Request</h2>
-        <p class="text-gray-600 mb-3">Please write the reason for declining this owner:</p>
+        <h2 class="text-xl font-bold text-[#002B5C] mb-4">Delete a account</h2>
+        <p class="text-gray-600 mb-3">Please write the reason for deleting this owner:</p>
         <textarea
           v-model="declineReason"
           rows="4"

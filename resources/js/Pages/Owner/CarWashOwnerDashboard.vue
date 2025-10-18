@@ -209,13 +209,13 @@ function openShop(id?: number | null) {
       <div v-if="shop" class="mt-4 flex flex-col items-center space-y-3">
         <p class="text-sm text-white">
           Shop Status:
-          <span :class="shop.status === 'open' ? 'text-green-400' : 'text-red-400'">
+          <span :class="shop.status === 'Open' ? 'text-green-400' : 'text-red-400'">
             {{ shop.status }}
           </span>
         </p>
 
         <button
-          v-if="shop.status === 'open'"
+          v-if="shop.status === 'Open'"
           @click="closeShop(shop.id)"
           :disabled="closing"
           class="px-8 py-3 rounded-full bg-red-600 text-white font-bold text-lg shadow hover:bg-red-700 transition disabled:opacity-60"
@@ -238,7 +238,7 @@ function openShop(id?: number | null) {
 <div class="mt-6">
   <!-- When shop is open -->
 <Link
-  v-if="shop.status === 'open'"
+  v-if="shop.status === 'Open'"
   :href="route('owner.walkin', { id: shop.id })"
   as="button"
   class="px-8 py-3 rounded-full bg-[#FF2D2D] text-white font-bold text-lg shadow hover:bg-[#d72626] hover:scale-105 transition"
