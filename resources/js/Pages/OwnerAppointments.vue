@@ -158,7 +158,7 @@
   <!-- Approve Button -->
   <button
     @click="approve(appt.id)"
-    :disabled="appt.status === 'approved' || appt.status === 'declined'"
+    :disabled="appt.status === 'Approved' || appt.status === 'declined'"
     class="px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg font-semibold text-xs sm:text-sm transition text-white
            bg-green-600 hover:bg-green-700
            disabled:bg-gray-400 disabled:cursor-not-allowed"
@@ -169,7 +169,7 @@
   <!-- Decline Button -->
   <button
     @click="openDeclineModal(appt.id)"
-    :disabled="appt.status === 'approved' || appt.status === 'declined'"
+    :disabled="appt.status === 'Approved' || appt.status === 'declined'"
     class="px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg font-semibold text-xs sm:text-sm transition text-white
            bg-red-600 hover:bg-red-700
            disabled:bg-gray-400 disabled:cursor-not-allowed"
