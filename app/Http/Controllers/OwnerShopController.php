@@ -163,7 +163,7 @@ public static function ensureBookingTableExists($shopId)
             $table->date('date_of_booking');
             $table->integer('slot_number');
             $table->decimal('payment_amount', 8, 2)->nullable();
-            $table->string('status')->default('pending');
+            $table->string('status')->default('Pending');
             $table->string('payment_proof')->nullable();
             $table->text('reason')->nullable();
             $table->text('services_offered')->nullable();// ✅ Added reason column
@@ -182,7 +182,7 @@ public static function ensureBookingTableExists($shopId)
                 $table->decimal('payment_amount', 8, 2)->default(50);
             }
             if (!in_array('payment_status', $columns)) {
-                $table->enum('payment_status', ['pending', 'paid'])->default('pending');
+                $table->enum('payment_status', ['Pending', 'paid'])->default('Pending');
             }
             if (!in_array('payment_proof', $columns)) {
                 $table->string('payment_proof')->nullable();
@@ -353,7 +353,7 @@ public function index()
             abort(403, 'Unauthorized action.');
         }
 
-        $shop->status = 'closed';
+        $shop->status = 'Closed';
         $shop->save();
 
         return back()->with('success', 'Shop has been closed temporarily.');
@@ -367,7 +367,7 @@ public function index()
             abort(403, 'Unauthorized action.');
         }
 
-        $shop->status = 'open';
+        $shop->status = 'Open';
         $shop->save();
 
         return back()->with('success', 'Shop is now open.');

@@ -111,7 +111,7 @@ $appointments = DB::table($tableName)
             'slot_number' => 'required|integer|min:1|max:4',
         ]);
 
-        $validated['status'] = 'approved'; // walk-ins are instantly approved
+        $validated['status'] = 'Approved'; // walk-ins are instantly approved
         $validated['created_at'] = now();
         $validated['updated_at'] = now();
 
@@ -214,7 +214,7 @@ public function decline(Request $request, $id)
     // Update DB
     DB::table($tableName)
         ->where('id', $id)
-        ->update(['status' => 'declined', 'reason' => $request->reason]);
+        ->update(['status' => 'Declined', 'reason' => $request->reason]);
 
     // Prepare email payload (same structure as approve)
     $shop = CarWashShop::find($shopId);

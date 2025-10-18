@@ -126,7 +126,7 @@ public function decline(Request $request, $id)
 public function approveCustomer($id)
 {
     $user = User::findOrFail($id);
-    $user->customer_status = 'approved';
+    $user->customer_status = 'Approved';
     $user->save();
 
     try {

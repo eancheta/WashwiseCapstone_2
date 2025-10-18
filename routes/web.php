@@ -161,7 +161,6 @@ Route::post('/admin/owners/{id}/decline', [AdminController::class, 'decline'])->
 | STATIC PAGES
 |--------------------------------------------------------------------------
 */
-Route::get('/about', fn() => Inertia::render('AboutUs'))->name('about');
 Route::get('/', fn() => Inertia::render('Welcome'))->name('home');
 
 /*

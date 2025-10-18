@@ -13,16 +13,6 @@ function getPhotoSrc(photoPath: string | null): string {
   return `/storage/${photoPath}`
 }
 
-const deleteOwnerAccount = (id: number) => {
-  if (!confirm('Are you sure you want to delete this account?')) return
-  router.post(route('owners.decline', { id }))
-}
-
-const deleteCustomerAccount = (id: number) => {
-  if (!confirm('Are you sure you want to delete this account?')) return
-  router.post(route('customers.decline', { id }))
-}
-
 
 interface Owner {
   id: number
@@ -73,24 +63,7 @@ const approve = (id: number) => {
   router.post(route('owners.approve', { id }))
 }
 
-// Open decline modal
-const openDeclineModal = (id: number) => {
-  selectedOwnerId.value = id
-  showDeclineModal.value = true
-}
 
-// Submit decline with reason
-const submitDecline = () => {
-  if (!selectedOwnerId.value || !declineReason.value.trim()) {
-    alert('Please enter a reason before declining.')
-    return
-  }
-  router.post(route('owners.decline', { id: selectedOwnerId.value }), {
-    reason: declineReason.value,
-  })
-  showDeclineModal.value = false
-  declineReason.value = ''
-}
 
 const logout = () => {
   router.post('/logout')
@@ -134,11 +107,37 @@ const submitDeclineCustomer = () => {
     alert('Please enter a reason before declining.')
     return
   }
+
+  if (!confirm('Are you sure you want to delete this account?')) return
+
   router.post(route('customers.decline', { id: selectedCustomerId.value }), {
     reason: declineCustomerReason.value,
   })
+
   showDeclineCustomerModal.value = false
   declineCustomerReason.value = ''
+}
+
+const openDeclineModal = (id: number) => {
+  selectedOwnerId.value = id
+  showDeclineModal.value = true
+}
+
+// Submit decline with reason
+const submitDecline = () => {
+  if (!selectedOwnerId.value || !declineReason.value.trim()) {
+    alert('Please enter a reason before declining.')
+    return
+  }
+
+  if (!confirm('Are you sure you want to delete this account?')) return
+
+  router.post(route('owners.decline', { id: selectedOwnerId.value }), {
+    reason: declineReason.value,
+  })
+
+  showDeclineModal.value = false
+  declineReason.value = ''
 }
 </script>
 
@@ -242,7 +241,7 @@ const submitDeclineCustomer = () => {
     <!-- If approved -->
     <template v-if="user.customer_status === 'approved'">
       <button
-        @click="deleteCustomerAccount(user.id)"
+        @click="openDeclineCustomerModal(user.id)"
         class="min-w-[70px] px-3 py-1 sm:px-4 sm:py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold text-xs sm:text-sm transition"
       >
         Delete
@@ -332,7 +331,7 @@ const submitDeclineCustomer = () => {
     <!-- If approved -->
     <template v-if="owner.status === 'approved'">
       <button
-        @click="deleteOwnerAccount(owner.id)"
+        @click="openDeclineModal(owner.id)"
         class="min-w-[70px] px-3 py-1 sm:px-4 sm:py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold text-xs sm:text-sm transition"
       >
         Delete
