@@ -96,12 +96,12 @@ function openShop(id?: number | null) {
     <div class="flex items-center gap-4">
 <button
   @click="toggleSidebar"
-  class="flex flex-col justify-between w-6 h-5 focus:outline-none hover:opacity-80 transition z-50 relative"
+  class="flex flex-col justify-between w-6 h-5 min-w-[24px] min-h-[20px] focus:outline-none hover:opacity-80 transition z-50 relative"
   aria-label="Toggle sidebar"
 >
-  <span class="block h-0.5 bg-[#002B5C] rounded"></span>
-  <span class="block h-0.5 bg-[#002B5C] rounded"></span>
-  <span class="block h-0.5 bg-[#002B5C] rounded"></span>
+  <span class="block h-0.5 w-full bg-[#002B5C] rounded"></span>
+  <span class="block h-0.5 w-full bg-[#002B5C] rounded"></span>
+  <span class="block h-0.5 w-full bg-[#002B5C] rounded"></span>
 </button>
 
       <img src="/images/washwiselogo2.png" alt="WashWise Logo" class="h-10 w-auto select-none" draggable="false" />

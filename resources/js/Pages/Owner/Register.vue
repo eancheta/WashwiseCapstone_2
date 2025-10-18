@@ -81,11 +81,11 @@ function acceptTerms() {
   <Head title="Car Wash Owner Registration" />
 
   <!-- Top Info Bar -->
-  <div class="w-full bg-white flex flex-wrap items-center justify-between px-8 py-2 border-b border-gray-200 text-sm font-semibold">
+  <div class="w-full bg-white flex flex-wrap items-center justify-between px-4 sm:px-8 py-2 border-b border-gray-200 text-sm font-semibold">
     <div class="flex items-center gap-2">
-      <img src="/images/washwiselogo2.png" alt="WashWise Logo" class="h-14 w-auto mx-auto block" draggable="false" />
+      <img src="/images/washwiselogo2.png" alt="WashWise Logo" class="h-12 sm:h-14 w-auto mx-auto block" draggable="false" />
     </div>
-    <div class="flex gap-8 items-center text-[#002B5C]">
+    <div class="flex gap-6 items-center text-[#002B5C] text-xs sm:text-sm">
       <div class="flex items-center gap-2">
         <span>📞</span> <span class="font-bold">Call Us</span> <span class="font-normal">+012 345 6789</span>
       </div>
@@ -96,38 +96,38 @@ function acceptTerms() {
   </div>
 
   <!-- Navigation Bar -->
-  <nav class="w-full bg-[#182235] flex items-center px-8 py-2 text-white font-semibold shadow z-10">
-    <ul class="flex gap-8 items-center flex-1">
+  <nav class="w-full bg-[#182235] flex items-center px-4 sm:px-8 py-2 text-white font-semibold shadow z-10">
+    <ul class="flex gap-4 items-center flex-1">
       <li><Link :href="'/'" class="text-[#FF2D2D] font-bold text-base">Home</Link></li>
     </ul>
-    <div class="flex items-center gap-4 ml-8">
+    <div class="flex items-center gap-4 ml-4">
       <button @click="openLoginModal" class="text-white font-semibold hover:text-[#FF2D2D] transition text-base">Log in</button>
-      <button @click="openRegisterModal" class="px-6 py-2 rounded-full border-2 font-semibold transition" style="border-color:#FF2D2D; color:#FF2D2D;">
+      <button @click="openRegisterModal" class="px-4 py-2 rounded-full border-2 font-semibold transition" style="border-color:#FF2D2D; color:#FF2D2D;">
         Register
       </button>
     </div>
   </nav>
 
   <!-- Login Modal -->
-  <div v-if="showLoginModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-    <div class="bg-white rounded-lg p-8 w-full max-w-xs shadow-lg relative">
+  <div v-if="showLoginModal" class="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-50">
+    <div class="bg-white rounded-t-lg sm:rounded-lg p-4 sm:p-8 w-full sm:max-w-xs shadow-lg relative overflow-auto">
       <button @click="closeModals" class="absolute top-2 right-2 text-gray-400 hover:text-[#FF2D2D] text-xl">&times;</button>
       <h3 class="text-lg font-bold mb-4 text-[#182235] text-center">Login as:</h3>
       <div class="flex flex-col gap-4">
-        <Link :href="route('login')" class="px-4 py-2 rounded bg-[#182235] text-white font-semibold text-center hover:bg-[#FF2D2D] transition">Customer</Link>
-        <Link href="/owner/login" class="px-4 py-2 rounded bg-[#182235] text-white font-semibold text-center hover:bg-[#FF2D2D] transition">Business Owner</Link>
+        <Link :href="route('login')" class="px-4 py-3 rounded bg-[#182235] text-white font-semibold text-center hover:bg-[#FF2D2D] transition">Customer</Link>
+        <Link href="/owner/login" class="px-4 py-3 rounded bg-[#182235] text-white font-semibold text-center hover:bg-[#FF2D2D] transition">Business Owner</Link>
       </div>
     </div>
   </div>
 
   <!-- Register Modal -->
-  <div v-if="showRegisterModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-    <div class="bg-white rounded-lg p-8 w-full max-w-xs shadow-lg relative">
+  <div v-if="showRegisterModal" class="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-50">
+    <div class="bg-white rounded-t-lg sm:rounded-lg p-4 sm:p-8 w-full sm:max-w-xs shadow-lg relative overflow-auto">
       <button @click="closeModals" class="absolute top-2 right-2 text-gray-400 hover:text-[#FF2D2D] text-xl">&times;</button>
       <h3 class="text-lg font-bold mb-4 text-[#182235] text-center">Register as:</h3>
       <div class="flex flex-col gap-4">
-        <Link :href="route('register')" class="px-4 py-2 rounded bg-[#182235] text-white font-semibold text-center hover:bg-[#FF2D2D] transition">Customer</Link>
-        <Link href="/owner/register" class="px-4 py-2 rounded bg-[#182235] text-white font-semibold text-center hover:bg-[#FF2D2D] transition">Business Owner</Link>
+        <Link :href="route('register')" class="px-4 py-3 rounded bg-[#182235] text-white font-semibold text-center hover:bg-[#FF2D2D] transition">Customer</Link>
+        <Link href="/owner/register" class="px-4 py-3 rounded bg-[#182235] text-white font-semibold text-center hover:bg-[#FF2D2D] transition">Business Owner</Link>
       </div>
     </div>
   </div>
@@ -137,15 +137,15 @@ function acceptTerms() {
     <form
       @submit.prevent="submit"
       enctype="multipart/form-data"
-      class="flex flex-col gap-4 w-full max-w-sm mx-auto bg-white p-8 rounded-lg shadow-md overflow-y-auto"
-      style="max-height: 80vh;"
+      class="flex flex-col gap-4 w-full max-w-lg mx-auto bg-white p-4 sm:p-8 rounded-lg shadow-md overflow-y-auto"
+      style="max-height: 90vh;"
     >
       <h2 class="text-2xl font-bold text-center text-[#182235]">Register as Owner</h2>
       <p class="text-center text-gray-500 mb-4">Enter your details below to create your account</p>
 
       <!-- Name -->
       <div>
-        <Label for="name" class="text-gray-700 font-medium">Name</Label>
+        <Label for="name" class="text-gray-700 font-medium text-sm">Name</Label>
         <input
           id="name"
           type="text"
@@ -154,14 +154,14 @@ function acceptTerms() {
           autocomplete="name"
           v-model="form.name"
           placeholder="Full name"
-          class="w-full text-black border border-gray-200 px-4 py-2 rounded-lg bg-gray-300"
+          class="w-full text-black border border-gray-200 px-4 py-3 rounded-lg bg-gray-100"
         />
         <InputError :message="form.errors.name" />
       </div>
 
       <!-- Email -->
       <div>
-        <Label for="email" class="text-gray-700 font-medium">Email</Label>
+        <Label for="email" class="text-gray-700 font-medium text-sm">Email</Label>
         <input
           id="email"
           type="email"
@@ -169,14 +169,14 @@ function acceptTerms() {
           autocomplete="email"
           v-model="form.email"
           placeholder="email@example.com"
-          class="w-full text-black border border-gray-200 px-4 py-2 rounded-lg bg-gray-300"
+          class="w-full text-black border border-gray-200 px-4 py-3 rounded-lg bg-gray-100"
         />
         <InputError :message="form.errors.email" />
       </div>
 
       <!-- Password -->
       <div class="grid gap-1 w-full">
-        <Label for="password" class="text-gray-700 font-medium">Password</Label>
+        <Label for="password" class="text-gray-700 font-medium text-sm">Password</Label>
         <input
           id="password"
           type="password"
@@ -185,14 +185,14 @@ function acceptTerms() {
           v-model.trim="form.password"
           name="password"
           placeholder="Password"
-          class="w-full text-black border border-gray-200 px-4 py-2 rounded-lg bg-gray-300"
+          class="w-full text-black border border-gray-200 px-4 py-3 rounded-lg bg-gray-100"
         />
         <div v-if="form.errors.password" class="text-red-600 text-sm mt-1">{{ form.errors.password }}</div>
       </div>
 
       <!-- Confirm Password -->
       <div class="grid gap-1 w-full">
-        <Label for="password_confirmation" class="text-gray-700 font-medium">Confirm password</Label>
+        <Label for="password_confirmation" class="text-gray-700 font-medium text-sm">Confirm password</Label>
         <input
           id="password_confirmation"
           name="password_confirmation"
@@ -201,18 +201,18 @@ function acceptTerms() {
           autocomplete="new-password"
           v-model="form.password_confirmation"
           placeholder="Confirm password"
-          class="w-full text-black border border-gray-200 px-4 py-2 rounded-lg bg-gray-300"
+          class="w-full text-black border border-gray-200 px-4 py-3 rounded-lg bg-gray-100"
         />
         <div v-if="form.errors.password_confirmation" class="text-red-600 text-sm mt-1">{{ form.errors.password_confirmation }}</div>
       </div>
       <!-- District -->
       <div>
-        <Label for="district" class="text-gray-700 font-medium">District</Label>
+        <Label for="district" class="text-gray-700 font-medium text-sm">District</Label>
         <select
           v-model="form.district"
           id="district"
           required
-          class="w-full text-black border border-gray-200 px-4 py-2 rounded-lg bg-gray-300"
+          class="w-full text-black border border-gray-200 px-4 py-3 rounded-lg bg-gray-100"
         >
           <option value="">Select District</option>
           <option v-for="n in 6" :key="n" :value="n">{{ n }}</option>
@@ -222,20 +222,20 @@ function acceptTerms() {
 
       <!-- Address -->
       <div>
-        <Label for="address" class="text-gray-700 font-medium">Address</Label>
+        <Label for="address" class="text-gray-700 font-medium text-sm">Address</Label>
         <input
           placeholder="Enter address"
           v-model="form.address"
           id="address"
           type="text"
-          class="w-full text-black border border-gray-200 px-4 py-2 rounded-lg bg-gray-300"
+          class="w-full text-black border border-gray-200 px-4 py-3 rounded-lg bg-gray-100"
         />
         <InputError :message="form.errors.address" />
       </div>
 
       <!-- Photo Uploads -->
       <div>
-        <Label for="photo1" class="text-gray-700 font-medium">Business permit picture 1</Label>
+        <Label for="photo1" class="text-gray-700 font-medium text-sm">Business permit picture 1</Label>
         <input
           type="file"
           id="photo1"
@@ -246,13 +246,13 @@ function acceptTerms() {
           v-if="preview1"
           :src="preview1"
           alt="Photo 1 preview"
-          class="mt-2 w-32 h-32 object-cover border rounded"
+          class="mt-2 w-28 h-28 sm:w-32 sm:h-32 object-cover border rounded"
         />
         <InputError :message="form.errors.photo1" />
       </div>
 
       <div>
-        <Label for="photo2" class="text-gray-700 font-medium">Business permit picture 2</Label>
+        <Label for="photo2" class="text-gray-700 font-medium text-sm">Business permit picture 2</Label>
         <input
           type="file"
           id="photo2"
@@ -263,13 +263,13 @@ function acceptTerms() {
           v-if="preview2"
           :src="preview2"
           alt="Photo 2 preview"
-          class="mt-2 w-32 h-32 object-cover border rounded"
+          class="mt-2 w-28 h-28 sm:w-32 sm:h-32 object-cover border rounded"
         />
         <InputError :message="form.errors.photo2" />
       </div>
 
       <div>
-        <Label for="photo3" class="text-gray-700 font-medium">Business permit picture 3</Label>
+        <Label for="photo3" class="text-gray-700 font-medium text-sm">Business permit picture 3</Label>
         <input
           type="file"
           id="photo3"
@@ -280,7 +280,7 @@ function acceptTerms() {
           v-if="preview3"
           :src="preview3"
           alt="Photo 3 preview"
-          class="mt-2 w-32 h-32 object-cover border rounded"
+          class="mt-2 w-28 h-28 sm:w-32 sm:h-32 object-cover border rounded"
         />
         <InputError :message="form.errors.photo3" />
       </div>
@@ -302,8 +302,8 @@ function acceptTerms() {
       <!-- Submit Button -->
       <button
         type="submit"
-        class="mt-2 w-full"
-        style="background:#FF2D2D; color:#fff; font-weight:600; padding:0.5rem; border-radius:0.5rem;"
+        class="mt-2 w-full py-3"
+        style="background:#FF2D2D; color:#fff; font-weight:600; border-radius:0.5rem;"
         :disabled="form.processing"
       >
         Register
@@ -313,9 +313,9 @@ function acceptTerms() {
     <!-- Terms Modal -->
 <div
   v-if="showTermsModal"
-  class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4"
+  class="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-50 px-4"
 >
-  <div class="bg-white w-full max-w-lg rounded-2xl shadow-xl p-6 relative overflow-y-auto max-h-[80vh]">
+  <div class="bg-white w-full max-w-lg rounded-t-2xl sm:rounded-2xl shadow-xl p-4 sm:p-6 relative overflow-y-auto max-h-[80vh]">
     <h2 class="text-xl font-bold text-[#002B5C] mb-4">WashWise Terms and Conditions</h2>
     <div class="text-gray-700 space-y-2 text-sm">
       <p>By signing up for an account on WashWise, you agree to the following terms:</p>
@@ -349,3 +349,23 @@ function acceptTerms() {
 </div>
   </div>
 </template>
+
+<style>
+/* Keep the same alerts styles */
+.alert-success {
+  background-color: #d4edda;
+  color: #155724;
+  padding: 1rem;
+  border-radius: 0.25rem;
+}
+.alert-danger {
+  background-color: #f8d7da;
+  color: #721c24;
+  padding: 1rem;
+  border-radius: 0.25rem;
+}
+
+/* Small tweaks to improve tap targets on mobile */
+input[type="file"] { touch-action: manipulation; }
+button { -webkit-tap-highlight-color: transparent; }
+</style>
