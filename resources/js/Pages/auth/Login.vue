@@ -36,7 +36,7 @@ const forgotForm = useForm({
   password_confirmation: '',
 })
 const sendCode = () => {
-  forgotForm.post(route('password.sendCode.user'), {
+  forgotForm.post(route('password.sendCode'), {
     onSuccess: () => {
       forgotStatus.value = 'Verification code sent!'
       forgotStep.value = 2
@@ -45,7 +45,7 @@ const sendCode = () => {
 }
 
 const resetPassword = () => {
-  forgotForm.post(route('password.reset.user'), {
+  forgotForm.post(route('password.reset'), {
     onSuccess: () => {
       forgotStatus.value = 'Password reset successful! You can now log in.'
       setTimeout(() => showForgotPassword.value = false, 1500)
