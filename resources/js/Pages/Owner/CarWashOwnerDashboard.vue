@@ -106,32 +106,13 @@ function openShop(id?: number | null) {
   <span class="block h-0.5 w-full bg-[#002B5C] rounded"></span>
 </button>
 
-
-<div class="w-full flex items-center justify-between px-4 py-2">
-
-  <!-- LEFT — LOGO -->
-<div class="flex items-center justify-between w-full px-4 sm:px-6 py-2">
-  <!-- LEFT — Logo -->
-  <div class="flex-shrink-0">
-    <img
-      src="/images/washwiselogo2.png"
-      alt="WashWise Logo"
-      class="h-10 w-auto select-none"
-      draggable="false"
-    />
-  </div>
-
-  <!-- RIGHT — Owner Name -->
-  <div class="ml-4 sm:ml-6 text-gray-700 font-medium truncate max-w-[50%] text-right">
-    {{ user ? user.name : 'Owner' }}
-  </div>
-</div>
-
-</div>
+      <img src="/images/washwiselogo2.png" alt="WashWise Logo" class="h-10 w-auto select-none" draggable="false" />
     </div>
-  </div>
 
-
+    <div class="flex items-center space-x-2 px-3 py-2 rounded-lg">
+      <span class="text-gray-700 font-medium">{{ user ? user.name : 'Owner' }}</span>
+    </div>
+</div>
   <!-- Sidebar -->
   <aside
     :class="[
