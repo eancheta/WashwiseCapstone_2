@@ -163,6 +163,6 @@ public function login(Request $request)
             'status' => 'verified', // ✅ update to verified
         ]);
 
-        return redirect()->route('login')->with('success', 'Email verified successfully! You can now log in.');
+        return redirect()->route('login')->with('success', 'Email verified successfully! Your account currently pending please wait for approval.');
     }
 }
