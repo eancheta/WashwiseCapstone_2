@@ -63,20 +63,20 @@ function submit() {
   <Head title="Car Wash Owner Registration" />
 
   <!-- Top Info Bar -->
-  <div class="w-full bg-white flex flex-wrap items-center justify-between px-4 sm:px-8 py-2 border-b border-gray-200 text-sm font-semibold">
-    <img src="/images/washwiselogo2.png" alt="WashWise Logo" class="h-12 sm:h-14 w-auto mx-auto block" draggable="false" />
-    <div class="flex gap-6 items-center text-[#002B5C] text-xs sm:text-sm">
-      <div class="flex items-center gap-2">📞 <span class="font-bold">Call Us</span> <span class="font-normal">+012 345 6789</span></div>
-      <div class="flex items-center gap-2">✉️ <span class="font-bold">Email Us</span> <span class="font-normal">washwise00@gmail.com</span></div>
+  <div class="w-full bg-white flex flex-col sm:flex-row items-center sm:justify-between gap-2 px-4 sm:px-8 py-2 border-b border-gray-200 text-xs sm:text-sm font-semibold text-center sm:text-left">
+    <img src="/images/washwiselogo2.png" alt="WashWise Logo" class="h-12 sm:h-14 w-auto block mx-auto sm:mx-0" draggable="false" />
+    <div class="flex flex-col sm:flex-row gap-1 sm:gap-6 items-center text-[#002B5C]">
+      <div class="flex items-center gap-2"><span class="hidden sm:inline">📞</span> <span class="font-bold">Call Us</span> <span class="font-normal">+012 345 6789</span></div>
+      <div class="flex items-center gap-2"><span class="hidden sm:inline">✉️</span> <span class="font-bold">Email Us</span> <span class="font-normal">washwise00@gmail.com</span></div>
     </div>
   </div>
 
   <!-- Navigation Bar -->
-  <nav class="w-full bg-[#182235] flex items-center px-4 sm:px-8 py-2 text-white font-semibold shadow z-10">
-    <ul class="flex gap-4 items-center flex-1">
+  <nav class="w-full bg-[#182235] flex items-center justify-between flex-wrap px-4 sm:px-8 py-2 text-white font-semibold shadow z-10">
+    <ul class="flex gap-4 items-center flex-1 flex-wrap">
       <li><Link :href="'/'" class="text-[#FF2D2D] font-bold text-base">Home</Link></li>
     </ul>
-    <div class="flex items-center gap-4 ml-4">
+    <div class="flex items-center gap-3 ml-4">
       <button @click="openLoginModal" class="text-white font-semibold hover:text-[#FF2D2D] transition text-base">Log in</button>
       <button @click="openRegisterModal" class="px-4 py-2 rounded-full border-2 font-semibold transition" style="border-color:#FF2D2D; color:#FF2D2D;">Register</button>
     </div>
@@ -107,9 +107,10 @@ function submit() {
   </div>
 
   <!-- Owner Register Form -->
-  <div class="flex-grow flex items-center justify-center bg-[#F8FAFC] min-h-screen px-4">
+  <!-- Note: outer wrapper has NO horizontal padding on mobile (E2) as requested -->
+  <div class="flex-grow flex items-center justify-center bg-[#F8FAFC] min-h-screen">
     <form @submit.prevent="submit" enctype="multipart/form-data"
-      class="flex flex-col gap-4 w-full max-w-lg mx-auto bg-white p-4 sm:p-8 rounded-lg shadow-md overflow-y-auto"
+      class="flex flex-col gap-4 w-full lg:max-w-lg mx-auto bg-white p-4 sm:p-8 rounded-lg shadow-md overflow-y-auto"
       style="max-height: 90vh;"
     >
       <h2 class="text-2xl font-bold text-center text-[#182235]">Register as Owner</h2>
@@ -230,7 +231,7 @@ button { -webkit-tap-highlight-color: transparent; }
 
 /* Mobile adjustments */
 @media (max-width: 640px) {
-  form { padding: 2rem 1rem; }
+form { padding: 2rem 1rem; }
   input, select, button { font-size: 0.875rem; }
   .flex-col > * + * { margin-top: 0.75rem; }
 }

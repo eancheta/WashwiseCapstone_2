@@ -89,6 +89,25 @@ function openShop(id?: number | null) {
 <template>
   <Head title="Owner Dashboard" />
 
+
+    <header class="w-full bg-white flex items-center justify-between px-4 py-3 shadow-md sticky top-0 z-40">
+  <button
+  @click="toggleSidebar"
+  class="flex flex-col justify-between w-6 h-5 min-w-[24px] min-h-[20px] focus:outline-none hover:opacity-80 transition z-50 relative"
+  aria-label="Toggle sidebar"
+>
+  <span class="block h-0.5 w-full bg-[#002B5C] rounded"></span>
+  <span class="block h-0.5 w-full bg-[#002B5C] rounded"></span>
+  <span class="block h-0.5 w-full bg-[#002B5C] rounded"></span>
+    </button>
+
+    <div class="flex items-center gap-2">
+      <img src="/images/washwiselogo2.png" alt="WashWise Logo" class="h-10 w-auto object-contain" />
+    </div>
+
+    <span class="hidden sm:block text-sm font-semibold text-gray-800">{{ user ? user.name : 'Owner' }}</span>
+  </header>
+
   <!-- Top Navigation -->
   <div
     class="w-full bg-white flex items-center justify-between px-6 py-3 border-b border-gray-200 shadow-sm sticky top-0 z-40"
@@ -106,12 +125,9 @@ function openShop(id?: number | null) {
 
       <img src="/images/washwiselogo2.png" alt="WashWise Logo" class="h-10 w-auto select-none" draggable="false" />
     </div>
-
-<div class="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-100 w-full overflow-hidden">
-  <span class="text-gray-700 font-medium truncate">
-    {{ user ? user.name : 'Owner' }}
-  </span>
-</div>
+    <div class="flex items-center space-x-2 px-3 py-2 rounded-lg">
+      <span class="text-gray-700 font-medium">{{ user ? user.name : 'Owner' }}</span>
+    </div>
   </div>
 
   <!-- Sidebar -->

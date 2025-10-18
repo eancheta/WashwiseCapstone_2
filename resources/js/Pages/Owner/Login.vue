@@ -1,4 +1,3 @@
-// File: OwnerLogin.vue
 <script setup lang="ts">
 import InputError from '@/components/InputError.vue';
 import TextLink from '@/components/TextLink.vue';
@@ -22,7 +21,7 @@ const submit = () => {
     });
 };
 
-// Forgot Password
+// Forgot Password for Owner
 const showForgotPassword = ref(false);
 const forgotStep = ref(1);
 const forgotStatus = ref('');
@@ -34,17 +33,17 @@ const forgotForm = useForm({
 });
 
 const sendCode = () => {
-  forgotForm.post(route('password.sendCode.owner'), {
+  forgotForm.post(route('password.sendCode'), { // owner route
     onSuccess: () => {
       forgotStatus.value = 'Verification code sent!'
       forgotStep.value = 2
     },
-    onError: (errors) => console.error(errors),
+    onError: (errors) => console.error(errors)
   })
-};
+}
 
 const resetPassword = () => {
-  forgotForm.post(route('password.reset.owner'), {
+  forgotForm.post(route('password.reset'), { // owner route
     onSuccess: () => {
       forgotStatus.value = 'Password reset successful! You can now log in.'
       setTimeout(() => {
@@ -53,9 +52,9 @@ const resetPassword = () => {
         forgotForm.reset()
       }, 1500)
     },
-    onError: (errors) => console.error(errors),
+    onError: (errors) => console.error(errors)
   })
-};
+}
 </script>
 
 <template>
