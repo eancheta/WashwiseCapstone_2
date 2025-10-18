@@ -110,14 +110,22 @@ function openShop(id?: number | null) {
 <div class="w-full flex items-center justify-between px-4 py-2">
 
   <!-- LEFT — LOGO -->
-  <div class="flex items-center">
-    <img src="/images/washwiselogo2.png" alt="WashWise Logo" class="h-10 w-auto select-none" draggable="false" />
+<div class="flex items-center justify-between w-full px-4 sm:px-6 py-2">
+  <!-- LEFT — Logo -->
+  <div class="flex-shrink-0">
+    <img
+      src="/images/washwiselogo2.png"
+      alt="WashWise Logo"
+      class="h-10 w-auto select-none"
+      draggable="false"
+    />
   </div>
 
-  <!-- RIGHT — OWNER -->
-  <div>
-    <span class="text-gray-700 font-medium">{{ user ? user.name : 'Owner' }}</span>
+  <!-- RIGHT — Owner Name -->
+  <div class="ml-4 sm:ml-6 text-gray-700 font-medium truncate max-w-[50%] text-right">
+    {{ user ? user.name : 'Owner' }}
   </div>
+</div>
 
 </div>
     </div>

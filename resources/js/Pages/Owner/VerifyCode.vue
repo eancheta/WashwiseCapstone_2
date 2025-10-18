@@ -53,7 +53,7 @@ function resend() {
     <!-- Navbar -->
     <nav class="w-full bg-[#182235] flex flex-wrap sm:flex-nowrap items-center px-4 sm:px-6 py-2 text-white font-semibold shadow z-10">
       <ul class="flex flex-1 gap-4 sm:gap-6 items-center flex-wrap sm:flex-nowrap">
-        <TextLink :href="route('home')" class="text-[#FF2D2D]">Home</TextLink>
+        <TextLink :href="route('home')" class="text-white">Home</TextLink>
       </ul>
       <div class="flex gap-2 sm:gap-4 mt-2 sm:mt-0">
         <TextLink
