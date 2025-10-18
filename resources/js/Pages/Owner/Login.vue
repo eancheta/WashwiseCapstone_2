@@ -131,7 +131,9 @@ function submit() {
           Login
         </button>
       </div>
-
+<Link :href="route('password.request', { type: 'owner' })" class="text-sm text-blue-600 hover:underline">
+  Forgot your password?
+</Link>
       <div class="text-center text-sm mt-2">
         <span class="text-gray-600">Don't have an account?</span>
         <a
@@ -141,11 +143,6 @@ function submit() {
         >
           Register
         </a>
-      </div>
-      <div class="text-center text-sm mt-1">
-<Link :href="route('password.request', { type: 'owner' })" class="text-sm text-blue-600 hover:underline">
-  Forgot your password?
-</Link>
       </div>
     </form>
   </div>

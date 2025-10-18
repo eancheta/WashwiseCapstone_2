@@ -140,7 +140,9 @@ const submit = () => {
             Log in
           </Button>
         </div>
-
+<Link :href="route('password.request', { type: 'user' })" class="text-sm text-blue-600 hover:underline">
+  Forgot your password?
+</Link>
         <!-- Links -->
         <div class="text-center text-sm mt-2">
           <span class="text-gray-600">Don't have an account?</span>
@@ -151,12 +153,6 @@ const submit = () => {
           >
             Register
           </TextLink>
-        </div>
-
-        <div v-if="canResetPassword" class="text-center text-sm mt-1">
-<Link :href="route('password.request', { type: 'user' })" class="text-sm text-blue-600 hover:underline">
-  Forgot your password?
-</Link>
         </div>
       </form>
     </div>
