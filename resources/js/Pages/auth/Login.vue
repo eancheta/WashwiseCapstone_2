@@ -140,9 +140,9 @@ const submit = () => {
             Log in
           </Button>
         </div>
-<Link :href="route('password.request', { type: 'user' })" class="text-sm text-blue-600 hover:underline">
+<a :href="route('password.request', { type: 'user' })" class="text-sm text-blue-600 hover:underline">
   Forgot your password?
-</Link>
+</a>
         <!-- Links -->
         <div class="text-center text-sm mt-2">
           <span class="text-gray-600">Don't have an account?</span>
