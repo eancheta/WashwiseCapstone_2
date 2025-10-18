@@ -154,13 +154,9 @@ const submit = () => {
         </div>
 
         <div v-if="canResetPassword" class="text-center text-sm mt-1">
-          <TextLink
-            :href="route('password.request')"
-            class="text-sm font-medium transition-colors duration-200 hover:text-[#004080]"
-            style="color: #002B5C;"
-          >
-            Forgot your password?
-          </TextLink>
+<Link :href="route('password.request', { type: 'user' })" class="text-sm text-blue-600 hover:underline">
+  Forgot your password?
+</Link>
         </div>
       </form>
     </div>

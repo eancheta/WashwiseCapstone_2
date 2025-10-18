@@ -143,13 +143,9 @@ function submit() {
         </a>
       </div>
       <div class="text-center text-sm mt-1">
-        <a
-          href="/owner/forgot-password"
-          class="text-sm font-medium transition-colors duration-200 hover:text-[#004080]"
-          style="color: #002B5C;"
-        >
-          Forgot your password?
-        </a>
+<Link :href="route('password.request', { type: 'owner' })" class="text-sm text-blue-600 hover:underline">
+  Forgot your password?
+</Link>
       </div>
     </form>
   </div>

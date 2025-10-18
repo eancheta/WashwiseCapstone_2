@@ -30,6 +30,19 @@ use App\Http\Controllers\Owner\ReviewController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use app\Http\Middleware\EnsureUserIsVerified;
 
+use App\Http\Controllers\Auth\ForgotPasswordController;
+
+Route::get('/forgot-password', fn (Request $request) =>
+    Inertia::render('auth/ForgotPassword', [
+        'type' => $request->query('type', 'user') // default = user
+    ])
+)->name('password.request');
+
+Route::post('/forgot-password/send-code', [ForgotPasswordController::class, 'sendCode'])->name('password.sendCode');
+Route::post('/forgot-password/reset', [ForgotPasswordController::class, 'resetPassword'])->name('password.reset');
+
+
+
 Route::post('/customers/{id}/approve', [AdminController::class, 'approveCustomer'])->name('customers.approve');
 Route::post('/customers/{id}/decline', [AdminController::class, 'declineCustomer'])->name('customers.decline');
 
