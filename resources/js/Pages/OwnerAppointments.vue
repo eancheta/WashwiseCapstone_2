@@ -81,10 +81,10 @@
     v-model="statusFilter"
     class="w-full px-4 py-2 sm:py-3 font-semibold text-[#182235] border rounded-lg focus:ring-2 focus:ring-[#002B5C] focus:outline-none"
   >
-    <option value="all">All</option>
-    <option value="approved">Approved</option>
-    <option value="declined">Declined</option>
-    <option value="pending">Pending</option>
+    <option value="All">All</option>
+    <option value="Approved">Approved</option>
+    <option value="Declined">Declined</option>
+    <option value="Pending">Pending</option>
   </select>
 </div>
       </div>
@@ -346,7 +346,7 @@ const filteredAppointments = computed(() => {
   // --- STATUS FILTER ---
   if (statusFilter.value !== "all") {
     data = data.filter((a) => {
-      const status = a.status?.toLowerCase() || "pending";
+      const status = a.status?.toLowerCase() || "Pending";
       return status === statusFilter.value;
     });
   }

@@ -142,7 +142,7 @@ public function approve($id)
 
     DB::table($tableName)
         ->where('id', $id)
-        ->update(['status' => 'approved']);
+        ->update(['status' => 'Approved']);
 
     if ($booking->email) {
         $shop = CarWashShop::findOrFail($shopId);
