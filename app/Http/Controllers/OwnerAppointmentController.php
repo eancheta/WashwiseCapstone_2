@@ -211,7 +211,6 @@ public function decline(Request $request, $id)
         return back()->with('error', 'Booking not found.');
     }
 
-    // Update DB
     DB::table($tableName)
         ->where('id', $id)
         ->update(['status' => 'Declined', 'reason' => $request->reason]);
