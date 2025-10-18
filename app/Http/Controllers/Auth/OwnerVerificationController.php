@@ -59,6 +59,6 @@ class OwnerVerificationController extends Controller
         session()->forget('owner_verification_email');
 
         return redirect()->route('owner.login.show')
-            ->with('success', 'Email verified successfully. Please login.');
+            ->with('success', 'Email verification successful. Your account is currently pending approval. You will be notified via email.');
     }
 }
