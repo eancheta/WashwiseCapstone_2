@@ -94,15 +94,15 @@ function openShop(id?: number | null) {
     class="w-full bg-white flex items-center justify-between px-6 py-3 border-b border-gray-200 shadow-sm sticky top-0 z-40"
   >
     <div class="flex items-center gap-4">
-      <button
-        @click="toggleSidebar"
-        class="flex flex-col justify-between w-6 h-5 focus:outline-none hover:opacity-80 transition"
-        aria-label="Toggle sidebar"
-      >
-        <span class="block h-0.5 bg-blue-800 rounded"></span>
-        <span class="block h-0.5 bg-blue-800 rounded"></span>
-        <span class="block h-0.5 bg-blue-800 rounded"></span>
-      </button>
+<button
+  @click="toggleSidebar"
+  class="flex flex-col justify-between w-6 h-5 focus:outline-none hover:opacity-80 transition z-50 relative"
+  aria-label="Toggle sidebar"
+>
+  <span class="block h-0.5 bg-[#002B5C] rounded"></span>
+  <span class="block h-0.5 bg-[#002B5C] rounded"></span>
+  <span class="block h-0.5 bg-[#002B5C] rounded"></span>
+</button>
 
       <img src="/images/washwiselogo2.png" alt="WashWise Logo" class="h-10 w-auto select-none" draggable="false" />
     </div>

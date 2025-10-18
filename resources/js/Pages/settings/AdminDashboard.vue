@@ -416,7 +416,7 @@ const submitDecline = () => {
             @click="submitDecline"
             class="px-5 py-2 bg-[#FF2D2D] text-white font-semibold rounded-lg hover:bg-[#E02626] transition"
           >
-            Send & Decline
+            Send & Delete
           </button>
         </div>
       </div>
@@ -460,8 +460,8 @@ const submitDecline = () => {
 </div>
 <div v-if="showDeclineCustomerModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 px-4">
   <div class="bg-white w-full max-w-md rounded-2xl shadow-xl p-6 relative">
-    <h2 class="text-xl font-bold text-[#002B5C] mb-4">Decline Customer Account</h2>
-    <p class="text-gray-600 mb-3">Please write the reason for declining this customer:</p>
+    <h2 class="text-xl font-bold text-[#002B5C] mb-4">Deleting Account</h2>
+    <p class="text-gray-600 mb-3">Please write the reason for deleting this customer:</p>
     <textarea
       v-model="declineCustomerReason"
       rows="4"
@@ -480,7 +480,7 @@ const submitDecline = () => {
         @click="submitDeclineCustomer"
         class="px-5 py-2 bg-[#FF2D2D] text-white font-semibold rounded-lg hover:bg-[#E02626] transition"
       >
-        Send & Decline
+        Send & Delete
       </button>
     </div>
   </div>
