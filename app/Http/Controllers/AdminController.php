@@ -32,7 +32,7 @@ public function index()
     public function approve($id)
     {
         $owner = CarWashOwner::findOrFail($id);
-        $owner->status = 'approved';
+        $owner->status = 'Approved';
         $owner->save();
 
         try {

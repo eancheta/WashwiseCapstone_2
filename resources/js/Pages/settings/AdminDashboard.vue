@@ -13,6 +13,17 @@ function getPhotoSrc(photoPath: string | null): string {
   return `/storage/${photoPath}`
 }
 
+const deleteOwnerAccount = (id: number) => {
+  if (!confirm('Are you sure you want to delete this account?')) return
+  router.post(route('owners.decline', { id }))
+}
+
+const deleteCustomerAccount = (id: number) => {
+  if (!confirm('Are you sure you want to delete this account?')) return
+  router.post(route('customers.decline', { id }))
+}
+
+
 interface Owner {
   id: number
   name: string
@@ -228,25 +239,33 @@ const submitDeclineCustomer = () => {
                   <!-- Action Column -->
 <td class="py-2 px-3">
   <div class="flex flex-wrap gap-2 justify-center">
-    <!-- Approve Button -->
-    <button
-      @click="approveCustomer(user.id)"
-      :disabled="user.customer_status === 'approved'"
-      class="min-w-[70px] px-3 py-1 sm:px-4 sm:py-2 rounded-lg font-semibold text-xs sm:text-sm transition
-             text-white
-             bg-green-600 hover:bg-green-700
-             disabled:bg-gray-400 disabled:cursor-not-allowed"
-    >
-      {{ user.customer_status === 'approved' ? 'Approved' : 'Approve' }}
-    </button>
+    <!-- If approved -->
+    <template v-if="user.customer_status === 'approved'">
+      <button
+        @click="deleteCustomerAccount(user.id)"
+        class="min-w-[70px] px-3 py-1 sm:px-4 sm:py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold text-xs sm:text-sm transition"
+      >
+        Delete
+      </button>
+    </template>
 
-    <!-- Decline Button -->
-    <button
-      @click="openDeclineCustomerModal(user.id)"
-      class="min-w-[70px] px-3 py-1 sm:px-4 sm:py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold text-xs sm:text-sm transition"
-    >
-      Decline
-    </button>
+    <!-- If not approved -->
+    <template v-else>
+      <button
+        @click="approveCustomer(user.id)"
+        class="min-w-[70px] px-3 py-1 sm:px-4 sm:py-2 rounded-lg font-semibold text-xs sm:text-sm transition
+               text-white bg-green-600 hover:bg-green-700"
+      >
+        Approve
+      </button>
+
+      <button
+        @click="openDeclineCustomerModal(user.id)"
+        class="min-w-[70px] px-3 py-1 sm:px-4 sm:py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold text-xs sm:text-sm transition"
+      >
+        Decline
+      </button>
+    </template>
   </div>
 </td>
             </tr>
@@ -310,33 +329,47 @@ const submitDeclineCustomer = () => {
 
 <td class="px-2 py-2 text-center">
   <div class="flex flex-wrap gap-2 justify-center">
-    <!-- Approve Button -->
-    <button
-      @click="approve(owner.id)"
-      :disabled="owner.status === 'approved'"
-      class="min-w-[70px] px-3 py-1 sm:px-4 sm:py-2 rounded-lg font-semibold text-xs sm:text-sm transition
-             text-white
-             bg-green-600 hover:bg-green-700
-             disabled:bg-gray-400 disabled:cursor-not-allowed"
-    >
-      {{ owner.status === 'approved' ? 'Approved' : 'Approve' }}
-    </button>
+    <!-- If approved -->
+    <template v-if="owner.status === 'approved'">
+      <button
+        @click="deleteOwnerAccount(owner.id)"
+        class="min-w-[70px] px-3 py-1 sm:px-4 sm:py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold text-xs sm:text-sm transition"
+      >
+        Delete
+      </button>
 
-    <!-- Decline Button -->
-    <button
-      @click="openDeclineModal(owner.id)"
-      class="min-w-[70px] px-3 py-1 sm:px-4 sm:py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold text-xs sm:text-sm transition"
-    >
-      Decline
-    </button>
+      <button
+        @click="openFeedbackModal(owner)"
+        class="min-w-[70px] px-3 py-1 sm:px-4 sm:py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-xs sm:text-sm transition"
+      >
+        View Feedback
+      </button>
+    </template>
 
-    <!-- Feedback Button -->
-    <button
-      @click="openFeedbackModal(owner)"
-      class="min-w-[70px] px-3 py-1 sm:px-4 sm:py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-xs sm:text-sm transition"
-    >
-      Feedback
-    </button>
+    <!-- If not approved -->
+    <template v-else>
+      <button
+        @click="approve(owner.id)"
+        class="min-w-[70px] px-3 py-1 sm:px-4 sm:py-2 rounded-lg font-semibold text-xs sm:text-sm transition
+               text-white bg-green-600 hover:bg-green-700"
+      >
+        Approve
+      </button>
+
+      <button
+        @click="openDeclineModal(owner.id)"
+        class="min-w-[70px] px-3 py-1 sm:px-4 sm:py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold text-xs sm:text-sm transition"
+      >
+        Decline
+      </button>
+
+      <button
+        @click="openFeedbackModal(owner)"
+        class="min-w-[70px] px-3 py-1 sm:px-4 sm:py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-xs sm:text-sm transition"
+      >
+        View Feedback
+      </button>
+    </template>
   </div>
 </td>
             </tr>
