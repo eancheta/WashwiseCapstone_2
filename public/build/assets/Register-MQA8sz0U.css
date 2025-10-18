@@ -1,0 +1,1 @@
+input[type=file]{touch-action:manipulation}button{-webkit-tap-highlight-color:transparent}@media (max-width: 640px){form{padding:2rem 1rem}input,select,button{font-size:.875rem}.flex-col>*+*{margin-top:.75rem}}

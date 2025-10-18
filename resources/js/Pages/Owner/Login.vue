@@ -34,23 +34,26 @@ const forgotForm = useForm({
 });
 
 const sendCode = () => {
-forgotForm.post(route('password.reset'), {
-  onSuccess: () => {
-    forgotStatus.value = 'Password reset successful! You can now log in.'
-    setTimeout(() => showForgotPassword.value = false, 1500)
-    forgotStep.value = 1
-    forgotForm.reset()
-  },
-  onError: (errors) => console.error(errors),
-})
+  forgotForm.post(route('password.sendCode.owner'), {
+    onSuccess: () => {
+      forgotStatus.value = 'Verification code sent!'
+      forgotStep.value = 2
+    },
+    onError: (errors) => console.error(errors),
+  })
 };
 
 const resetPassword = () => {
-  forgotForm.post(route('password.reset'), {
+  forgotForm.post(route('password.reset.owner'), {
     onSuccess: () => {
       forgotStatus.value = 'Password reset successful! You can now log in.'
-      setTimeout(() => showForgotPassword.value = false, 1500)
-    }
+      setTimeout(() => {
+        showForgotPassword.value = false
+        forgotStep.value = 1
+        forgotForm.reset()
+      }, 1500)
+    },
+    onError: (errors) => console.error(errors),
   })
 };
 </script>
