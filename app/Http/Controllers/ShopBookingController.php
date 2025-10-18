@@ -239,7 +239,7 @@ public function confirmBooking(Request $request, int $shopId)
             'payment_amount' => $data['payment_amount'],
             'payment_proof' => $paymentProofUrl,
             'services_offered' => $data['services_offered'] ?? null, // ✅ update existing
-            'status' => 'pending',
+            'status' => 'Pending',
             'user_id' => Auth::id(),
             'updated_at' => $now,
         ]);
@@ -256,7 +256,7 @@ public function confirmBooking(Request $request, int $shopId)
             'services_offered' => $data['services_offered'] ?? null, // ✅ insert new
             'payment_amount' => $data['payment_amount'],
             'payment_proof' => $paymentProofUrl,
-            'status' => 'pending',
+            'status' => 'Pending',
             'created_at' => $now,
             'updated_at' => $now,
         ]);

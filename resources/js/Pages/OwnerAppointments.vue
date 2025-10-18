@@ -127,8 +127,8 @@
               <td class="px-3 sm:px-4 py-3">{{ appt.date_of_booking }}</td>
               <td class="px-3 sm:px-4 py-3">{{ appt.time_of_booking }}</td>
               <td class="px-3 sm:px-4 py-3">
-                <span v-if="appt.status === 'approved'" class="text-green-600 font-semibold">Approved</span>
-                <span v-else-if="appt.status === 'declined'" class="text-red-600 font-semibold">Declined</span>
+                <span v-if="appt.status === 'Approved'" class="text-green-600 font-semibold">Approved</span>
+                <span v-else-if="appt.status === 'Declined'" class="text-red-600 font-semibold">Declined</span>
                 <span v-else class="text-gray-600 font-semibold">Pending</span>
               </td>
               <td class="px-3 sm:px-4 py-3 text-center">{{ appt.id }}</td>
