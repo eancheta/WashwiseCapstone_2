@@ -1,7 +1,9 @@
 <?php
 
 namespace App\Http\Controllers\Auth;
+use Illuminate\Support\Facades\Http;
 
+use Illuminate\Support\Facades\View;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
@@ -15,47 +17,69 @@ use App\Models\PasswordResetCode;
 class ForgotPasswordController extends Controller
 {
     // Step 1: Send verification code
-    public function sendCode(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email',
-        ]);
+public function sendCode(Request $request)
+{
+    $request->validate(['email' => 'required|email']);
+    $email = $request->email;
 
-        $email = $request->email;
+    // Determine user type (owner or customer)
+    $owner = CarWashOwner::where('email', $email)->first();
+    $user  = $owner ? null : User::where('email', $email)->first();
 
-        // Check if the email belongs to an owner or a user
-        $owner = CarWashOwner::where('email', $email)->first();
-        $user  = $owner ? null : User::where('email', $email)->first();
-
-        if (!$owner && !$user) {
-            return back()->withErrors(['email' => 'No account found with this email.']);
-        }
-
-        $model = $owner ?? $user;
-        $userType = $owner ? 'owner' : 'user';
-
-        // Generate 6-digit code
-        $code = rand(100000, 999999);
-
-        // Store code in database
-        PasswordResetCode::updateOrCreate(
-            ['email' => $email, 'user_type' => $userType],
-            ['code' => $code, 'expires_at' => Carbon::now()->addMinutes(10)]
-        );
-
-        // Send email
-        try {
-            $toName = $model->name ?? 'WashWise User';
-            Mail::raw("Hello {$toName},\nYour WashWise password reset code is: {$code}", function ($message) use ($email) {
-                $message->to($email)
-                        ->subject('WashWise Password Reset Code');
-            });
-        } catch (\Throwable $e) {
-            Log::error("Failed to send password reset email to {$email}: " . $e->getMessage());
-        }
-
-        return back()->with('status', 'Verification code sent to your email.');
+    if (!$owner && !$user) {
+        return back()->withErrors(['email' => 'No account found with this email.']);
     }
+
+    $model = $owner ?? $user;
+    $userType = $owner ? 'owner' : 'user';
+
+    $code = rand(100000, 999999);
+
+    PasswordResetCode::updateOrCreate(
+        ['email' => $email, 'user_type' => $userType],
+        ['code' => $code, 'expires_at' => now()->addMinutes(10)]
+    );
+
+    $toName = $model->name ?? 'WashWise User';
+
+    // Build email content
+    $htmlContent = View::make('emails.verify-code', [
+        'name'   => $toName,
+        'toName' => $toName,
+        'code'   => $code,
+    ])->render();
+
+    $textContent = "Hello {$toName},\nYour WashWise verification code is: {$code}\n\nThanks,\nWashWise";
+
+    // Send email via Sendinblue API
+    try {
+        $payload = [
+            'sender' => [
+                'name'  => env('MAIL_FROM_NAME', 'WashWise'),
+                'email' => env('MAIL_FROM_ADDRESS', 'noreply@example.com'),
+            ],
+            'to' => [
+                ['email' => $email, 'name' => $toName],
+            ],
+            'subject' => 'WashWise — Your verification code',
+            'htmlContent' => $htmlContent,
+            'textContent' => $textContent,
+        ];
+
+        $response = Http::withHeaders([
+            'api-key' => env('SENDINBLUE_API_KEY'),
+            'Content-Type' => 'application/json',
+        ])->post('https://api.sendinblue.com/v3/smtp/email', $payload);
+
+        if ($response->failed()) {
+            Log::error("Failed to send password reset email to {$email}", ['response' => $response->body()]);
+        }
+    } catch (\Throwable $e) {
+        Log::error("Sendinblue API error for {$email}: " . $e->getMessage());
+    }
+
+    return back()->with('status', 'Verification code sent to your email (if it exists).');
+}
 
     // Step 2: Verify code and reset password
     public function resetPassword(Request $request)
