@@ -344,12 +344,12 @@ const filteredAppointments = computed(() => {
   }
 
   // --- STATUS FILTER ---
-  if (statusFilter.value !== "all") {
-    data = data.filter((a) => {
-      const status = a.status?.toLowerCase() || "Pending";
-      return status === statusFilter.value;
-    });
-  }
+if (statusFilter.value !== "All") {
+  data = data.filter((a) => {
+    const status = a.status || "Pending";
+    return status === statusFilter.value;
+  });
+}
 
   return data;
 });
