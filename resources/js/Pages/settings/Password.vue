@@ -16,8 +16,37 @@ const form = useForm({
   password_confirmation: '',
 })
 
+// alert messages
+const successMessage = ref('')
+const errorMessage = ref('')
+
+const clearAlerts = (delay = 3000) => {
+  setTimeout(() => {
+    successMessage.value = ''
+    errorMessage.value = ''
+  }, delay)
+}
+
 const submit = () => {
-  form.put('/settings/password')
+  form.put('/settings/password', {
+    onSuccess: () => {
+      successMessage.value = 'Password changed successfully! You can now log in.'
+      form.reset('current_password', 'password', 'password_confirmation')
+      clearAlerts(3500)
+    },
+    onError: (err: any) => {
+      // normalize where the server may put validation messages
+      const errorData = (err as any)?.response?.data ?? (err as any)
+      const firstErr =
+        errorData?.errors?.current_password?.[0] ||
+        errorData?.errors?.password?.[0] ||
+        errorData?.message ||
+        'Failed to change password. Please check your inputs.'
+      errorMessage.value = firstErr
+      clearAlerts(5000)
+      console.error('Change password error:', err)
+    },
+  })
 }
 
 function goTo(path: string) {
@@ -50,6 +79,14 @@ function goTo(path: string) {
           <h1 class="text-2xl font-extrabold text-center text-[#002B5C] mb-6 tracking-tight">
             Change Password
           </h1>
+
+          <!-- Success / Error Alerts -->
+          <div v-if="successMessage" class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg text-center font-semibold">
+            {{ successMessage }}
+          </div>
+          <div v-if="errorMessage" class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg text-center font-semibold">
+            {{ errorMessage }}
+          </div>
 
           <form @submit.prevent="submit" class="space-y-6">
             <!-- Current Password -->
