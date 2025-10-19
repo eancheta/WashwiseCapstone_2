@@ -11,14 +11,16 @@
         <p>Hi {{ $toName }},</p>
 
         <p>
-            Thank you for signing up with <strong>WashWise</strong> – your go-to platform for hassle-free car wash bookings in Quezon City!
+            Thank you for using <strong>WashWise</strong>
         </p>
 
         <p>
-            To complete your registration, please verify your email address by entering the code below:
+            Here is your verification code:
         </p>
 
         <h1 style="text-align: center; color: #FF2D2D; font-size: 36px; letter-spacing: 4px;">{{ $code }}</h1>
+
+        <p>You can use this code to complete your registration or reset your password.</p>
 
         <p>If you did not sign up for a WashWise account, please ignore this message.</p>
 
