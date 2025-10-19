@@ -105,7 +105,10 @@ const resetPassword = () => {
       >
         <h2 class="text-2xl sm:text-3xl font-bold text-center text-[#182235]">Log in to your account</h2>
         <p class="text-center text-gray-500 mb-4 text-sm sm:text-base">Enter your credentials below to log in</p>
-
+<!-- Password Reset Notice -->
+<div v-if="forgotStatus" class="alert-success mb-4 text-center">
+  {{ forgotStatus }}
+</div>
         <!-- Flash Messages -->
         <div v-if="$page.props.flash.error" class="alert-danger mb-4">
           {{ $page.props.flash.error }}
