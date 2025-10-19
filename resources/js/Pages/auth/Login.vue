@@ -45,11 +45,16 @@ const sendCode = () => {
 }
 
 const resetPassword = () => {
-  forgotForm.post(route('password.reset'), {
+  forgotForm.post(route('password.reset'), { // owner route
     onSuccess: () => {
       forgotStatus.value = 'Password reset successful! You can now log in.'
-      setTimeout(() => showForgotPassword.value = false, 1500)
-    }
+      setTimeout(() => {
+        showForgotPassword.value = false
+        forgotStep.value = 1
+        forgotForm.reset()
+      }, 1500)
+    },
+    onError: (errors) => console.error(errors)
   })
 }
 </script>
@@ -105,10 +110,10 @@ const resetPassword = () => {
       >
         <h2 class="text-2xl sm:text-3xl font-bold text-center text-[#182235]">Log in to your account</h2>
         <p class="text-center text-gray-500 mb-4 text-sm sm:text-base">Enter your credentials below to log in</p>
-<!-- Password Reset Notice -->
-<div v-if="forgotStatus" class="alert-success mb-4 text-center">
-  {{ forgotStatus }}
-</div>
+  <!-- Password Reset Notice -->
+  <div v-if="forgotStatus" class="alert-success mb-4 text-center">
+    {{ forgotStatus }}
+  </div>
         <!-- Flash Messages -->
         <div v-if="$page.props.flash.error" class="alert-danger mb-4">
           {{ $page.props.flash.error }}
