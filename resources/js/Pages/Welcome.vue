@@ -110,7 +110,9 @@ function closeModals() {
 
 
     </div>
-    <!-- Footer -->
+
+  </section>
+      <!-- Footer -->
 <footer class="bg-[#182235] text-gray-200 text-center sm:text-left py-8 px-6 border-t border-gray-700">
   <div class="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-6">
 
@@ -137,5 +139,4 @@ function closeModals() {
     <br class="sm:hidden" /> Developed by <span class="text-[#FF2D2D] font-semibold">Washwise Team.</span>
   </div>
 </footer>
-  </section>
 </template>
