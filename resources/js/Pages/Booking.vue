@@ -219,8 +219,19 @@ watch(
           <input type="date" v-model="form.date_of_booking" class="w-full p-2 border rounded focus:ring-2 focus:ring-[#002B5C]" required :min="minDate"/>
           <input type="time" v-model="form.time_of_booking" class="w-full p-2 border rounded focus:ring-2 focus:ring-[#002B5C]" required :min="minTime"/>
 
-          <input type="number" v-model="form.slot_number" min="1" max="4" class="w-full p-2 border rounded focus:ring-2 focus:ring-[#002B5C]" required/>
-
+          <div class="space-y-2">
+  <label for="slot_number" class="block text-gray-700">Slot Number</label>
+  <input
+    id="slot_number"
+    type="number"
+    v-model="form.slot_number"
+    min="1"
+    max="4"
+    class="w-full p-2 border rounded focus:ring-2 focus:ring-[#002B5C]"
+    required
+  />
+  <p class="text-sm text-gray-600">Selected: Slot {{ form.slot_number || 1 }}</p>
+</div>
 <!-- ✅ Services Offered Section (Clickable Image Support) -->
 <div>
   <label class="block text-sm font-semibold text-gray-700 mb-1">Services Offered</label>
@@ -249,6 +260,7 @@ watch(
     class="w-full p-2 border rounded focus:ring-2 focus:ring-[#002B5C]"
     placeholder="Specify services you want"
     rows="3"
+    required
   ></textarea>
 
   <div v-if="form.errors.services_offered" class="text-red-600 text-sm mt-1">
@@ -359,4 +371,31 @@ watch(
     </div>
     <div v-else class="text-red-600 font-medium text-center mt-10">Shop not found.</div>
   </div>
+      <!-- Footer -->
+<footer class="bg-[#182235] text-gray-200 text-center sm:text-left py-8 px-6 border-t border-gray-700">
+  <div class="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-6">
+
+    <!-- About -->
+    <div>
+      <h2 class="text-lg font-bold text-white mb-3">About WashWise</h2>
+      <p class="text-sm leading-relaxed">
+        WashWise is your trusted platform for booking car wash services — connecting customers and business owners for a smoother, cleaner experience every day.
+      </p>
+    </div>
+    <!-- Contact Info -->
+    <div>
+      <h2 class="text-lg font-bold text-white mb-3">Contact Us</h2>
+      <ul class="text-sm space-y-1">
+        <li>📞 +63 992 759 4673</li>
+        <li>✉️ washwise00@gmail.com</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Bottom Bar -->
+  <div class="border-t border-gray-700 mt-8 pt-4 text-center text-xs text-gray-400">
+    © {{ new Date().getFullYear() }} WashWise. All rights reserved.
+    <br class="sm:hidden" /> Developed by <span class="text-[#FF2D2D] font-semibold">Washwise Team.</span>
+  </div>
+</footer>
 </template>

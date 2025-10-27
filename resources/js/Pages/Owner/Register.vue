@@ -66,7 +66,7 @@ function submit() {
   <div class="w-full bg-white flex flex-col sm:flex-row items-center sm:justify-between gap-2 px-4 sm:px-8 py-2 border-b border-gray-200 text-xs sm:text-sm font-semibold text-center sm:text-left">
     <img src="/images/washwiselogo2.png" alt="WashWise Logo" class="h-12 sm:h-14 w-auto block mx-auto sm:mx-0" draggable="false" />
     <div class="flex flex-col sm:flex-row gap-1 sm:gap-6 items-center text-[#002B5C]">
-      <div class="flex items-center gap-2"><span class="hidden sm:inline">📞</span> <span class="font-bold">Call Us</span> <span class="font-normal">+012 345 6789</span></div>
+      <div class="flex items-center gap-2"><span class="hidden sm:inline">📞</span> <span class="font-bold">Call Us</span> <span class="font-normal">+639927594673/09927594673</span></div>
       <div class="flex items-center gap-2"><span class="hidden sm:inline">✉️</span> <span class="font-bold">Email Us</span> <span class="font-normal">washwise00@gmail.com</span></div>
     </div>
   </div>
@@ -223,6 +223,33 @@ function submit() {
       </div>
     </div>
   </div>
+      <!-- Footer -->
+<footer class="bg-[#182235] text-gray-200 text-center sm:text-left py-8 px-6 border-t border-gray-700">
+  <div class="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-6">
+
+    <!-- About -->
+    <div>
+      <h2 class="text-lg font-bold text-white mb-3">About WashWise</h2>
+      <p class="text-sm leading-relaxed">
+        WashWise is your trusted platform for booking car wash services — connecting customers and business owners for a smoother, cleaner experience every day.
+      </p>
+    </div>
+    <!-- Contact Info -->
+    <div>
+      <h2 class="text-lg font-bold text-white mb-3">Contact Us</h2>
+      <ul class="text-sm space-y-1">
+        <li>📞 +63 992 759 4673</li>
+        <li>✉️ washwise00@gmail.com</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Bottom Bar -->
+  <div class="border-t border-gray-700 mt-8 pt-4 text-center text-xs text-gray-400">
+    © {{ new Date().getFullYear() }} WashWise. All rights reserved.
+    <br class="sm:hidden" /> Developed by <span class="text-[#FF2D2D] font-semibold">Washwise Team.</span>
+  </div>
+</footer>
 </template>
 
 <style>

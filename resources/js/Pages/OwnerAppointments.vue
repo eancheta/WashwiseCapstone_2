@@ -109,6 +109,7 @@
               <th class="px-3 sm:px-4 py-3 hidden md:table-cell">Services</th>
               <th class="px-3 sm:px-4 py-3 hidden md:table-cell">Contact</th>
               <th class="px-3 sm:px-4 py-3 hidden md:table-cell">Slot</th>
+              <th class="px-3 sm:px-4 py-3 hidden md:table-cell">Type of Appointment</th>
               <th class="px-3 sm:px-4 py-3 hidden lg:table-cell">Created</th>
               <th class="px-3 sm:px-4 py-3 text-center hidden md:table-cell">Payment Proof</th>
               <th class="px-3 sm:px-4 py-3 text-center hidden sm:table-cell">Amount</th>
@@ -138,6 +139,13 @@
               <td class="px-3 sm:px-4 py-3 hidden md:table-cell">{{ appt.services_offered || 'N/A' }}</td>
               <td class="px-3 sm:px-4 py-3 hidden md:table-cell">{{ appt.contact_no }}</td>
               <td class="px-3 sm:px-4 py-3 hidden md:table-cell">{{ appt.slot_number }}</td>
+              <td class="px-3 sm:px-4 py-3 hidden md:table-cell">
+  <span
+    :class="appt.email ? 'text-blue-600 font-semibold' : 'text-gray-700 font-semibold'"
+  >
+    {{ appt.email ? 'Book Online' : 'Walk-In' }}
+  </span>
+</td>
               <td class="px-3 sm:px-4 py-3 hidden lg:table-cell">{{ appt.created_at }}</td>
 
               <td class="px-3 sm:px-4 py-3 text-center hidden md:table-cell">
@@ -235,6 +243,33 @@
       ✕
     </button>
   </div>
+      <!-- Footer -->
+<footer class="bg-[#182235] text-gray-200 text-center sm:text-left py-8 px-6 border-t border-gray-700">
+  <div class="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-6">
+
+    <!-- About -->
+    <div>
+      <h2 class="text-lg font-bold text-white mb-3">About WashWise</h2>
+      <p class="text-sm leading-relaxed">
+        WashWise is your trusted platform for booking car wash services — connecting customers and business owners for a smoother, cleaner experience every day.
+      </p>
+    </div>
+    <!-- Contact Info -->
+    <div>
+      <h2 class="text-lg font-bold text-white mb-3">Contact Us</h2>
+      <ul class="text-sm space-y-1">
+        <li>📞 +63 992 759 4673</li>
+        <li>✉️ washwise00@gmail.com</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Bottom Bar -->
+  <div class="border-t border-gray-700 mt-8 pt-4 text-center text-xs text-gray-400">
+    © {{ new Date().getFullYear() }} WashWise. All rights reserved.
+    <br class="sm:hidden" /> Developed by <span class="text-[#FF2D2D] font-semibold">Washwise Team.</span>
+  </div>
+</footer>
 </template>
 
 <script setup lang="ts">

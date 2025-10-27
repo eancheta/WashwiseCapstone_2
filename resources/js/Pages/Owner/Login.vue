@@ -68,7 +68,7 @@ const resetPassword = () => {
       </div>
       <div class="flex flex-col sm:flex-row gap-2 sm:gap-8 text-[#002B5C] items-center text-xs sm:text-sm">
         <div class="flex items-center gap-2">
-          <span>📞</span> Call Us <span class="font-normal">+012 345 6789</span>
+          <span>📞</span> Call Us <span class="font-normal">+639927594673/09927594673</span>
         </div>
         <div class="flex items-center gap-2">
           <span>✉️</span> Email Us <span class="font-normal">washwise00@gmail.com</span>
