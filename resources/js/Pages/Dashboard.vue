@@ -2,6 +2,8 @@
 import { Head } from '@inertiajs/vue3'
 import { ref, computed } from 'vue'
 import { Inertia } from '@inertiajs/inertia'
+const selectedStatus = ref<'all' | 'open' | 'closed'>('all')
+
 
 const sidebarOpen = ref(false)
 function toggleSidebar() { sidebarOpen.value = !sidebarOpen.value }
@@ -62,9 +64,21 @@ const cancelReminder = () => {
 }
 
 const filteredShops = computed(() => {
-  if (selectedDistrict.value === 'all') return props.shops
-  return props.shops.filter((shop) => shop.district == selectedDistrict.value)
+  let shops = props.shops
+
+  // Filter by district
+  if (selectedDistrict.value !== 'all') {
+    shops = shops.filter((shop) => shop.district == selectedDistrict.value)
+  }
+
+  // Filter by status (open/closed)
+  if (selectedStatus.value !== 'all') {
+    shops = shops.filter((shop) => shop.status === selectedStatus.value)
+  }
+
+  return shops
 })
+
 
 function getLogoSrc(shop: Shop) {
   if (!shop.logo) return '/images/default-carwash.png'
@@ -119,25 +133,26 @@ function handleImgError(e: Event) {
     <main class="flex-1 p-4 sm:p-8">
       <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-900 text-center">Available Car Wash Services</h1>
 
-      <!-- 📍 District Selector -->
-      <div class="mt-6 bg-white/80 backdrop-blur-lg rounded-xl shadow-md p-4 border border-gray-100">
-        <label for="district" class="block text-sm font-medium text-gray-900 mb-1">Nearby</label>
-        <div class="relative">
-          <select
-            id="district"
-            v-model="selectedDistrict"
-            class="block w-full appearance-none rounded-xl border border-gray-300 bg-gradient-to-r from-white via-gray-50 to-white px-4 py-2 pr-10 text-gray-900 shadow focus:border-[#FF2D2D] focus:ring-2 focus:ring-[#FF2D2D] text-sm transition"
-          >
-            <option value="all">All Districts</option>
-            <option v-for="d in props.districts" :key="d" :value="d">District {{ d }}</option>
-          </select>
-          <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-            <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-            </svg>
-          </div>
-        </div>
-      </div>
+<div class="mt-6 bg-white/80 backdrop-blur-lg rounded-xl shadow-md p-4 border border-gray-100 grid grid-cols-1 sm:grid-cols-2 gap-4">
+  <!-- District Filter -->
+  <div>
+    <label for="district" class="block text-sm font-medium text-gray-900 mb-1">Nearby</label>
+    <select id="district" v-model="selectedDistrict" class="block w-full appearance-none rounded-xl border border-gray-300 px-4 py-2 pr-10 text-gray-900 shadow focus:border-[#FF2D2D] focus:ring-2 focus:ring-[#FF2D2D] text-sm transition">
+      <option value="all">All Districts</option>
+      <option v-for="d in props.districts" :key="d" :value="d">District {{ d }}</option>
+    </select>
+  </div>
+
+  <!-- Status Filter -->
+  <div>
+    <label for="status" class="block text-sm font-medium text-gray-900 mb-1">Shop Status</label>
+    <select id="status" v-model="selectedStatus" class="block w-full appearance-none rounded-xl border border-gray-300 px-4 py-2 pr-10 text-gray-900 shadow focus:border-[#FF2D2D] focus:ring-2 focus:ring-[#FF2D2D] text-sm transition">
+      <option value="all">All Shops</option>
+      <option value="open">🟢 Open Shops</option>
+      <option value="closed">🔴 Closed Shops</option>
+    </select>
+  </div>
+</div>
 
       <!-- 🧽 Shops List -->
       <div v-if="filteredShops.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
@@ -198,7 +213,7 @@ function handleImgError(e: Event) {
   </div>
       <!-- Footer -->
 <footer class="bg-[#182235] text-gray-200 text-center sm:text-left py-8 px-6 border-t border-gray-700">
-  <div class="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-6">
+  <div class="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-6">
 
     <!-- About -->
     <div>

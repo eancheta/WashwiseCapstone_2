@@ -30,7 +30,6 @@ class RegisteredUserController extends Controller
         'name' => 'required|string|max:255',
         'email' => 'required|email|unique:users,email',
         'password' => 'required|string|min:8|confirmed',
-        'picture_id' => 'nullable|image|mimes:jpg,jpeg,png|max:5120', // ✅ added validation
     ]);
 
     // Generate 6-digit verification code & hash password
@@ -38,24 +37,7 @@ class RegisteredUserController extends Controller
     $data['password'] = Hash::make($data['password']);
     $data['status'] = 'not verified';
 
-    // ✅ Cloudinary upload for picture ID
-    if ($request->hasFile('picture_id')) {
-        $cloudinary = new Cloudinary([
-            'cloud' => [
-                'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
-                'api_key'    => env('CLOUDINARY_API_KEY'),
-                'api_secret' => env('CLOUDINARY_API_SECRET'),
-            ],
-            'url' => ['secure' => true],
-        ]);
 
-        $file = $request->file('picture_id');
-        $response = $cloudinary->uploadApi()->upload($file->getRealPath(), [
-            'folder' => 'user_ids',
-            'resource_type' => 'image',
-        ]);
-        $data['picture_id'] = $response['secure_url'];
-    }
 
     // Create user
     $user = User::create($data);

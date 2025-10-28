@@ -200,73 +200,153 @@ watch(
         <div v-if="overlapError" class="bg-red-100 text-red-800 p-2 rounded-lg text-sm">{{ overlapError }}</div>
 
         <form @submit.prevent="submit" class="space-y-4">
-          <input type="text" v-model="form.name" placeholder="Your Name" class="w-full p-2 border rounded focus:ring-2 focus:ring-[#002B5C]" required/>
-          <input type="email" v-model="form.email" placeholder="Email Address" class="w-full p-2 border rounded focus:ring-2 focus:ring-[#002B5C]" required/>
-          <select v-model="form.size_of_the_car" class="w-full p-2 border rounded focus:ring-2 focus:ring-[#002B5C]" required>
-            <option value="">Select Car Types</option>
-            <option>HatchBack</option>
-            <option>Sedan</option>
-            <option>MPV</option>
-            <option>SUV</option>
-            <option>Pickup</option>
-            <option>Van</option>
-            <option>Motorcycle</option>
-          </select>
+  <!-- Name -->
+  <div>
+    <label class="block text-gray-700 font-medium">
+      <span class="text-red-600">*</span> Name <span class="text-gray-500">(Required)</span>
+    </label>
+    <input
+      type="text"
+      v-model="form.name"
+      placeholder="Your Name"
+      class="w-full p-2 border rounded focus:ring-2 focus:ring-[#002B5C]"
+      required
+    />
+  </div>
 
-          <input type="text" v-model="form.contact_no" placeholder="09XXXXXXXXX" class="w-full p-2 border rounded focus:ring-2 focus:ring-[#002B5C]" required maxlength="11" @input="limitContactLength"/>
+  <!-- Email -->
+  <div>
+    <label class="block text-gray-700 font-medium">
+      <span class="text-red-600">*</span> Email <span class="text-gray-500">(Required)</span>
+    </label>
+    <input
+      type="email"
+      v-model="form.email"
+      placeholder="Email Address"
+      class="w-full p-2 border rounded focus:ring-2 focus:ring-[#002B5C]"
+      required
+    />
+  </div>
+  <!-- Car Type -->
+  <div>
+    <label class="block text-gray-700 font-medium">
+      <span class="text-red-600">*</span> Car Type <span class="text-gray-500">(Required)</span>
+    </label>
+    <select
+      v-model="form.size_of_the_car"
+      class="w-full p-2 border rounded focus:ring-2 focus:ring-[#002B5C]"
+      required
+    >
+      <option value="">Select Car Type</option>
+      <option>HatchBack</option>
+      <option>Sedan</option>
+      <option>MPV</option>
+      <option>SUV</option>
+      <option>Pickup</option>
+      <option>Van</option>
+      <option>Motorcycle</option>
+    </select>
+  </div>
 
-          <!-- Date & Time with restrictions -->
-          <input type="date" v-model="form.date_of_booking" class="w-full p-2 border rounded focus:ring-2 focus:ring-[#002B5C]" required :min="minDate"/>
-          <input type="time" v-model="form.time_of_booking" class="w-full p-2 border rounded focus:ring-2 focus:ring-[#002B5C]" required :min="minTime"/>
+            <!-- Contact Number -->
+  <div>
+    <label class="block text-gray-700 font-medium">
+      <span class="text-red-600">*</span> Contact Number <span class="text-gray-500">(Required)</span>
+    </label>
+    <input
+      type="text"
+      v-model="form.contact_no"
+      placeholder="09XXXXXXXXX"
+      class="w-full p-2 border rounded focus:ring-2 focus:ring-[#002B5C]"
+      required
+      maxlength="11"
+      @input="limitContactLength"
+    />
+  </div>
 
-          <div class="space-y-2">
-  <label for="slot_number" class="block text-gray-700">Slot Number</label>
-  <input
-    id="slot_number"
-    type="number"
-    v-model="form.slot_number"
-    min="1"
-    max="4"
-    class="w-full p-2 border rounded focus:ring-2 focus:ring-[#002B5C]"
-    required
-  />
-  <p class="text-sm text-gray-600">Selected: Slot {{ form.slot_number || 1 }}</p>
-</div>
-<!-- ✅ Services Offered Section (Clickable Image Support) -->
-<div>
-  <label class="block text-sm font-semibold text-gray-700 mb-1">Services Offered</label>
+  <!-- Date -->
+  <div>
+    <label class="block text-gray-700 font-medium">
+      <span class="text-red-600">*</span> Date of Booking <span class="text-gray-500">(Required)</span>
+    </label>
+    <input
+      type="date"
+      v-model="form.date_of_booking"
+      class="w-full p-2 border rounded focus:ring-2 focus:ring-[#002B5C]"
+      required
+      :min="minDate"
+    />
+  </div>
 
-  <div v-if="shop.services_offered">
-    <!-- Check if it's an image URL -->
-    <div v-if="shop.services_offered.match(/\.(jpg|jpeg|png|gif|webp)$/i) || shop.services_offered.startsWith('http')">
-      <img
-        :src="shop.services_offered.startsWith('http') ? shop.services_offered : `/storage/${shop.services_offered}`"
-        alt="Services Offered"
-        class="h-24 w-24 object-contain rounded border cursor-pointer hover:scale-105 transition"
-        @click="openQr(shop.services_offered.startsWith('http') ? shop.services_offered : `/storage/${shop.services_offered}`)"
-      />
+  <!-- Time -->
+  <div>
+    <label class="block text-gray-700 font-medium">
+      <span class="text-red-600">*</span> Time of Booking <span class="text-gray-500">(Required)</span>
+    </label>
+    <input
+      type="time"
+      v-model="form.time_of_booking"
+      class="w-full p-2 border rounded focus:ring-2 focus:ring-[#002B5C]"
+      required
+      :min="minTime"
+    />
+  </div>
+
+  <!-- Slot -->
+  <div class="space-y-2">
+    <label for="slot_number" class="block text-gray-700 font-medium">
+      <span class="text-red-600">*</span> Slot Number <span class="text-gray-500">(Required)</span>
+    </label>
+    <input
+      id="slot_number"
+      type="number"
+      v-model="form.slot_number"
+      min="1"
+      max="4"
+      class="w-full p-2 border rounded focus:ring-2 focus:ring-[#002B5C]"
+      required
+    />
+    <p class="text-sm text-gray-600">Selected: Slot {{ form.slot_number || 1 }}</p>
+  </div>
+  <!-- Services Offered -->
+  <div>
+    <label class="block text-gray-700 font-medium mb-1">
+      <span class="text-red-600">*</span> Services Offered <span class="text-gray-500">(Required)</span>
+    </label>
+
+    <div v-if="shop.services_offered">
+      <!-- If it's an image -->
+      <div v-if="shop.services_offered.match(/\.(jpg|jpeg|png|gif|webp)$/i) || shop.services_offered.startsWith('http')">
+        <img
+          :src="shop.services_offered.startsWith('http') ? shop.services_offered : `/storage/${shop.services_offered}`"
+          alt="Services Offered"
+          class="h-24 w-24 object-contain rounded border cursor-pointer hover:scale-105 transition"
+          @click="openQr(shop.services_offered.startsWith('http') ? shop.services_offered : `/storage/${shop.services_offered}`)"
+        />
+      </div>
+
+      <!-- Otherwise, show text -->
+      <p v-else class="text-gray-700 text-sm">{{ shop.services_offered }}</p>
     </div>
 
-    <!-- Otherwise show text -->
-    <p v-else class="text-gray-700 text-sm">{{ shop.services_offered }}</p>
-  </div>
+    <div v-else class="text-gray-500 italic text-sm">No services listed</div>
 
-  <div v-else class="text-gray-500 italic text-sm">No services listed</div>
+    <!-- User’s requested service -->
+    <label class="block text-gray-700 font-medium mt-3">
+      <span class="text-red-600">*</span> Services Requested <span class="text-gray-500">(Required)</span>
+    </label>
+    <textarea
+      v-model="form.services_offered"
+      class="w-full p-2 border rounded focus:ring-2 focus:ring-[#002B5C]"
+      placeholder="Specify services you want"
+      rows="3"
+      required
+    ></textarea>
 
-  <!-- User’s request input -->
-  <label class="block text-sm font-semibold text-gray-700 mt-3">Services Requested</label>
-  <textarea
-    v-model="form.services_offered"
-    class="w-full p-2 border rounded focus:ring-2 focus:ring-[#002B5C]"
-    placeholder="Specify services you want"
-    rows="3"
-    required
-  ></textarea>
-
-  <div v-if="form.errors.services_offered" class="text-red-600 text-sm mt-1">
+      <div v-if="form.errors.services_offered" class="text-red-600 text-sm mt-1">
     {{ form.errors.services_offered }}
   </div>
-</div>
+  </div>
 
           <div v-if="form.date_of_booking" class="mt-4">
             <h3 class="text-sm font-semibold text-gray-700 mb-2">Taken Slots on {{ formattedDate }} (View Only)</h3>
@@ -373,7 +453,7 @@ watch(
   </div>
       <!-- Footer -->
 <footer class="bg-[#182235] text-gray-200 text-center sm:text-left py-8 px-6 border-t border-gray-700">
-  <div class="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-6">
+  <div class="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-6">
 
     <!-- About -->
     <div>

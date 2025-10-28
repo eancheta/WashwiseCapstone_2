@@ -116,37 +116,51 @@ function submit() {
       <h2 class="text-2xl font-bold text-center text-[#182235]">Register as Owner</h2>
       <p class="text-center text-gray-500 mb-4">Enter your details below to create your account</p>
 
-      <!-- Name, Email, Password, Confirm Password, District, Address -->
+      <!-- Name -->
       <div>
-        <Label for="name" class="text-gray-700 font-medium text-sm">Name</Label>
+        <Label for="name" class="text-gray-700 font-medium text-sm">
+          <span class="text-red-600">*</span> Name <span class="text-gray-500">(Required)</span>
+        </Label>
         <input id="name" type="text" required autofocus autocomplete="name" v-model="form.name"
           placeholder="Full name" class="w-full text-black border border-gray-200 px-4 py-3 rounded-lg bg-gray-100"/>
         <InputError :message="form.errors.name" />
       </div>
 
+      <!-- Email -->
       <div>
-        <Label for="email" class="text-gray-700 font-medium text-sm">Email</Label>
+        <Label for="email" class="text-gray-700 font-medium text-sm">
+          <span class="text-red-600">*</span> Email <span class="text-gray-500">(Required)</span>
+        </Label>
         <input id="email" type="email" required autocomplete="email" v-model="form.email"
           placeholder="email@example.com" class="w-full text-black border border-gray-200 px-4 py-3 rounded-lg bg-gray-100"/>
         <InputError :message="form.errors.email" />
       </div>
 
+      <!-- Password -->
       <div>
-        <Label for="password" class="text-gray-700 font-medium text-sm">Password</Label>
+        <Label for="password" class="text-gray-700 font-medium text-sm">
+          <span class="text-red-600">*</span> Password <span class="text-gray-500">(Required)</span>
+        </Label>
         <input id="password" type="password" required autocomplete="new-password" v-model.trim="form.password"
           placeholder="Password" class="w-full text-black border border-gray-200 px-4 py-3 rounded-lg bg-gray-100"/>
         <InputError :message="form.errors.password" />
       </div>
 
+      <!-- Confirm Password -->
       <div>
-        <Label for="password_confirmation" class="text-gray-700 font-medium text-sm">Confirm Password</Label>
+        <Label for="password_confirmation" class="text-gray-700 font-medium text-sm">
+          <span class="text-red-600">*</span> Confirm Password <span class="text-gray-500">(Required)</span>
+        </Label>
         <input id="password_confirmation" type="password" required autocomplete="new-password" v-model="form.password_confirmation"
           placeholder="Confirm password" class="w-full text-black border border-gray-200 px-4 py-3 rounded-lg bg-gray-100"/>
         <InputError :message="form.errors.password_confirmation" />
       </div>
 
+      <!-- District -->
       <div>
-        <Label for="district" class="text-gray-700 font-medium text-sm">District</Label>
+        <Label for="district" class="text-gray-700 font-medium text-sm">
+          <span class="text-red-600">*</span> District <span class="text-gray-500">(Required)</span>
+        </Label>
         <select id="district" v-model="form.district" required class="w-full text-black border border-gray-200 px-4 py-3 rounded-lg bg-gray-100">
           <option value="">Select District</option>
           <option v-for="n in 6" :key="n" :value="n">{{ n }}</option>
@@ -154,33 +168,42 @@ function submit() {
         <InputError :message="form.errors.district" />
       </div>
 
+      <!-- Address -->
       <div>
-        <Label for="address" class="text-gray-700 font-medium text-sm">Address</Label>
-        <input placeholder="Enter address" v-model="form.address" id="address" type="text"
+        <Label for="address" class="text-gray-700 font-medium text-sm">
+          <span class="text-red-600">*</span> Address <span class="text-gray-500">(Required)</span>
+        </Label>
+        <input placeholder="Enter address" v-model="form.address" id="address" type="text" required
           class="w-full text-black border border-gray-200 px-4 py-3 rounded-lg bg-gray-100"/>
         <InputError :message="form.errors.address" />
       </div>
 
       <!-- Photo uploads -->
       <div>
-        <Label for="photo1" class="text-gray-700 font-medium text-sm">Business permit picture 1</Label>
-        <input type="file" id="photo1" @change="handlePhoto1Change"
+        <Label for="photo1" class="text-gray-700 font-medium text-sm">
+          <span class="text-red-600">*</span> Business Permit Picture 1 <span class="text-gray-500">(Required)</span>
+        </Label>
+        <input type="file" id="photo1" required @change="handlePhoto1Change"
           class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4"/>
         <img v-if="preview1" :src="preview1" alt="Photo 1 preview" class="mt-2 w-28 h-28 sm:w-32 sm:h-32 object-cover border rounded"/>
         <InputError :message="form.errors.photo1" />
       </div>
 
       <div>
-        <Label for="photo2" class="text-gray-700 font-medium text-sm">Business permit picture 2</Label>
-        <input type="file" id="photo2" @change="handlePhoto2Change"
+        <Label for="photo2" class="text-gray-700 font-medium text-sm">
+          <span class="text-red-600">*</span> Business Permit Picture 2 <span class="text-gray-500">(Required)</span>
+        </Label>
+        <input type="file" id="photo2" required @change="handlePhoto2Change"
           class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4"/>
         <img v-if="preview2" :src="preview2" alt="Photo 2 preview" class="mt-2 w-28 h-28 sm:w-32 sm:h-32 object-cover border rounded"/>
         <InputError :message="form.errors.photo2" />
       </div>
 
       <div>
-        <Label for="photo3" class="text-gray-700 font-medium text-sm">Business permit picture 3</Label>
-        <input type="file" id="photo3" @change="handlePhoto3Change"
+        <Label for="photo3" class="text-gray-700 font-medium text-sm">
+          <span class="text-red-600">*</span> Business Permit Picture 3 <span class="text-gray-500">(Required)</span>
+        </Label>
+        <input type="file" id="photo3" required @change="handlePhoto3Change"
           class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4"/>
         <img v-if="preview3" :src="preview3" alt="Photo 3 preview" class="mt-2 w-28 h-28 sm:w-32 sm:h-32 object-cover border rounded"/>
         <InputError :message="form.errors.photo3" />
@@ -191,12 +214,15 @@ function submit() {
         <input id="terms" type="checkbox" v-model="agreedToTerms"
           class="mt-1 w-4 h-4 rounded border-gray-300 text-[#FF2D2D] focus:ring-[#FF2D2D]"/>
         <label for="terms" class="text-gray-700 text-sm">
-          I agree to the
+          <span class="text-red-600">*</span> I agree to the
           <button type="button" @click="openTermsModal" class="text-[#FF2D2D] underline">Terms and Conditions</button>
+          <span class="text-gray-500">(Required)</span>
         </label>
       </div>
 
-      <button type="submit" class="mt-2 w-full py-3 bg-[#FF2D2D] text-white font-semibold rounded-lg" :disabled="form.processing">Register</button>
+      <button type="submit" class="mt-2 w-full py-3 bg-[#FF2D2D] text-white font-semibold rounded-lg" :disabled="form.processing">
+        Register
+      </button>
     </form>
 
     <!-- Terms Modal -->
@@ -225,7 +251,7 @@ function submit() {
   </div>
       <!-- Footer -->
 <footer class="bg-[#182235] text-gray-200 text-center sm:text-left py-8 px-6 border-t border-gray-700">
-  <div class="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-6">
+  <div class="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-6">
 
     <!-- About -->
     <div>

@@ -38,20 +38,7 @@ const form = useForm<RegisterForm>({
   picture_id: null,
 })
 
-// File upload handler
-const picturePreview = ref<string | null>(null)
 
-// File handler (same logic as handleLogoChange)
-function handlePictureChange(event: Event) {
-  const target = event.target as HTMLInputElement | null
-  if (target?.files?.length) {
-    form.picture_id = target.files[0]
-    picturePreview.value = URL.createObjectURL(target.files[0])
-  } else {
-    form.picture_id = null
-    picturePreview.value = null
-  }
-}
 
 // Form submission handler
 const submit = () => {
@@ -68,6 +55,15 @@ const submit = () => {
   })
 }
 
+function validateNameInput(e: Event) {
+  const input = e.target as HTMLInputElement
+  const cleaned = input.value.replace(/[^A-Za-z\s]/g, '')
+  if (input.value !== cleaned) {
+    alert('⚠️ Only letters and spaces are allowed in the name field.')
+  }
+  input.value = cleaned
+  form.name = cleaned
+}
 </script>
 
 <template>
@@ -121,101 +117,94 @@ const submit = () => {
         <p class="text-center text-gray-500 mb-4 text-sm sm:text-base">Enter your details below to create your account</p>
 
         <div class="grid gap-3 w-full">
-          <!-- Name -->
-          <div class="grid gap-1 w-full">
-            <Label for="name" class="text-gray-700 font-medium">Name</Label>
-            <Input
-              id="name"
-              type="text"
-              required
-              autofocus
-              autocomplete="name"
-              v-model="form.name"
-              placeholder="Full name"
-              class="w-full text-black"
-            />
-            <InputError :message="form.errors.name" />
-          </div>
+<!-- Name -->
+<div class="grid gap-1 w-full">
+  <Label for="name" class="text-gray-700 font-medium flex items-center gap-1">
+    Name <span class="text-red-500">*</span> <span class="text-xs text-gray-500">(Required)</span>
+  </Label>
+  <Input
+    id="name"
+    type="text"
+    required
+    autofocus
+    autocomplete="name"
+    v-model="form.name"
+    placeholder="Full name"
+    class="w-full text-black"
+    @input="validateNameInput"
+  />
+  <InputError :message="form.errors.name" />
+</div>
 
-          <!-- Email -->
-          <div class="grid gap-1 w-full">
-            <Label for="email" class="text-gray-700 font-medium">Email address</Label>
-            <Input
-              id="email"
-              type="email"
-              required
-              autocomplete="email"
-              v-model="form.email"
-              placeholder="email@example.com"
-              class="w-full text-black"
-            />
-            <InputError :message="form.errors.email" />
-          </div>
+<!-- Email -->
+<div class="grid gap-1 w-full">
+  <Label for="email" class="text-gray-700 font-medium flex items-center gap-1">
+    Email Address <span class="text-red-500">*</span> <span class="text-xs text-gray-500">(Required)</span>
+  </Label>
+  <Input
+    id="email"
+    type="email"
+    required
+    autocomplete="email"
+    v-model="form.email"
+    placeholder="email@example.com"
+    class="w-full text-black"
+  />
+  <InputError :message="form.errors.email" />
+</div>
 
-          <!-- Password -->
-          <div class="grid gap-1 w-full">
-            <Label for="password" class="text-gray-700 font-medium">Password</Label>
-            <Input
-              id="password"
-              type="password"
-              required
-              autocomplete="new-password"
-              v-model="form.password"
-              placeholder="Password"
-              class="w-full text-black"
-            />
-            <InputError :message="form.errors.password" />
-          </div>
+<!-- Password -->
+<div class="grid gap-1 w-full">
+  <Label for="password" class="text-gray-700 font-medium flex items-center gap-1">
+    Password <span class="text-red-500">*</span> <span class="text-xs text-gray-500">(Required)</span>
+  </Label>
+  <Input
+    id="password"
+    type="password"
+    required
+    autocomplete="new-password"
+    v-model="form.password"
+    placeholder="Password"
+    class="w-full text-black"
+  />
+  <InputError :message="form.errors.password" />
+</div>
 
-          <!-- Confirm Password -->
-          <div class="grid gap-1 w-full">
-            <Label for="password_confirmation" class="text-gray-700 font-medium">Confirm password</Label>
-            <Input
-              id="password_confirmation"
-              type="password"
-              required
-              autocomplete="new-password"
-              v-model="form.password_confirmation"
-              placeholder="Confirm password"
-              class="w-full text-black"
-            />
-            <InputError :message="form.errors.password_confirmation" />
-          </div>
-  <div>
-    <label class="block text-sm font-semibold text-gray-700">Picture ID</label>
-    <div class="mt-1 flex items-center">
-      <input
-        type="file"
-        required
-        accept="image/*"
-        @change="handlePictureChange"
-        class="w-full p-3 border border-gray-300 rounded-xl text-gray-900
-               focus:ring-2 focus:ring-[#002B5C] focus:outline-none shadow-sm
-               file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0
-               file:text-sm file:font-semibold file:bg-[#002B5C] file:text-white
-               hover:file:bg-[#003b7a] cursor-pointer"
-      />
-    </div>
+<!-- Confirm Password -->
+<div class="grid gap-1 w-full">
+  <Label for="password_confirmation" class="text-gray-700 font-medium flex items-center gap-1">
+    Confirm Password <span class="text-red-500">*</span> <span class="text-xs text-gray-500">(Required)</span>
+  </Label>
+  <Input
+    id="password_confirmation"
+    type="password"
+    required
+    autocomplete="new-password"
+    v-model="form.password_confirmation"
+    placeholder="Confirm password"
+    class="w-full text-black"
+  />
+  <InputError :message="form.errors.password_confirmation" />
+</div>
 
-    <!-- Preview -->
-    <img v-if="picturePreview" :src="picturePreview" class="mt-2 w-32 h-32 object-cover border rounded" />
-  </div>
-
-  <!-- Terms and Conditions Checkbox -->
+<!-- Terms Checkbox -->
 <div class="flex items-start gap-2 mt-2">
   <input
     id="terms"
     type="checkbox"
     v-model="agreedToTerms"
+    required
     class="mt-1 w-4 h-4 rounded border-gray-300 text-[#FF2D2D] focus:ring-[#FF2D2D]"
   />
-  <label for="terms" class="text-gray-700 text-sm">
-    I agree to the
+  <label for="terms" class="text-gray-700 text-sm flex flex-wrap gap-1">
+    <span>Terms and Conditions <span class="text-red-500">*</span> <span class="text-xs text-gray-500">(Required)</span></span>
+    — I agree to the
     <button type="button" @click="openTermsModal" class="text-[#FF2D2D] underline">
       Terms and Conditions
     </button>
   </label>
 </div>
+
           <!-- Submit Button -->
           <Button
             type="submit"
@@ -279,3 +268,10 @@ const submit = () => {
 </div>
   </div>
 </template>
+<style scoped>
+.required::after {
+  content: " *";
+  color: #FF2D2D;
+  font-weight: bold;
+}
+</style>
