@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useForm, Head } from '@inertiajs/vue3'
+import { useForm, Head,router } from '@inertiajs/vue3'
 import { Button } from '@/components/ui/button'
 import InputError from '@/components/InputError.vue'
 
@@ -38,12 +38,27 @@ function handleIdNumberInput(e: Event) {
   input.value = cleaned
   form.id_number = cleaned
 }
+function goBack() {
+  router.visit('/dashboard')
+}
 </script>
 
 <template>
   <Head title="Verify Account" />
   <div class="min-h-screen bg-[#F8FAFC] flex items-center justify-center p-6">
+        <!-- Return Button -->
+    <div class="absolute top-4 left-4 z-20">
+      <button
+        @click="goBack"
+        type="button"
+        class="flex items-center gap-2 px-3 py-1.5 bg-gray-200 text-black rounded-lg text-sm font-medium shadow hover:bg-[#FF2D2D] hover:text-white transition"
+      >
+        ⬅ Return
+      </button>
+    </div>
     <div class="bg-white w-full max-w-lg p-8 rounded-2xl shadow-lg">
+
+
       <h2 class="text-2xl font-bold text-[#002B5C] mb-6 text-center">🪪 Verify Your Account</h2>
 
       <form @submit.prevent="submit" class="space-y-5">
