@@ -170,7 +170,7 @@ function handleImgError(e: Event) {
     <!-- ✅ BOOK BUTTON CONTROL -->
     <template v-if="shop.status === 'open'">
       <button
-        v-if="props.auth.user?.status === 'approved'"
+        v-if="props.auth.user?.status === 'Approved'"
         @click.prevent="openReminder(shop)"
         class="w-full sm:w-auto px-5 py-2 rounded-full bg-[#002B5C] text-white font-medium shadow hover:bg-[#FF2D2D] hover:scale-105 transition"
       >
