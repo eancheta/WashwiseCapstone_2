@@ -17,7 +17,7 @@ interface Shop {
   qr_code?: string | null
   status: string
 }
-interface AuthUser { id: number; name: string; email: string; email_verified_at?: string | null }
+interface AuthUser { id: number; name: string; email: string; email_verified_at?: string | null; status?: string; }
 interface Props { shops: Shop[]; districts: (string|number)[]; auth: { user: AuthUser | null } }
 
 const props = defineProps<Props>()
@@ -125,6 +125,9 @@ function handleImgError(e: Event) {
         <button @click.prevent="Inertia.get('/settings/profile')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 transition font-bold">⚙️ Edit Profile</button>
         <button @click.prevent="Inertia.get('/settings/password')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 transition font-bold">🔒 Password</button>
         <button @click.prevent="Inertia.get('/settings/appearance')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 transition font-bold">💳 Transaction History</button>
+        <button @click.prevent="Inertia.get('/settings/verify')" class="w-full text-left px-3 py-2 rounded-lg text-yellow-400 hover:bg-yellow-400/10 transition font-bold" >
+      ✅ Verify Now
+    </button>
         <button @click="logout" class="w-full text-left px-3 py-2 rounded-lg text-red-500 hover:bg-red-500/10 transition font-bold">🚪 Log Out</button>
       </nav>
     </aside>
@@ -154,28 +157,44 @@ function handleImgError(e: Event) {
   </div>
 </div>
 
-      <!-- 🧽 Shops List -->
-      <div v-if="filteredShops.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-        <div v-for="shop in filteredShops" :key="shop.id" class="bg-white shadow-md rounded-xl p-4 flex flex-col items-center text-center border border-gray-200 hover:shadow-xl hover:-translate-y-1 transition">
-          <img :src="getLogoSrc(shop)" alt="Car Wash Logo" class="h-20 w-20 object-contain mb-4" @error="handleImgError" />
-          <h3 class="text-lg font-semibold text-gray-800">{{ shop.name }}</h3>
-          <p class="text-sm text-gray-500 mb-2">{{ shop.address }}</p>
-          <p class="text-xs font-semibold mb-4" :class="shop.status === 'open' ? 'text-green-600' : 'text-red-600'">
-            {{ shop.status === 'open' ? '🟢 Open' : '🔴 Closed' }}
-          </p>
+<!-- 🧽 Shops List -->
+<div v-if="filteredShops.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+  <div v-for="shop in filteredShops" :key="shop.id" class="bg-white shadow-md rounded-xl p-4 flex flex-col items-center text-center border border-gray-200 hover:shadow-xl hover:-translate-y-1 transition">
+    <img :src="getLogoSrc(shop)" alt="Car Wash Logo" class="h-20 w-20 object-contain mb-4" @error="handleImgError" />
+    <h3 class="text-lg font-semibold text-gray-800">{{ shop.name }}</h3>
+    <p class="text-sm text-gray-500 mb-2">{{ shop.address }}</p>
+    <p class="text-xs font-semibold mb-4" :class="shop.status === 'open' ? 'text-green-600' : 'text-red-600'">
+      {{ shop.status === 'open' ? '🟢 Open' : '🔴 Closed' }}
+    </p>
 
-          <button v-if="shop.status === 'open'" @click.prevent="openReminder(shop)" class="w-full sm:w-auto px-5 py-2 rounded-full bg-[#002B5C] text-white font-medium shadow hover:bg-[#FF2D2D] hover:scale-105 transition">
-            Book Now
-          </button>
-          <button v-else disabled class="w-full sm:w-auto px-5 py-2 rounded-full bg-gray-400 text-white font-medium shadow cursor-not-allowed">
-            🚫 Closed
-          </button>
+    <!-- ✅ BOOK BUTTON CONTROL -->
+    <template v-if="shop.status === 'open'">
+      <button
+        v-if="props.auth.user?.status === 'approved'"
+        @click.prevent="openReminder(shop)"
+        class="w-full sm:w-auto px-5 py-2 rounded-full bg-[#002B5C] text-white font-medium shadow hover:bg-[#FF2D2D] hover:scale-105 transition"
+      >
+        Book Now
+      </button>
 
-          <a :href="`/customer/feedback/${shop.id}`" class="mt-2 w-full sm:w-auto px-5 py-2 rounded-full bg-[#FF2D2D] text-white font-medium shadow hover:bg-[#002B5C] hover:scale-105 transition">
-            Feedback
-          </a>
-        </div>
-      </div>
+      <button
+        v-else
+        disabled
+        class="w-full sm:w-auto px-5 py-2 rounded-full bg-gray-400 text-white font-medium shadow cursor-not-allowed"
+      >
+        ⚠️ Not Approved
+      </button>
+    </template>
+
+    <button v-else disabled class="w-full sm:w-auto px-5 py-2 rounded-full bg-gray-400 text-white font-medium shadow cursor-not-allowed">
+      🚫 Closed
+    </button>
+
+    <a :href="`/customer/feedback/${shop.id}`" class="mt-2 w-full sm:w-auto px-5 py-2 rounded-full bg-[#FF2D2D] text-white font-medium shadow hover:bg-[#002B5C] hover:scale-105 transition">
+      Feedback
+    </a>
+  </div>
+</div>
 
       <p v-else class="text-gray-500 text-center mt-8">No approved shops available.</p>
     </main>

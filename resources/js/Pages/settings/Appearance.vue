@@ -1,6 +1,5 @@
 <script setup lang="ts">
-
-import { withDefaults } from 'vue';
+import { withDefaults, ref, computed } from 'vue'
 import { Head, router } from '@inertiajs/vue3'
 
 function goBack() {
@@ -35,7 +34,22 @@ const props = withDefaults(defineProps<{
   bookings: () => [],
   message: null,
   pageTitle: 'Transaction History'
-});
+})
+
+// ✅ Search + Sort
+const searchQuery = ref('')
+const selectedStatus = ref<'all' | 'pending' | 'approved' | 'declined'>('all')
+
+// ✅ Filtered bookings
+const filteredBookings = computed(() => {
+  return props.bookings.filter((b) => {
+    const matchesSearch = b.shop.name.toLowerCase().includes(searchQuery.value.toLowerCase())
+    const matchesStatus =
+      selectedStatus.value === 'all' ||
+      (b.payment_status?.toLowerCase() === selectedStatus.value)
+    return matchesSearch && matchesStatus
+  })
+})
 </script>
 
 <template>
@@ -55,7 +69,26 @@ const props = withDefaults(defineProps<{
     ⬅ Return
   </button>
 </div>
+<div class="flex flex-col sm:flex-row justify-between items-center gap-3 mb-4">
+  <!-- 🔍 Search Bar -->
+  <input
+    v-model="searchQuery"
+    type="text"
+    placeholder="Search by Shop Name..."
+    class="w-full sm:w-1/2 px-3 py-2 border rounded-lg shadow-sm text-gray-900 focus:ring-2 focus:ring-[#002B5C] focus:outline-none"
+  />
 
+  <!-- ⚙️ Sort Dropdown -->
+  <select
+    v-model="selectedStatus"
+    class="w-full sm:w-1/3 px-3 py-2 border rounded-lg shadow-sm text-gray-900 focus:ring-2 focus:ring-[#FF2D2D] focus:outline-none"
+  >
+    <option value="all">All Status</option>
+    <option value="pending">Pending</option>
+    <option value="approved">Approved</option>
+    <option value="declined">Declined</option>
+  </select>
+</div>
 
       <div v-if="props.bookings.length > 0" class="overflow-x-auto">
         <table class="min-w-full bg-white border border-gray-200 rounded-lg text-sm">
@@ -71,7 +104,7 @@ const props = withDefaults(defineProps<{
             </tr>
           </thead>
     <tbody class="text-[#182235] font-medium">
-    <tr v-for="b in props.bookings" :key="`${b.shop.id}-${b.id}`" class="border-b hover:bg-gray-50 transition">
+    <tr v-for="b in filteredBookings" :key="`${b.shop.id}-${b.id}`" class="border-b hover:bg-gray-50 transition">
     <td class="px-4 py-3 font-medium">{{ b.shop.name }}</td>
     <td class="px-4 py-3">{{ b.size_of_the_car }}</td>
     <td class="px-4 py-3">{{ b.date_of_booking }}</td>

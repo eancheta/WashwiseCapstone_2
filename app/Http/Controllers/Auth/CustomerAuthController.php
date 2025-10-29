@@ -35,14 +35,9 @@ public function login(Request $request)
         return back()->withErrors(['email' => 'Your account is not verified. Please check your email.'])->withInput();
     }
 
-    // Block login if customer not yet approved
-    if ($user->customer_status !== 'Approved') {
-        return back()->withErrors(['email' => 'Your account is pending approval by the admin.'])->withInput();
-    }
-
     // Check password
     if (! Hash::check($data['password'], $user->password)) {
-        return back()->withErrors(['email' => 'Invalid credentials'])->withInput();
+        return back()->withErrors(['email' => 'Wrong Password or Email'])->withInput();
     }
 
     // Login approved & verified user

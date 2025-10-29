@@ -31,6 +31,13 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use app\Http\Middleware\EnsureUserIsVerified;
 
 use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\VerifyNow;
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/settings/verify', [VerifyNow::class, 'index'])->name('verify.index');
+    Route::post('/settings/verify', [VerifyNow::class, 'store'])->name('verify.store');
+});
+
 
 Route::post('/forgot-password/send-code', [ForgotPasswordController::class, 'sendCode'])->name('password.sendCode');
 Route::post('/forgot-password/reset', [ForgotPasswordController::class, 'resetPassword'])->name('password.reset');

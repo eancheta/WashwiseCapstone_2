@@ -175,7 +175,7 @@ public function update(Request $request)
             return redirect()->intended(route('carwashownerdashboard'));
         }
 
-        return back()->withErrors(['email' => 'Invalid credentials'])->withInput();
+        return back()->withErrors(['email' => 'Wrong Password or Email'])->withInput();
     }
 
     /**
