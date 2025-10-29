@@ -15,6 +15,7 @@ class User extends Authenticatable
         'password',
         'verification_code',
         'status',
+        'customer_status',
         'picture_id',
         'id_number',
     ];
