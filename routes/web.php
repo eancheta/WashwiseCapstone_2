@@ -32,22 +32,53 @@ use app\Http\Middleware\EnsureUserIsVerified;
 
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\VerifyNow;
-use App\Mail\BookingReminderMail;
-use Illuminate\Support\Facades\Mail;
 
-Route::get('/test-booking-reminder', function () {
-    $data = [
-        'customer_name' => 'John Doe',
-        'service_name' => 'Sedan Wash',
-        'date_time' => '2025-10-30 2:00 PM',
-        'car_wash_name' => 'Sparkle Auto Wash',
-        'car_wash_address' => '123 Main St',
+Route::get('/test-brevo-reminder', function () {
+    // test recipient — replace with the email you control
+    $recipient = 'youremail@example.com';
+
+    // payload data used by your blade view
+    $emailData = [
+        'customer_name'    => 'John Doe',
+        'service_name'     => 'Sedan Wash',
+        'date_time'        => '2025-10-30 19:00', // human readable
+        'car_wash_name'    => 'Sparkle Auto Wash',
+        'car_wash_address' => '123 Main Street, Metro City',
     ];
 
-    Mail::to('cireancheta2003@gmail.com')->send(new BookingReminderMail($data));
-    return 'Test email sent';
-});
+    // render the blade to html (same view your mailables use)
+    $html = view('emails.booking_reminder', $emailData)->render();
 
+    $apiKey = env('SENDINBLUE_API_KEY');
+
+    // POST to Brevo (SendinBlue) SMTP endpoint
+    $response = Http::withHeaders([
+        'api-key'      => $apiKey,
+        'Content-Type' => 'application/json',
+    ])->post('https://api.sendinblue.com/v3/smtp/email', [
+        'sender' => [
+            'name'  => env('MAIL_FROM_NAME', 'WashWise'),
+            'email' => env('MAIL_FROM_ADDRESS', 'no-reply@washwise.local'),
+        ],
+        'to' => [
+            ['email' => $recipient, 'name' => $emailData['customer_name']],
+        ],
+        'subject'     => 'Booking Reminder — ' . $emailData['car_wash_name'],
+        'htmlContent' => $html,
+    ]);
+
+    // Log response for debugging
+    \Log::info('Brevo test send', [
+        'status' => $response->status(),
+        'body'   => $response->body(),
+    ]);
+
+    // return the response so you can view it in the browser
+    return response()->json([
+        'status' => $response->status(),
+        'body'   => $response->json(),
+    ]);
+});
 
 
 
