@@ -44,7 +44,7 @@ Route::get('/test-booking-reminder', function () {
         'car_wash_address' => '123 Main St',
     ];
 
-    Mail::to('youremail@example.com')->send(new BookingReminderMail($data));
+    Mail::to('cireancheta2003@gmail.com')->send(new BookingReminderMail($data));
     return 'Test email sent';
 });
 
