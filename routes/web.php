@@ -35,19 +35,19 @@ use App\Http\Controllers\VerifyNow;
 use App\Mail\BookingReminderMail;
 use Illuminate\Support\Facades\Mail;
 
-Route::get('/test-email', function () {
-    $booking = (object)[
-        'name' => 'Eric',
-        'email' => 'Cireancheta2003@gmail.com',
-        'date_of_booking' => '2025-10-28',
-        'time_of_booking' => '20:00',
-        'car_wash_name' => 'Speedy Wash',
+Route::get('/test-booking-reminder', function () {
+    $data = [
+        'customer_name' => 'John Doe',
+        'service_name' => 'Sedan Wash',
+        'date_time' => '2025-10-30 2:00 PM',
+        'car_wash_name' => 'Sparkle Auto Wash',
+        'car_wash_address' => '123 Main St',
     ];
 
-    Mail::to($booking->email)->send(new BookingReminderMail($booking));
-
-    return '✅ Test email sent successfully.';
+    Mail::to('youremail@example.com')->send(new BookingReminderMail($data));
+    return 'Test email sent';
 });
+
 
 
 
