@@ -9,6 +9,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\BookingReminderMail;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+
 
 class ShopBookingController extends Controller
 {
@@ -283,4 +288,64 @@ public function confirmBooking(Request $request, int $shopId)
 
         return $shop;
     }
+
+    public function sendBookingReminders()
+{
+    $now = Carbon::now();
+    $nowPlus1Hour = $now->copy()->addHour()->format('Y-m-d H:i');
+
+    // Loop through all shops dynamically
+    $shops = CarWashShop::all();
+
+    foreach ($shops as $shop) {
+        $table = "bookings_shop_{$shop->id}";
+
+        if (!Schema::hasTable($table)) continue;
+
+        // Get bookings 1 hour ahead of now
+        $bookings = DB::table($table)
+            ->where('status', 'Approved')
+            ->get();
+
+        foreach ($bookings as $booking) {
+            $bookingDateTime = Carbon::parse("{$booking->date_of_booking} {$booking->time_of_booking}");
+
+            if ($bookingDateTime->isSameMinuteAs($nowPlus1Hour)) {
+                try {
+                    $emailData = [
+                        'customer_name' => $booking->name,
+                        'service_name' => $booking->size_of_the_car . ' Wash',
+                        'date_time' => $booking->date_of_booking . ' ' . $booking->time_of_booking,
+                        'car_wash_name' => $shop->name,
+                        'car_wash_address' => $shop->address,
+                    ];
+
+                    $apiKey = env('SENDINBLUE_API_KEY');
+                    $response = Http::withHeaders([
+                        'api-key'      => $apiKey,
+                        'Content-Type' => 'application/json',
+                    ])->post('https://api.sendinblue.com/v3/smtp/email', [
+                        'sender' => [
+                            'name'  => env('MAIL_FROM_NAME', 'WashWise'),
+                            'email' => env('MAIL_FROM_ADDRESS', 'no-reply@washwise.com'),
+                        ],
+                        'to' => [
+                            ['email' => $booking->email, 'name' => $booking->name],
+                        ],
+                        'subject' => '⏰ Reminder: Your Car Wash Appointment in 1 Hour',
+                        'htmlContent' => view('emails.booking_reminder', $emailData)->render(),
+                    ]);
+
+                    if ($response->failed()) {
+                        Log::error("Brevo reminder email failed: " . $response->body());
+                    }
+                } catch (\Exception $e) {
+                    Log::error('Failed to send reminder for booking ID: ' . $booking->id . ' | ' . $e->getMessage());
+                }
+            }
+        }
+    }
+
+    return response()->json(['message' => 'Reminder check completed']);
+}
 }
