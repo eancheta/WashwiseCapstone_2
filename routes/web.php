@@ -38,7 +38,7 @@ use Illuminate\Support\Facades\Mail;
 Route::get('/test-email', function () {
     $booking = (object)[
         'name' => 'Eric',
-        'email' => 'eric@example.com',
+        'email' => 'Cireancheta2003@gmail.com',
         'date_of_booking' => '2025-10-28',
         'time_of_booking' => '20:00',
         'car_wash_name' => 'Speedy Wash',
