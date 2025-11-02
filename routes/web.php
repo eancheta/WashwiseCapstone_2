@@ -32,6 +32,26 @@ use app\Http\Middleware\EnsureUserIsVerified;
 
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\VerifyNow;
+use App\Mail\BookingReminderMail;
+use Illuminate\Support\Facades\Mail;
+
+Route::get('/test-email', function () {
+    // Fake booking data
+    $booking = (object)[
+        'name' => 'John Doe',
+        'shop_name' => 'Clean Car Wash',
+        'date_of_booking' => '2025-10-30',
+        'time_of_booking' => '10:00 AM',
+    ];
+
+    // Send test email
+    Mail::to('youremail@example.com')->send(new BookingReminderMail($booking));
+
+    return 'Booking reminder email sent!';
+});
+
+
+
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/settings/verify', [VerifyNow::class, 'index'])->name('verify.index');
