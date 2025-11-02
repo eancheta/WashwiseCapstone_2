@@ -35,7 +35,7 @@ use App\Http\Controllers\VerifyNow;
 
 Route::get('/test-brevo-reminder', function () {
     // test recipient — replace with the email you control
-    $recipient = 'youremail@example.com';
+    $recipient = 'cireancheta2003@gmail.com';
 
     // payload data used by your blade view
     $emailData = [
