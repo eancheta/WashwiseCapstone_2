@@ -36,18 +36,17 @@ use App\Mail\BookingReminderMail;
 use Illuminate\Support\Facades\Mail;
 
 Route::get('/test-email', function () {
-    // Fake booking data
     $booking = (object)[
-        'name' => 'John Doe',
-        'shop_name' => 'Clean Car Wash',
-        'date_of_booking' => '2025-10-30',
-        'time_of_booking' => '10:00 AM',
+        'name' => 'Eric',
+        'email' => 'eric@example.com',
+        'date_of_booking' => '2025-10-28',
+        'time_of_booking' => '20:00',
+        'car_wash_name' => 'Speedy Wash',
     ];
 
-    // Send test email
-    Mail::to('youremail@example.com')->send(new BookingReminderMail($booking));
+    Mail::to($booking->email)->send(new BookingReminderMail($booking));
 
-    return 'Booking reminder email sent!';
+    return '✅ Test email sent successfully.';
 });
 
 

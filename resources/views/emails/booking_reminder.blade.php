@@ -5,15 +5,15 @@
     <title>Booking Reminder</title>
 </head>
 <body style="font-family: Arial, sans-serif;">
-    <h2>Hi {{ $name }},</h2>
+    <h2>Hi {{ $customer_name }},</h2>
 
     <p>This is a friendly reminder from <strong>WashWise</strong> about your upcoming car wash booking.</p>
 
     <ul>
-        <li><strong>Shop:</strong> {{ $shopName }}</li>
-        <li><strong>Address:</strong> {{ $address }}</li>
-        <li><strong>Date:</strong> {{ $date }}</li>
-        <li><strong>Time:</strong> {{ $time }}</li>
+        <li><strong>Shop:</strong> {{ $car_wash_name }}</li>
+        <li><strong>Address:</strong> {{ $car_wash_address }}</li>
+        <li><strong>Date & Time:</strong> {{ $date_time }}</li>
+        <li><strong>Service:</strong> {{ $service_name }}</li>
     </ul>
 
     <p>🕐 Please arrive at least 10 minutes before your scheduled time to avoid delays.</p>
