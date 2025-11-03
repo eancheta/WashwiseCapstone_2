@@ -270,10 +270,6 @@ public function confirmBooking(Request $request, int $shopId)
     return redirect()->route('dashboard')
         ->with('success', "Booked on slot #{$data['slot_number']} at {$shop->name}. Payment proof uploaded.");
 }
-
-    /**
-     * Helper: Get shop with Cloudinary images
-     */
     private function getShopWithCloudinaryImages(int $shopId)
     {
         $shop = CarWashShop::findOrFail($shopId);
