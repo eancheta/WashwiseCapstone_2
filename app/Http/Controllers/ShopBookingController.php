@@ -292,7 +292,7 @@ public function confirmBooking(Request $request, int $shopId)
     public function sendBookingReminders()
 {
     $now = Carbon::now();
-    $nowPlus1Hour = $now->copy()->addHour()->format('Y-m-d H:i');
+    $nowPlus1Hour = $now->copy()->addHour();
 
     // Loop through all shops dynamically
     $shops = CarWashShop::all();
