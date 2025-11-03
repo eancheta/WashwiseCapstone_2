@@ -3,7 +3,9 @@
 namespace App\Console;
 
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use App\Http\Controllers\ShopBookingController;
 
+use Illuminate\Console\Scheduling\Schedule;
 class Kernel extends ConsoleKernel
 {
     protected $commands = [
@@ -11,8 +13,11 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\TestCloudinaryUpload::class,
     ];
 
-    protected function schedule(\Illuminate\Console\Scheduling\Schedule $schedule)
+    protected function schedule(Schedule $schedule)
     {
+                $schedule->call(function () {
+            app(ShopBookingController::class)->sendBookingReminders();
+        })->everyMinute();
         // $schedule->command('inspire')->hourly();
     }
 
