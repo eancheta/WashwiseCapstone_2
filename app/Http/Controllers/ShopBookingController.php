@@ -310,9 +310,10 @@ public function confirmBooking(Request $request, int $shopId)
             $bookingDateTime = Carbon::parse("{$booking->date_of_booking} {$booking->time_of_booking}");
 
            if ($bookingDateTime->between(
-    $now->copy()->addHour()->subMinutes(5),
-    $now->copy()->addHour()->addMinutes(5)
-))  {
+    $now->copy()->addHour()->subMinutes(30),
+    $now->copy()->addHour()->addMinutes(30)
+)) {
+    Log::info("⏰ Sending reminder for booking ID: {$booking->id} | Booking time: {$bookingDateTime}");
                 try {
                     $emailData = [
                         'customer_name' => $booking->name,
