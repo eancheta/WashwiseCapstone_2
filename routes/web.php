@@ -236,6 +236,17 @@ Route::get('/', fn() => Inertia::render('Welcome'))->name('home');
 | DEBUG / TEST
 |--------------------------------------------------------------------------
 */
+Route::get('/debug-time', function () {
+    date_default_timezone_set('Asia/Manila');
+    $now = \Carbon\Carbon::now();
+    $nowPlus1Hour = $now->copy()->addHour();
+
+    return response()->json([
+        'now' => $now->format('Y-m-d H:i:s'),
+        'now_plus_1_hour' => $nowPlus1Hour->format('Y-m-d H:i:s'),
+    ]);
+});
+
 Route::get('/test-auth', function () {
     return response()->json([
         'user' => Auth::user() ? Auth::user()->toArray() : null,
