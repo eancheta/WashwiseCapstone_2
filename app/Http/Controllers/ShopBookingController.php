@@ -287,6 +287,9 @@ public function confirmBooking(Request $request, int $shopId)
 
     public function sendBookingReminders()
 {
+    date_default_timezone_set('Asia/Manila');
+    $now = Carbon::now();
+
     $now = Carbon::now();
     $nowPlus1Hour = $now->copy()->addHour();
 
@@ -306,7 +309,10 @@ public function confirmBooking(Request $request, int $shopId)
         foreach ($bookings as $booking) {
             $bookingDateTime = Carbon::parse("{$booking->date_of_booking} {$booking->time_of_booking}");
 
-            if ($bookingDateTime->isSameMinuteAs($nowPlus1Hour)) {
+           if ($bookingDateTime->between(
+    $now->copy()->addHour()->subMinutes(5),
+    $now->copy()->addHour()->addMinutes(5)
+))  {
                 try {
                     $emailData = [
                         'customer_name' => $booking->name,

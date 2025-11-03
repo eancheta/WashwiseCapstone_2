@@ -33,6 +33,10 @@ use app\Http\Middleware\EnsureUserIsVerified;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\VerifyNow;
 
+
+Route::get('/send-reminders', [ShopBookingController::class, 'sendBookingReminders']);
+
+
 Route::get('/test-brevo-reminder', function () {
     // test recipient — replace with the email you control
     $recipient = 'cireancheta2003@gmail.com';
